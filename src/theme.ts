@@ -161,6 +161,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     Modal: Modal.extend({
       classNames: (_theme, props) => ({
         root: modalClasses.root,
+        inner: props.fullScreen ? modalClasses.fullScreenInner : undefined,
         content: props.fullScreen ? modalClasses.fullScreenContent : modalClasses.content,
       }),
       defaultProps: { transitionProps: overlayTransition },

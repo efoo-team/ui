@@ -13,6 +13,10 @@
   border-radius: 0;
 }
 
+.fullScreenInner {
+  left: 0;
+}
+
 .root :global(.mantine-Modal-title) {
   letter-spacing: -0.025em;
 }
