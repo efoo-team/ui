@@ -8,7 +8,7 @@ const options = [
 ];
 
 const meta = {
-  title: '入力 / 選択欄（Select・MultiSelect）',
+  title: '入力 / 選択欄（Select, MultiSelect）',
   component: Select,
   tags: ['autodocs'],
 } satisfies Meta<typeof Select>;

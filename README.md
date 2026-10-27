@@ -165,20 +165,20 @@ Popover の中で操作させる場合は、Escape で閉じられるように `
 
 ## 表示例
 
-部品ごとの表示例は、Storybook のサイドバーで「日本語名（Mantine の部品名）」から探せます。
+部品ごとの表示例は、Storybook のサイドバーで「日本語名（Mantine の部品名）」から探せます。サイドバーの検索欄に Mantine の部品名（例: `Radio`）を入れても見つかります。
 
 | 部品                                             | サイドバーの場所                                                                      |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------- |
-| AppShell・NavLink                                | 構造 / 画面の枠組みとナビゲーション（AppShell・NavLink）                              |
+| AppShell・NavLink                                | 構造 / 画面の枠組みとナビゲーション（AppShell, NavLink）                              |
 | Button                                           | 操作 / ボタン（Button）                                                               |
 | Tabs                                             | 操作 / タブ（Tabs）                                                                   |
-| TextInput・Textarea・NumberInput・PasswordInput  | 入力 / テキスト入力欄（TextInput・Textarea・NumberInput・PasswordInput）              |
-| Select・MultiSelect                              | 入力 / 選択欄（Select・MultiSelect）                                                  |
-| Checkbox・Radio・Switch                          | 入力 / チェック・選択・切り替え（Checkbox・Radio・Switch）                            |
-| Button・TextInput・Checkbox・Radio・Switch・Tabs | 入力 / フォーカスの見え方（Button・TextInput・Checkbox・Radio・Switch・Tabs）         |
-| Table・Card・Badge                               | 表示 / 表・カード・バッジ（Table・Card・Badge）                                       |
-| Skeleton・Tooltip                                | 表示 / 読み込み表示とツールチップ（Skeleton・Tooltip）                                |
-| Menu・Popover・Modal・Drawer                     | 重ねて表示 / メニュー・補足表示・モーダル・側面パネル（Menu・Popover・Modal・Drawer） |
+| TextInput・Textarea・NumberInput・PasswordInput  | 入力 / テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）              |
+| Select・MultiSelect                              | 入力 / 選択欄（Select, MultiSelect）                                                  |
+| Checkbox・Radio・Switch                          | 入力 / チェック・選択・切り替え（Checkbox, Radio, Switch）                            |
+| Button・TextInput・Checkbox・Radio・Switch・Tabs | 入力 / フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs）         |
+| Table・Card・Badge                               | 表示 / 表・カード・バッジ（Table, Card, Badge）                                       |
+| Skeleton・Tooltip                                | 表示 / 読み込み表示とツールチップ（Skeleton, Tooltip）                                |
+| Menu・Popover・Modal・Drawer                     | 重ねて表示 / メニュー・補足表示・モーダル・側面パネル（Menu, Popover, Modal, Drawer） |
 | Notification                                     | フィードバック / 通知（Notification）                                                 |
 | 開閉の動き                                       | 動き / 開閉の動き（Transition）                                                       |
 

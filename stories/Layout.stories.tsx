@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { AppShell, Button, Group, NavLink, Stack, Text, Title } from '@mantine/core';
 
 const meta = {
-  title: '構造 / 画面の枠組みとナビゲーション（AppShell・NavLink）',
+  title: '構造 / 画面の枠組みとナビゲーション（AppShell, NavLink）',
   component: AppShell,
   tags: ['autodocs'],
 } satisfies Meta<typeof AppShell>;

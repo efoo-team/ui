@@ -3,7 +3,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { Box, Button, Drawer, Group, Menu, Modal, Popover, Stack, Text } from '@mantine/core';
 
 const meta = {
-  title: '重ねて表示 / メニュー・補足表示・モーダル・側面パネル（Menu・Popover・Modal・Drawer）',
+  title: '重ねて表示 / メニュー・補足表示・モーダル・側面パネル（Menu, Popover, Modal, Drawer）',
   component: Menu,
   tags: ['autodocs'],
   parameters: {

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { NumberInput, PasswordInput, Stack, Text, Textarea, TextInput } from '@mantine/core';
 
 const meta = {
-  title: '入力 / テキスト入力欄（TextInput・Textarea・NumberInput・PasswordInput）',
+  title: '入力 / テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）',
   component: TextInput,
   tags: ['autodocs'],
 } satisfies Meta<typeof TextInput>;

@@ -12,7 +12,7 @@ import {
 } from '@mantine/core';
 
 const meta = {
-  title: '入力 / フォーカスの見え方（Button・TextInput・Checkbox・Radio・Switch・Tabs）',
+  title: '入力 / フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs）',
   tags: ['autodocs'],
 } satisfies Meta;
 

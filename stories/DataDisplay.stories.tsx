@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Badge, Card, Group, Stack, Table, Text, Title } from '@mantine/core';
 
 const meta = {
-  title: '表示 / 表・カード・バッジ（Table・Card・Badge）',
+  title: '表示 / 表・カード・バッジ（Table, Card, Badge）',
   component: Table,
   tags: ['autodocs'],
 } satisfies Meta<typeof Table>;

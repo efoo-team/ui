@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Box, Button, Group, Skeleton, Stack, Text, Tooltip } from '@mantine/core';
 
 const meta = {
-  title: '表示 / 読み込み表示とツールチップ（Skeleton・Tooltip）',
+  title: '表示 / 読み込み表示とツールチップ（Skeleton, Tooltip）',
   component: Skeleton,
   tags: ['autodocs'],
 } satisfies Meta<typeof Skeleton>;

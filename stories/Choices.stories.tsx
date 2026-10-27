@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Checkbox, Group, Radio, Stack, Switch, Text } from '@mantine/core';
 
 const meta = {
-  title: '入力 / チェック・選択・切り替え（Checkbox・Radio・Switch）',
+  title: '入力 / チェック・選択・切り替え（Checkbox, Radio, Switch）',
   component: Checkbox,
   tags: ['autodocs'],
 } satisfies Meta<typeof Checkbox>;
