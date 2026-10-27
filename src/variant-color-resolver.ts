@@ -38,12 +38,14 @@ export const efooVariantColorResolver: VariantColorsResolver = (input) => {
   }
 
   // shadcn/ui's outline uses the surface border, the body text and the accent hover instead of the filled color.
+  // The dark scheme adds a faint surface (--efoo-color-outline-*); the light scheme leaves them undefined.
   if (input.variant === 'outline') {
     return {
       ...resolved,
+      background: 'var(--efoo-color-outline-bg, transparent)',
       border: '1px solid var(--mantine-color-default-border)',
       color: 'var(--mantine-color-text)',
-      hover: 'var(--mantine-color-default-hover)',
+      hover: 'var(--efoo-color-outline-hover, var(--mantine-color-default-hover))',
     };
   }
 

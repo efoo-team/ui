@@ -8,4 +8,9 @@
     letter-spacing: normal;
     text-transform: none;
   }
+
+  /* shadcn/ui's outline Badge has no surface; Button and ActionIcon get one from the variant color resolver. */
+  .root[data-variant='outline'] {
+    background: transparent;
+  }
 }
