@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Button, Group, Skeleton, Stack, Text, Tooltip } from '@mantine/core';
+import { Box, Button, Group, Skeleton, Stack, Text, Tooltip } from '@mantine/core';
 
 const meta = {
-  title: '表示 / Skeleton・Tooltip',
+  title: '表示 / 読み込み表示とツールチップ（Skeleton・Tooltip）',
   component: Skeleton,
   tags: ['autodocs'],
 } satisfies Meta<typeof Skeleton>;
@@ -11,7 +11,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const SkeletonStates: Story = {
-  name: 'Skeleton / 読み込み中',
+  name: '読み込み中の表示',
+  parameters: {
+    docs: {
+      description: {
+        story: 'データの読み込み中に使う文章、画像、カードのプレースホルダーです。',
+      },
+    },
+  },
   render: () => (
     <Stack maw={420}>
       <Skeleton height={12} radius="xl" />
@@ -33,7 +40,14 @@ export const SkeletonStates: Story = {
 };
 
 export const TooltipStates: Story = {
-  name: 'Tooltip / 表示',
+  name: '補足説明の表示',
+  parameters: {
+    docs: {
+      description: {
+        story: '操作の補足を表示する Tooltip と、表示位置・表示までの時間を確認できます。',
+      },
+    },
+  },
   render: () => (
     <Group>
       <Tooltip label="補足の説明" withArrow>
@@ -48,5 +62,23 @@ export const TooltipStates: Story = {
         <Button variant="subtle">表示位置と遅延</Button>
       </Tooltip>
     </Group>
+  ),
+};
+
+export const TooltipOpened: Story = {
+  name: '表示中の補足説明',
+  parameters: {
+    docs: {
+      description: {
+        story: '補足説明を表示した状態で、面・文字・矢印の見た目を確認できます。',
+      },
+    },
+  },
+  render: () => (
+    <Box pos="relative" h={80}>
+      <Tooltip opened withinPortal={false} label="補足の説明" withArrow position="bottom">
+        <Button variant="outline">対象のボタン</Button>
+      </Tooltip>
+    </Box>
   ),
 };

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Stack, Tabs, Text } from '@mantine/core';
 
 const meta = {
-  title: '操作 / Tabs',
+  title: '操作 / タブ（Tabs）',
   component: Tabs,
   tags: ['autodocs'],
 } satisfies Meta<typeof Tabs>;
@@ -11,6 +11,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const VariantsAndOrientation: Story = {
+  name: '表示方法・向き・操作',
+  parameters: {
+    docs: {
+      description: {
+        story: '下線型、選択中を塗り分ける表示、縦向きのタブとキーボード操作を確認できます。',
+      },
+    },
+  },
   render: () => (
     <Stack gap="xl">
       <Tabs defaultValue="overview">

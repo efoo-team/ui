@@ -1,18 +1,33 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useDisclosure } from '@mantine/hooks';
-import { Button, Drawer, Group, Menu, Modal, Popover, Stack, Text } from '@mantine/core';
+import { Box, Button, Drawer, Group, Menu, Modal, Popover, Stack, Text } from '@mantine/core';
 
 const meta = {
-  title: '表示 / Menu・Popover・Modal・Drawer',
-  component: Button,
+  title: '重ねて表示 / メニュー・補足表示・モーダル・側面パネル（Menu・Popover・Modal・Drawer）',
+  component: Menu,
   tags: ['autodocs'],
-} satisfies Meta<typeof Button>;
+  parameters: {
+    docs: {
+      description: {
+        component:
+          '押して開くメニュー、補足表示（Popover）、モーダル、側面パネルの開閉例です。開いた状態の見た目は「開いた〜」の story で確認できます。開閉の動きは theme の既定値で、story では指定していません。',
+      },
+    },
+  },
+} satisfies Meta<typeof Menu>;
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = Omit<StoryObj<typeof meta>, 'args'>;
 
 export const MenuExample: Story = {
-  name: 'Menu / 開閉',
+  name: 'メニューの開閉',
+  parameters: {
+    docs: {
+      description: {
+        story: 'ボタンでメニューを開き、項目を選択できます。',
+      },
+    },
+  },
   render: () => (
     <Menu shadow="md" width={220}>
       <Menu.Target>
@@ -31,11 +46,19 @@ export const MenuExample: Story = {
 };
 
 export const PopoverExample: Story = {
-  name: 'Popover / 開閉',
+  name: '補足表示の開閉',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'ボタンで開く補足表示の位置と矢印を確認できます。内側にフォーカスが移るので、Escape で閉じて、フォーカスがボタンに戻ります。',
+      },
+    },
+  },
   render: () => (
-    <Popover width={280} position="bottom" withArrow shadow="md">
+    <Popover width={280} position="bottom" withArrow shadow="md" trapFocus returnFocus>
       <Popover.Target>
-        <Button variant="outline">Popover を開く</Button>
+        <Button variant="outline">補足表示を開く</Button>
       </Popover.Target>
       <Popover.Dropdown>
         <Stack gap="xs">
@@ -48,7 +71,14 @@ export const PopoverExample: Story = {
 };
 
 export const ModalExample: Story = {
-  name: 'Modal / 開閉・全画面',
+  name: 'モーダルの開閉',
+  parameters: {
+    docs: {
+      description: {
+        story: '通常のモーダルと全画面表示をボタンで開閉できます。',
+      },
+    },
+  },
   render: function ModalDemo() {
     const [opened, { open, close }] = useDisclosure(false);
     const [fullScreen, setFullScreen] = useDisclosure(false);
@@ -56,18 +86,12 @@ export const ModalExample: Story = {
     return (
       <Stack align="flex-start">
         <Group>
-          <Button onClick={open}>Modal を開く</Button>
+          <Button onClick={open}>モーダルを開く</Button>
           <Button variant="outline" onClick={setFullScreen.open}>
-            全画面 Modal を開く
+            全画面のモーダルを開く
           </Button>
         </Group>
-        <Modal
-          opened={opened}
-          onClose={close}
-          title="内容を確認"
-          centered
-          transitionProps={{ transition: 'pop', duration: 200 }}
-        >
+        <Modal opened={opened} onClose={close} title="内容を確認" centered>
           <Stack>
             <Text>保存前に入力内容を確認してください。</Text>
             <Group justify="flex-end">
@@ -78,13 +102,7 @@ export const ModalExample: Story = {
             </Group>
           </Stack>
         </Modal>
-        <Modal
-          opened={fullScreen}
-          onClose={setFullScreen.close}
-          fullScreen
-          title="全画面表示"
-          transitionProps={{ transition: 'fade', duration: 200 }}
-        >
+        <Modal opened={fullScreen} onClose={setFullScreen.close} fullScreen title="全画面表示">
           <Stack>
             <Text>全画面で表示したときの余白と境界線を確認できます。</Text>
             <Button onClick={setFullScreen.close}>閉じる</Button>
@@ -96,23 +114,23 @@ export const ModalExample: Story = {
 };
 
 export const DrawerExample: Story = {
-  name: 'Drawer / 開閉',
+  name: '側面パネルの開閉',
+  parameters: {
+    docs: {
+      description: {
+        story: '右側から開く詳細パネルを確認できます。',
+      },
+    },
+  },
   render: function DrawerDemo() {
     const [opened, { open, close }] = useDisclosure(false);
 
     return (
       <Stack align="flex-start">
         <Group>
-          <Button onClick={open}>Drawer を開く</Button>
+          <Button onClick={open}>側面パネルを開く</Button>
         </Group>
-        <Drawer
-          opened={opened}
-          onClose={close}
-          title="項目の詳細"
-          position="right"
-          size="md"
-          transitionProps={{ transition: 'pop', duration: 200 }}
-        >
+        <Drawer opened={opened} onClose={close} title="項目の詳細" position="right" size="md">
           <Stack>
             <Text>補足情報や編集フォームを表示します。</Text>
             <Button onClick={close}>閉じる</Button>
@@ -121,4 +139,157 @@ export const DrawerExample: Story = {
       </Stack>
     );
   },
+};
+
+export const MenuOpenedPreview: Story = {
+  name: '開いたメニュー',
+  parameters: {
+    docs: {
+      description: {
+        story: 'メニューを開いた状態で、項目の hover・無効・削除の見た目を確認できます。',
+      },
+    },
+  },
+  render: () => (
+    <Box pos="relative" h={260}>
+      <Menu
+        defaultOpened
+        withinPortal={false}
+        position="bottom-start"
+        hideDetached={false}
+        middlewares={{ flip: false, shift: false }}
+        shadow="md"
+        width={220}
+      >
+        <Menu.Target>
+          <Button>メニュー</Button>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Label>操作</Menu.Label>
+          <Menu.Item>詳細を見る</Menu.Item>
+          <Menu.Item>名前を変更</Menu.Item>
+          <Menu.Item disabled>利用できません</Menu.Item>
+          <Menu.Divider />
+          <Menu.Item color="red">削除</Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+    </Box>
+  ),
+};
+
+export const PopoverOpenedPreview: Story = {
+  name: '開いた補足表示',
+  parameters: {
+    docs: {
+      description: {
+        story: '補足表示を開いた状態で、面・矢印・文字の見た目を確認できます。',
+      },
+    },
+  },
+  render: () => (
+    <Box pos="relative" h={200}>
+      <Popover
+        defaultOpened
+        withinPortal={false}
+        width={280}
+        position="bottom-start"
+        hideDetached={false}
+        middlewares={{ flip: false, shift: false }}
+        withArrow
+        shadow="md"
+      >
+        <Popover.Target>
+          <Button variant="outline">補足表示</Button>
+        </Popover.Target>
+        <Popover.Dropdown>
+          <Stack gap="xs">
+            <Text fw={600}>確認内容</Text>
+            <Text size="sm">この領域に補足情報や操作を表示します。</Text>
+          </Stack>
+        </Popover.Dropdown>
+      </Popover>
+    </Box>
+  ),
+};
+
+export const ModalOpenedPreview: Story = {
+  name: '開いたモーダル',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '破線の枠内に、モーダルを開いた状態の面・タイトル・余白を表示します（背景の overlay は出しません）。',
+      },
+    },
+  },
+  render: () => (
+    <Box
+      pos="relative"
+      h={280}
+      style={{ border: '1px dashed var(--mantine-color-default-border)', overflow: 'hidden' }}
+    >
+      <Modal
+        opened
+        onClose={() => undefined}
+        title="内容を確認"
+        centered
+        withinPortal={false}
+        withOverlay={false}
+        trapFocus={false}
+        returnFocus={false}
+        styles={{
+          root: { position: 'absolute', inset: 0, zIndex: 0 },
+          inner: { position: 'absolute', inset: 0, padding: 0 },
+        }}
+      >
+        <Stack>
+          <Text>保存前に入力内容を確認してください。</Text>
+          <Group justify="flex-end">
+            <Button variant="default">戻る</Button>
+            <Button>確認しました</Button>
+          </Group>
+        </Stack>
+      </Modal>
+    </Box>
+  ),
+};
+
+export const DrawerOpenedPreview: Story = {
+  name: '開いた側面パネル',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '破線の枠内に、右側の側面パネルを開いた状態の面・タイトル・境界線を表示します（背景の overlay は出しません）。',
+      },
+    },
+  },
+  render: () => (
+    <Box
+      pos="relative"
+      h={280}
+      style={{ border: '1px dashed var(--mantine-color-default-border)', overflow: 'hidden' }}
+    >
+      <Drawer
+        opened
+        onClose={() => undefined}
+        title="項目の詳細"
+        position="right"
+        size="md"
+        withinPortal={false}
+        withOverlay={false}
+        trapFocus={false}
+        returnFocus={false}
+        styles={{
+          root: { position: 'absolute', inset: 0, zIndex: 0 },
+          inner: { position: 'absolute', inset: 0, padding: 0 },
+        }}
+      >
+        <Stack>
+          <Text>補足情報や編集フォームを表示します。</Text>
+          <Button>閉じる</Button>
+        </Stack>
+      </Drawer>
+    </Box>
+  ),
 };

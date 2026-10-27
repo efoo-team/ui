@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { NumberInput, PasswordInput, Stack, Text, Textarea, TextInput } from '@mantine/core';
 
 const meta = {
-  title: '入力 / テキスト入力欄',
+  title: '入力 / テキスト入力欄（TextInput・Textarea・NumberInput・PasswordInput）',
   component: TextInput,
   tags: ['autodocs'],
 } satisfies Meta<typeof TextInput>;
@@ -11,11 +11,25 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const VariantsAndStates: Story = {
+  name: '入力欄の種類と状態',
+  parameters: {
+    docs: {
+      description: {
+        story: 'テキスト、複数行、数値、パスワードの入力欄とその状態を確認できます。',
+      },
+    },
+  },
   render: () => (
     <Stack maw={440} gap="xl">
       <Stack gap="sm">
         <Text fw={600}>TextInput</Text>
-        <TextInput label="名前" placeholder="例：山田 太郎" />
+        <TextInput
+          label="名前"
+          placeholder="例：山田 太郎"
+          required
+          withAsterisk
+          description="画面に表示する名前を入力します。"
+        />
         <TextInput label="メールアドレス" placeholder="name@example.com" variant="filled" />
         <TextInput label="枠なし" placeholder="Unstyled" variant="unstyled" />
         <TextInput label="入力エラー" defaultValue="invalid" error="入力内容を確認してください" />
