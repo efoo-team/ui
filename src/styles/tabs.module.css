@@ -27,7 +27,7 @@
   }
 
   .root[data-variant='pills'] .tab:not([data-active]):not(:hover, :disabled, [data-disabled]) {
-    color: var(--efoo-color-tab-pills-text);
+    color: var(--efoo-color-tab-pills-text, var(--mantine-color-dimmed));
   }
 
   .root[data-variant='pills'] .tab {
