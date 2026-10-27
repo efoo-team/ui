@@ -1,0 +1,13 @@
+html,
+body,
+#storybook-root {
+  min-height: 100%;
+  margin: 0;
+}
+
+.storybook-canvas {
+  min-height: 100vh;
+  padding: 24px;
+  background: var(--mantine-color-body);
+  color: var(--mantine-color-text);
+}

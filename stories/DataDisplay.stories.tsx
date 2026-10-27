@@ -1,0 +1,129 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { Badge, Card, Group, Stack, Table, Text, Title } from '@mantine/core';
+
+const meta = {
+  title: '表示 / Table・Card・Badge',
+  component: Table,
+  tags: ['autodocs'],
+} satisfies Meta<typeof Table>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const TableExample: Story = {
+  name: 'Table / 内容と状態',
+  render: () => (
+    <Stack>
+      <Table striped highlightOnHover withTableBorder withColumnBorders verticalSpacing="md">
+        <Table.Thead>
+          <Table.Tr>
+            <Table.Th>項目</Table.Th>
+            <Table.Th>状態</Table.Th>
+            <Table.Th>担当</Table.Th>
+          </Table.Tr>
+        </Table.Thead>
+        <Table.Tbody>
+          <Table.Tr>
+            <Table.Td>サンプル項目 A</Table.Td>
+            <Table.Td>
+              <Badge>進行中</Badge>
+            </Table.Td>
+            <Table.Td>担当者 1</Table.Td>
+          </Table.Tr>
+          <Table.Tr>
+            <Table.Td>サンプル項目 B</Table.Td>
+            <Table.Td>
+              <Badge color="green" variant="light">
+                完了
+              </Badge>
+            </Table.Td>
+            <Table.Td>担当者 2</Table.Td>
+          </Table.Tr>
+          <Table.Tr>
+            <Table.Td>サンプル項目 C</Table.Td>
+            <Table.Td>
+              <Badge color="yellow" variant="outline">
+                確認中
+              </Badge>
+            </Table.Td>
+            <Table.Td>担当者 3</Table.Td>
+          </Table.Tr>
+        </Table.Tbody>
+      </Table>
+      <Table.ScrollContainer minWidth={480}>
+        <Table highlightOnHover>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>横幅がある表</Table.Th>
+              <Table.Th>数値</Table.Th>
+              <Table.Th>備考</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            <Table.Tr>
+              <Table.Td>サンプル項目</Table.Td>
+              <Table.Td>128</Table.Td>
+              <Table.Td>横幅に応じてスクロールできます</Table.Td>
+            </Table.Tr>
+          </Table.Tbody>
+        </Table>
+      </Table.ScrollContainer>
+      <Table withRowBorders={false} horizontalSpacing="xl">
+        <Table.Tbody>
+          <Table.Tr>
+            <Table.Td>区切り線なし</Table.Td>
+            <Table.Td>横余白を広げた表示</Table.Td>
+          </Table.Tr>
+          <Table.Tr>
+            <Table.Td>サンプル項目</Table.Td>
+            <Table.Td>内容</Table.Td>
+          </Table.Tr>
+        </Table.Tbody>
+      </Table>
+    </Stack>
+  ),
+};
+
+export const CardAndBadgeExamples: Story = {
+  name: 'Card・Badge / 見た目',
+  render: () => (
+    <Stack>
+      <Group>
+        <Badge>塗りつぶし</Badge>
+        <Badge variant="light">薄い背景</Badge>
+        <Badge variant="outline">枠線</Badge>
+        <Badge variant="dot">Dot</Badge>
+        <Badge color="green">完了</Badge>
+        <Badge color="red" variant="light">
+          要対応
+        </Badge>
+        <Badge size="lg">大</Badge>
+      </Group>
+      <Group align="stretch">
+        <Card w={300} shadow="sm" padding="lg" withBorder>
+          <Stack gap="sm">
+            <Group justify="space-between">
+              <Title order={4}>サンプルカード</Title>
+              <Badge variant="light">標準</Badge>
+            </Group>
+            <Text size="sm" c="dimmed">
+              カードは関連する情報と操作をひとまとまりに表示します。
+            </Text>
+            <Group justify="flex-end">
+              <Badge variant="outline">詳細</Badge>
+            </Group>
+          </Stack>
+        </Card>
+        <Card w={300} padding="lg" withBorder>
+          <Stack gap="sm">
+            <Title order={4}>状態を伝える</Title>
+            <Text size="sm">タイトル、説明、状態ラベルを組み合わせます。</Text>
+            <Badge color="green" variant="light">
+              利用可能
+            </Badge>
+          </Stack>
+        </Card>
+      </Group>
+    </Stack>
+  ),
+};

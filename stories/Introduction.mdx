@@ -1,0 +1,46 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="はじめに" />
+
+# efoo UI
+
+このリポジトリは、efoo のサービスで共通して使う Mantine のテーマと、その表示例をまとめています。画面の部品は Mantine を使い、色、余白、角丸、CSS 変数、部品ごとのスタイルをテーマでそろえています。
+
+## テーマを使う
+
+`@efoo-team/ui` をインストールした後、Mantine のスタイルとテーマを `MantineProvider` に渡します。
+
+```tsx
+import { MantineProvider } from '@mantine/core';
+import { efooTheme, efooCssVariablesResolver } from '@efoo-team/ui';
+import '@mantine/core/styles.css';
+
+export function App() {
+  return (
+    <MantineProvider theme={efooTheme} cssVariablesResolver={efooCssVariablesResolver}>
+      {/* アプリケーション */}
+    </MantineProvider>
+  );
+}
+```
+
+## サービスごとに調整する
+
+サービス固有の変更は `mergeThemeOverrides` で重ねます。共通テーマを直接変更せず、サービスに必要な差分だけを指定してください。
+
+```tsx
+import { MantineProvider, createTheme, mergeThemeOverrides } from '@mantine/core';
+import { efooTheme, efooCssVariablesResolver } from '@efoo-team/ui';
+
+const serviceTheme = mergeThemeOverrides(efooTheme, createTheme({ primaryColor: 'blue' }));
+
+export function App() {
+  return (
+    <MantineProvider theme={serviceTheme} cssVariablesResolver={efooCssVariablesResolver}>
+      {/* アプリケーション */}
+    </MantineProvider>
+  );
+}
+```
+
+上部ツールバーの「表示モード」からライトとダークを切り替え、各部品の表示を確認できます。
