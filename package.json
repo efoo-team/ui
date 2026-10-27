@@ -27,6 +27,7 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "build": "vite build --config vite.lib.config.ts && tsc --project tsconfig.build.json",
+    "prepare": "npm run build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "format:check": "prettier --check ."
@@ -34,7 +35,6 @@
   "peerDependencies": {
     "@mantine/core": "^9.7.4",
     "@mantine/hooks": "^9.7.4",
-    "@mantine/notifications": "^9.7.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
