@@ -58,7 +58,7 @@ Mantine の CSS は `styles.css` ではなく `styles.layer.css` を読み込み
 パッケージの CSS は読み込み順に関係なく Mantine の CSS に勝ちます。サービス側の指定との優先順位は次のとおりです。
 
 - Mantine の style props（`mt`・`c` など）、`style`、`styles` は、inline style か layer に入らない `<style>` として出力されるため、パッケージの CSS に常に勝ちます。
-- サービス側で書く layer に入らない CSS も、パッケージの CSS に勝ちます。詳細度を気にせずに調整できます。
+- サービス側で書く layer に入らない CSS も、パッケージの CSS に勝ちます。詳細度を気にせずに調整できます。ただし Notification の緩急は例外です。パッケージの CSS が `!important` で差し替えているため、layer に入らない CSS や、efoo より後に宣言した layer からは上書きできません。戻すには、サービスの theme で `components.Notifications.classNames.notification` を別の class に差し替えます。
 - サービス側で宣言する `@layer`（Tailwind CSS v4 の `theme, base, components, utilities` など）は、パッケージの CSS より先に宣言されるとパッケージの CSS に負けます。layer の順序は最初に宣言された順で決まるためです。サービス側の layer を優先させるには、CSS の先頭で `@layer mantine, efoo, theme, base, components, utilities;` のように順序をまとめて宣言します。
 - Mantine の CSS には `!important` の宣言が 20 件あります（Modal の全画面表示の角丸、AppShell の幅を変えている間の transition など）。layer に入った `!important` は layer に入らない `!important` にも勝つため、これらはサービス側の層なしの CSS では上書きできません。層なしの CSS が勝つのは、`!important` の付いていない宣言に対してだけです。
 
@@ -169,20 +169,20 @@ Popover の中で操作させる場合は、Escape で閉じられるように `
 
 部品ごとの表示例は、サイドバーの「日本語名（Mantine の部品名）」から探せます。サイドバーの検索欄に Mantine の部品名（例: `Radio`）を入れても見つかります。上部ツールバーの「ライト」「ダーク」のボタンで、表示を切り替えられます。
 
-| 部品                                             | サイドバーの場所                                                              |
-| ------------------------------------------------ | ----------------------------------------------------------------------------- |
-| AppShell・NavLink                                | 構造 / 画面の枠組みとナビゲーション（AppShell, NavLink）                      |
-| Button                                           | 操作 / ボタン（Button）                                                       |
-| Tabs                                             | 操作 / タブ（Tabs）                                                           |
-| TextInput・Textarea・NumberInput・PasswordInput  | 入力 / テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）      |
-| Select・MultiSelect                              | 入力 / 選択欄（Select, MultiSelect）                                          |
-| Checkbox・Radio・Switch                          | 入力 / チェック・選択・切り替え（Checkbox, Radio, Switch）                    |
-| Button・TextInput・Checkbox・Radio・Switch・Tabs | 入力 / フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs） |
-| Table・Card・Badge                               | 表示 / 表・カード・バッジ（Table, Card, Badge）                               |
-| Skeleton・Tooltip                                | 表示 / 読み込み表示とツールチップ（Skeleton, Tooltip）                        |
-| Menu・Popover・Modal・Drawer                     | 重ねて表示 / メニュー・モーダルほか（Menu, Popover, Modal, Drawer）           |
-| Notification                                     | フィードバック / 通知（Notification）                                         |
-| 開閉の動き                                       | 動き / 開閉の動き（Transition）                                               |
+| 部品                                             | サイドバーの場所                                                                                                                                                          |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AppShell・NavLink                                | [構造 / 画面の枠組みとナビゲーション（AppShell, NavLink）](?path=/docs/構造-画面の枠組みとナビゲーション（appshell-navlink）--docs)                                       |
+| Button                                           | [操作 / ボタン（Button）](?path=/docs/操作-ボタン（button）--docs)                                                                                                        |
+| Tabs                                             | [操作 / タブ（Tabs）](?path=/docs/操作-タブ（tabs）--docs)                                                                                                                |
+| TextInput・Textarea・NumberInput・PasswordInput  | [入力 / テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）](?path=/docs/入力-テキスト入力欄（textinput-textarea-numberinput-passwordinput）--docs)         |
+| Select・MultiSelect                              | [入力 / 選択欄（Select, MultiSelect）](?path=/docs/入力-選択欄（select-multiselect）--docs)                                                                               |
+| Checkbox・Radio・Switch                          | [入力 / チェック・選択・切り替え（Checkbox, Radio, Switch）](?path=/docs/入力-チェック・選択・切り替え（checkbox-radio-switch）--docs)                                    |
+| Button・TextInput・Checkbox・Radio・Switch・Tabs | [入力 / フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs）](?path=/docs/入力-フォーカスの見え方（button-textinput-checkbox-radio-switch-tabs）--docs) |
+| Table・Card・Badge                               | [表示 / 表・カード・バッジ（Table, Card, Badge）](?path=/docs/表示-表・カード・バッジ（table-card-badge）--docs)                                                          |
+| Skeleton・Tooltip                                | [表示 / 読み込み表示とツールチップ（Skeleton, Tooltip）](?path=/docs/表示-読み込み表示とツールチップ（skeleton-tooltip）--docs)                                           |
+| Menu・Popover・Modal・Drawer                     | [重ねて表示 / メニュー・モーダルほか（Menu, Popover, Modal, Drawer）](?path=/docs/重ねて表示-メニュー・モーダルほか（menu-popover-modal-drawer）--docs)                   |
+| Notification                                     | [フィードバック / 通知（Notification）](?path=/docs/フィードバック-通知（notification）--docs)                                                                            |
+| 開閉の動き                                       | [動き / 開閉の動き（Transition）](?path=/docs/動き-開閉の動き（transition）--docs)                                                                                        |
 
 ## ライセンス
 

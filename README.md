@@ -56,7 +56,7 @@ Mantine の CSS は `styles.css` ではなく `styles.layer.css` を読み込み
 パッケージの CSS は読み込み順に関係なく Mantine の CSS に勝ちます。サービス側の指定との優先順位は次のとおりです。
 
 - Mantine の style props（`mt`・`c` など）、`style`、`styles` は、inline style か layer に入らない `<style>` として出力されるため、パッケージの CSS に常に勝ちます。
-- サービス側で書く layer に入らない CSS も、パッケージの CSS に勝ちます。詳細度を気にせずに調整できます。
+- サービス側で書く layer に入らない CSS も、パッケージの CSS に勝ちます。詳細度を気にせずに調整できます。ただし Notification の緩急は例外です。パッケージの CSS が `!important` で差し替えているため、layer に入らない CSS や、efoo より後に宣言した layer からは上書きできません。戻すには、サービスの theme で `components.Notifications.classNames.notification` を別の class に差し替えます。
 - サービス側で宣言する `@layer`（Tailwind CSS v4 の `theme, base, components, utilities` など）は、パッケージの CSS より先に宣言されるとパッケージの CSS に負けます。layer の順序は最初に宣言された順で決まるためです。サービス側の layer を優先させるには、CSS の先頭で `@layer mantine, efoo, theme, base, components, utilities;` のように順序をまとめて宣言します。
 - Mantine の CSS には `!important` の宣言が 20 件あります（Modal の全画面表示の角丸、AppShell の幅を変えている間の transition など）。layer に入った `!important` は layer に入らない `!important` にも勝つため、これらはサービス側の層なしの CSS では上書きできません。層なしの CSS が勝つのは、`!important` の付いていない宣言に対してだけです。
 
