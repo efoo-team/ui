@@ -1,19 +1,28 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.root :global(.mantine-Checkbox-input) {
-  background-color: transparent;
-  border-color: var(--checkbox-color, var(--mantine-primary-color-filled));
-}
+@layer efoo {
+  .root {
+    --checkbox-size-sm: calc(1rem * var(--mantine-scale));
+  }
 
-.root :global(.mantine-Checkbox-input:checked),
-.root :global(.mantine-Checkbox-input[data-indeterminate]) {
-  background-color: var(--checkbox-color, var(--mantine-primary-color-filled));
-}
+  .input:disabled {
+    border-color: var(--mantine-color-default-border);
+    background-color: var(--mantine-color-default);
+  }
 
-.root :global(.mantine-Checkbox-input:disabled) {
-  opacity: 0.5;
-}
+  .inner:has(.input:disabled) {
+    opacity: 0.5;
+  }
 
-.root :global(.mantine-Checkbox-label[data-disabled]) {
-  color: var(--mantine-color-text);
-  opacity: 0.7;
+  .input:disabled:where(:checked, [data-indeterminate]) {
+    border-color: var(--checkbox-color);
+    background-color: var(--checkbox-color);
+  }
+
+  .root[data-variant='outline'] .input:disabled:where(:checked, [data-indeterminate]) {
+    background-color: transparent;
+  }
+
+  .input:disabled + .icon {
+    color: var(--checkbox-icon-color);
+  }
 }

@@ -1,29 +1,40 @@
-/* MantineHub-derived component styling with a dark-scheme label contrast fix; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.root :global(.mantine-Switch-label) {
-  color: var(--mantine-color-text);
-}
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+@layer efoo {
+  .root {
+    --switch-height-sm: calc(1.125rem * var(--mantine-scale));
+    --switch-width-sm: calc(2rem * var(--mantine-scale));
+    --switch-thumb-size-sm: calc(1rem * var(--mantine-scale));
+    --switch-track-label-padding-sm: calc(0.0625rem * var(--mantine-scale));
+    --switch-label-font-size-xs: calc(0.625rem * var(--mantine-scale));
+    --switch-label-font-size-sm: calc(0.625rem * var(--mantine-scale));
+    --switch-label-font-size-md: calc(0.625rem * var(--mantine-scale));
+    --switch-label-font-size-lg: calc(0.6875rem * var(--mantine-scale));
+    --switch-label-font-size-xl: calc(0.75rem * var(--mantine-scale));
+  }
 
-.root :global(.mantine-Switch-trackLabel) {
-  color: var(--mantine-color-white);
-}
+  .track {
+    --switch-bg: var(--mantine-color-default-border);
+  }
 
-:global([data-mantine-color-scheme='dark'])
-  .root
-  :global(.mantine-Switch-input:checked)
-  + :global(.mantine-Switch-track)
-  :global(.mantine-Switch-trackLabel) {
-  color: var(--mantine-primary-color-contrast);
-}
+  .input:checked + .track {
+    --switch-bg: var(--switch-color);
+    --switch-text-color: var(--efoo-switch-checked-contrast, var(--mantine-color-white));
+  }
 
-.root :global(.mantine-Switch-description) {
-  color: var(--mantine-color-dimmed);
-}
+  .input:focus-visible + .track {
+    outline: none;
+    box-shadow: var(--efoo-focus-ring);
+  }
 
-.root :global(.mantine-Switch-track) {
-  border-color: var(--mantine-color-default-border);
-}
+  .input:disabled + .track {
+    opacity: 0.5;
+  }
 
-.root :global(.mantine-Switch-thumb) {
-  background-color: var(--mantine-color-default);
-  border-color: var(--mantine-color-default-border);
+  .thumb {
+    --switch-thumb-bg: var(--mantine-color-white);
+  }
+
+  .input:checked + .track .thumb {
+    --switch-thumb-bg: var(--efoo-switch-checked-contrast, var(--mantine-color-white));
+  }
 }

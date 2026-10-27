@@ -1,7 +1,7 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.tooltip {
-  font-size: var(--mantine-font-size-xs);
-  padding-block: 0;
-  background-color: var(--mantine-color-primary-color-filled);
-  color: var(--mantine-color-primary-color-contrast);
+@layer efoo {
+  .tooltip {
+    padding: 0.375rem 0.75rem;
+    font-size: var(--mantine-font-size-xs);
+  }
 }

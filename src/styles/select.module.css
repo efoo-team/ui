@@ -1,18 +1,20 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.root :global(.mantine-Input-wrapper) {
-  --input-bg: transparent;
-  --input-bd: var(--mantine-color-default-border);
-  --input-bd-focus: var(--mantine-primary-color-filled);
-}
+@layer efoo {
+  .options {
+    --combobox-option-padding-sm: calc(0.25rem * var(--mantine-scale))
+      calc(0.5rem * var(--mantine-scale));
+  }
 
-:global(.mantine-Combobox-dropdown) {
-  background-color: var(--mantine-color-body);
-  border-color: var(--mantine-color-default-border);
-  border-radius: var(--mantine-radius-default);
-}
+  .option {
+    font-size: min(
+      var(--combobox-option-fz, var(--mantine-font-size-sm)),
+      var(--mantine-font-size-md)
+    );
+  }
 
-:global(.mantine-Combobox-option[data-combobox-selected]),
-:global(.mantine-Combobox-option[data-combobox-active]) {
-  background-color: var(--mantine-color-default-hover);
-  color: var(--mantine-color-text);
+  .option:hover:where(:not([data-combobox-disabled])),
+  .option[data-combobox-selected] {
+    background-color: var(--mantine-color-default-hover);
+    color: var(--mantine-color-text);
+  }
 }

@@ -1,14 +1,43 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.root {
-  --tab-border-color: var(--mantine-color-default-border);
-  --tabs-list-border-width: 1px;
-}
+@layer efoo {
+  .root {
+    --tab-hover-color: transparent;
+  }
 
-.root :global(.mantine-Tabs-tab) {
-  color: var(--mantine-color-dimmed);
-  transition: color var(--efoo-motion-duration-fast) var(--efoo-motion-easing);
-}
+  .tab {
+    color: var(--mantine-color-dimmed);
+    transition-property: color, background-color, box-shadow;
+    transition-duration: calc(var(--efoo-motion-duration-fast) * var(--efoo-motion-scale));
+    transition-timing-function: var(--efoo-motion-easing);
+  }
 
-.root :global(.mantine-Tabs-tab[data-active='true']) {
-  color: var(--mantine-color-text);
+  .tab:where(:hover:not(:disabled, [data-disabled]), [data-active]) {
+    color: var(--mantine-color-text);
+  }
+
+  .root[data-variant='pills'] .list {
+    gap: 0;
+    padding: 0.1875rem;
+    border-radius: calc(var(--tabs-radius) + 0.1875rem);
+    background-color: var(--mantine-color-default-hover);
+  }
+
+  .root[data-variant='pills'] .list:not([data-grow]) {
+    width: fit-content;
+  }
+
+  .root[data-variant='pills'] .tab {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid transparent;
+    font-weight: var(--mantine-font-weight-medium);
+  }
+
+  .root[data-variant='pills'] .tab[data-active] {
+    --tab-bg: var(--mantine-color-default);
+    border-color: var(--mantine-color-default-border);
+  }
+
+  .root[data-variant='pills'] .tab[data-active]:not(:focus-visible) {
+    box-shadow: var(--mantine-shadow-xs);
+  }
 }

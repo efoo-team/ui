@@ -1,8 +1,0 @@
-/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.root {
-  background-color: var(--mantine-color-default);
-}
-
-.root :global(.mantine-Card-section) {
-  border-color: var(--mantine-color-default-border);
-}

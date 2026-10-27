@@ -4,80 +4,108 @@
  * Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md.
  */
 import {
-  AppShell,
   Autocomplete,
   Badge,
   Button,
   Card,
   Checkbox,
+  CheckboxIndicator,
   Combobox,
   createTheme,
   Drawer,
+  Input,
+  InputWrapper,
   Menu,
   Modal,
   MultiSelect,
   NavLink,
   Notification,
-  NumberInput,
   PasswordInput,
+  Pill,
   Popover,
   Radio,
+  RadioGroup,
+  RadioIndicator,
   Select,
-  Skeleton,
   Switch,
   Table,
   Tabs,
-  Textarea,
-  TextInput,
+  ThemeIcon,
   Tooltip,
+  type MantineTheme,
   type MantineThemeOverride,
-  type TransitionProps,
 } from '@mantine/core';
-import { zincColors } from './colors';
-import { efooCssVariablesResolver } from './css-variable-resolver';
-import { efooVariantColorResolver } from './variant-color-resolver';
-import appShellClasses from './styles/app-shell.module.css';
+import {
+  blueColors,
+  darkColors,
+  grayColors,
+  greenColors,
+  redColors,
+  yellowColors,
+  zincColors,
+} from './colors.js';
+import { drawerTransitionProps, overlayTransitionProps } from './motion.js';
+import { efooVariantColorResolver, getZincContrast } from './variant-color-resolver.js';
+// Imported before the other styles so that dist/styles.css starts with the layer order.
+import baseClasses from './styles/base.module.css';
 import badgeClasses from './styles/badge.module.css';
 import buttonClasses from './styles/button.module.css';
-import cardClasses from './styles/card.module.css';
 import checkboxClasses from './styles/checkbox.module.css';
 import drawerClasses from './styles/drawer.module.css';
+import inlineInputClasses from './styles/inline-input.module.css';
 import inputClasses from './styles/input.module.css';
 import menuClasses from './styles/menu.module.css';
 import modalClasses from './styles/modal.module.css';
 import navLinkClasses from './styles/nav-link.module.css';
 import notificationClasses from './styles/notification.module.css';
-import popoverClasses from './styles/popover.module.css';
 import radioClasses from './styles/radio.module.css';
 import selectClasses from './styles/select.module.css';
-import skeletonClasses from './styles/skeleton.module.css';
 import switchClasses from './styles/switch.module.css';
 import tableClasses from './styles/table.module.css';
 import tabsClasses from './styles/tabs.module.css';
 import tooltipClasses from './styles/tooltip.module.css';
 
-const overlayTransition = {
-  transition: 'pop',
-  duration: 200,
-  timingFunction: 'cubic-bezier(0.16, 1, 0.3, 1)',
-} satisfies Partial<TransitionProps>;
+interface IconColorProps {
+  color?: string;
+  iconColor?: string;
+  variant?: string;
+}
 
-const comboboxProps = {
-  transitionProps: overlayTransition,
-};
+// Mantine computes the check and dot color without the color scheme and writes white inline.
+function getCheckboxIconColor(theme: MantineTheme, props: IconColorProps) {
+  if (props.iconColor) return undefined;
+  if (props.variant === 'outline') return 'var(--checkbox-color)';
+  return props.variant === 'light' ? undefined : getZincContrast(theme, props.color);
+}
+
+function getRadioIconColor(theme: MantineTheme, props: IconColorProps) {
+  if (props.iconColor || (props.variant !== undefined && props.variant !== 'filled')) {
+    return undefined;
+  }
+  return getZincContrast(theme, props.color);
+}
+
+const comboboxClassNames = { options: selectClasses.options, option: selectClasses.option };
+
+const overlayProps = { backgroundOpacity: 0.15, blur: 4 };
 
 export const efooTheme: MantineThemeOverride = createTheme({
   colors: {
     zinc: zincColors,
-    secondary: zincColors,
-    dark: zincColors,
+    gray: grayColors,
+    dark: darkColors,
+    red: redColors,
+    yellow: yellowColors,
+    green: greenColors,
+    blue: blueColors,
   },
+  black: '#09090b',
   primaryColor: 'zinc',
-  primaryShade: { light: 8, dark: 0 },
+  primaryShade: { light: 7, dark: 8 },
   autoContrast: true,
-  luminanceThreshold: 0.3,
+  luminanceThreshold: 0.179,
   respectReducedMotion: true,
-  focusRing: 'auto',
+  focusClassName: baseClasses.focus,
   fontFamily: 'Inter, system-ui, sans-serif',
   fontFamilyMonospace: 'ui-monospace, SFMono-Regular, Menlo, monospace',
   fontWeights: {
@@ -126,101 +154,134 @@ export const efooTheme: MantineThemeOverride = createTheme({
   },
   variantColorResolver: efooVariantColorResolver,
   components: {
-    AppShell: AppShell.extend({
-      classNames: { root: appShellClasses.root },
-    }),
-    Autocomplete: Autocomplete.extend({
-      classNames: { root: selectClasses.root },
-      defaultProps: { comboboxProps },
-    }),
+    Autocomplete: Autocomplete.extend({ classNames: comboboxClassNames }),
+    // Without a variant Mantine leaves the text color to its CSS default (white), which is unreadable on the dark-scheme neutral fill.
     Badge: Badge.extend({
       classNames: { root: badgeClasses.root },
       defaultProps: { variant: 'filled' },
     }),
-    Button: Button.extend({
-      classNames: { root: buttonClasses.root },
-    }),
-    Card: Card.extend({
-      classNames: { root: cardClasses.root },
-      defaultProps: { p: 'md', withBorder: true },
-    }),
+    Button: Button.extend({ classNames: { root: buttonClasses.root } }),
+    Card: Card.extend({ defaultProps: { withBorder: true } }),
     Checkbox: Checkbox.extend({
-      classNames: { root: checkboxClasses.root },
-    }),
-    Combobox: Combobox.extend({
-      defaultProps: { transitionProps: overlayTransition },
-    }),
-    Drawer: Drawer.extend({
-      classNames: { root: drawerClasses.root },
-      defaultProps: { transitionProps: overlayTransition },
-    }),
-    Menu: Menu.extend({
-      classNames: { dropdown: menuClasses.dropdown },
-      defaultProps: { transitionProps: overlayTransition },
-    }),
-    Modal: Modal.extend({
-      classNames: (_theme, props) => ({
-        root: modalClasses.root,
-        inner: props.fullScreen ? modalClasses.fullScreenInner : undefined,
-        content: props.fullScreen ? modalClasses.fullScreenContent : modalClasses.content,
+      classNames: {
+        root: checkboxClasses.root,
+        inner: checkboxClasses.inner,
+        input: checkboxClasses.input,
+        icon: checkboxClasses.icon,
+        label: inlineInputClasses.label,
+      },
+      defaultProps: { radius: 'xs' },
+      vars: (theme, props) => ({
+        root: { '--checkbox-icon-color': getCheckboxIconColor(theme, props) },
       }),
-      defaultProps: { transitionProps: overlayTransition },
     }),
-    MultiSelect: MultiSelect.extend({
-      classNames: { root: selectClasses.root },
-      defaultProps: { comboboxProps },
+    CheckboxIndicator: CheckboxIndicator.extend({
+      defaultProps: { radius: 'xs' },
+      vars: (theme, props) => ({
+        indicator: { '--checkbox-icon-color': getCheckboxIconColor(theme, props) },
+      }),
     }),
-    NavLink: NavLink.extend({
-      classNames: { root: navLinkClasses.root },
+    Combobox: Combobox.extend({ defaultProps: { transitionProps: overlayTransitionProps } }),
+    Drawer: Drawer.extend({
+      classNames: (_theme, props) => ({
+        inner: drawerClasses.inner,
+        content:
+          props.position === 'right'
+            ? drawerClasses.contentRight
+            : props.position === 'top'
+              ? drawerClasses.contentTop
+              : props.position === 'bottom'
+                ? drawerClasses.contentBottom
+                : drawerClasses.contentLeft,
+        title: drawerClasses.title,
+        close: drawerClasses.close,
+      }),
+      defaultProps: { transitionProps: drawerTransitionProps, overlayProps, shadow: 'lg' },
     }),
-    Notification: Notification.extend({
-      classNames: { root: notificationClasses.root },
-      defaultProps: { withBorder: true },
+    Input: Input.extend({
+      classNames: { wrapper: inputClasses.wrapper, input: inputClasses.input },
     }),
-    NumberInput: NumberInput.extend({
-      classNames: { root: inputClasses.root },
-    }),
-    PasswordInput: PasswordInput.extend({
-      classNames: { root: inputClasses.root },
-    }),
-    Popover: Popover.extend({
-      classNames: { dropdown: popoverClasses.dropdown },
-      defaultProps: { transitionProps: overlayTransition },
-    }),
-    Radio: Radio.extend({
-      classNames: { root: radioClasses.root },
-    }),
-    Select: Select.extend({
-      classNames: { root: selectClasses.root },
-      defaultProps: {
-        checkIconPosition: 'right',
-        comboboxProps,
+    InputWrapper: InputWrapper.extend({
+      classNames: {
+        label: inputClasses.label,
+        description: inputClasses.description,
+        error: inputClasses.error,
       },
     }),
-    Skeleton: Skeleton.extend({
-      classNames: { root: skeletonClasses.root },
+    Menu: Menu.extend({ classNames: { item: menuClasses.item } }),
+    Modal: Modal.extend({
+      classNames: {
+        inner: modalClasses.inner,
+        content: modalClasses.content,
+        title: modalClasses.title,
+        close: modalClasses.close,
+      },
+      defaultProps: { transitionProps: overlayTransitionProps, overlayProps },
+    }),
+    MultiSelect: MultiSelect.extend({ classNames: comboboxClassNames }),
+    NavLink: NavLink.extend({
+      classNames: { root: navLinkClasses.root, children: navLinkClasses.children },
+    }),
+    Notification: Notification.extend({
+      classNames: { closeButton: notificationClasses.closeButton },
+      defaultProps: { withBorder: true },
+    }),
+    PasswordInput: PasswordInput.extend({
+      classNames: { visibilityToggle: inputClasses.visibilityToggle },
+      defaultProps: { visibilityToggleFocusable: true },
+    }),
+    Pill: Pill.extend({ defaultProps: { radius: 'sm' } }),
+    Popover: Popover.extend({
+      defaultProps: { transitionProps: overlayTransitionProps, shadow: 'md' },
+    }),
+    Radio: Radio.extend({
+      classNames: {
+        root: radioClasses.root,
+        inner: radioClasses.inner,
+        radio: radioClasses.radio,
+        icon: radioClasses.icon,
+        label: inlineInputClasses.label,
+      },
+      vars: (theme, props) => ({
+        root: { '--radio-icon-color': getRadioIconColor(theme, props) },
+      }),
+    }),
+    RadioGroup: RadioGroup.extend({ classNames: { root: radioClasses.group } }),
+    RadioIndicator: RadioIndicator.extend({
+      vars: (theme, props) => ({
+        indicator: { '--radio-icon-color': getRadioIconColor(theme, props) },
+      }),
+    }),
+    Select: Select.extend({
+      classNames: comboboxClassNames,
+      defaultProps: { checkIconPosition: 'right' },
     }),
     Switch: Switch.extend({
-      classNames: { root: switchClasses.root },
-      defaultProps: { withThumbIndicator: true },
+      classNames: {
+        root: switchClasses.root,
+        input: switchClasses.input,
+        track: switchClasses.track,
+        thumb: switchClasses.thumb,
+        label: inlineInputClasses.label,
+      },
+      styles: (theme, props) => ({
+        root: { '--efoo-switch-checked-contrast': getZincContrast(theme, props.color) },
+      }),
+      defaultProps: { withThumbIndicator: false },
     }),
-    Table: Table.extend({
-      classNames: { table: tableClasses.table },
-    }),
+    Table: Table.extend({ classNames: { table: tableClasses.table, th: tableClasses.th } }),
     Tabs: Tabs.extend({
-      classNames: { root: tabsClasses.root },
+      classNames: { root: tabsClasses.root, list: tabsClasses.list, tab: tabsClasses.tab },
     }),
-    Textarea: Textarea.extend({
-      classNames: { root: inputClasses.root },
-    }),
-    TextInput: TextInput.extend({
-      classNames: { root: inputClasses.root },
-    }),
+    ThemeIcon: ThemeIcon.extend({ defaultProps: { variant: 'filled' } }),
     Tooltip: Tooltip.extend({
       classNames: { tooltip: tooltipClasses.tooltip },
-      defaultProps: { transitionProps: overlayTransition },
+      defaultProps: {
+        transitionProps: overlayTransitionProps,
+        radius: 'md',
+        arrowSize: 8,
+        events: { hover: true, focus: true, touch: false },
+      },
     }),
   },
 });
-
-export { efooCssVariablesResolver };

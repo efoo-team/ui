@@ -1,6 +1,11 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.table {
-  --table-hover-color: var(--mantine-color-default-hover);
-  --table-striped-color: var(--mantine-color-default-hover);
-  --table-border-color: var(--mantine-color-default-border);
+@layer efoo {
+  .table {
+    --table-hover-color: var(--mantine-color-default-hover);
+    --table-striped-color: color-mix(in srgb, var(--mantine-color-default-hover) 50%, transparent);
+  }
+
+  .th {
+    font-weight: var(--mantine-font-weight-medium);
+  }
 }

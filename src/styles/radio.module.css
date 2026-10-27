@@ -1,14 +1,37 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.root :global(.mantine-Radio-radio) {
-  background-color: transparent;
-  border-color: var(--radio-color, var(--mantine-primary-color-filled));
-}
+@layer efoo {
+  .root {
+    --radio-size-sm: calc(1rem * var(--mantine-scale));
+  }
 
-.root :global(.mantine-Radio-radio:checked) {
-  background-color: var(--radio-color, var(--mantine-primary-color-filled));
-  border-color: var(--radio-color, var(--mantine-primary-color-filled));
-}
+  /* Radio.Group does not pass its error to each Radio, so the group root's data-error selects the circles. */
+  .group[data-error] .radio:not(:checked, :disabled) {
+    border-color: var(--mantine-color-error);
+  }
 
-.root :global(.mantine-Radio-radio:disabled) {
-  opacity: 0.5;
+  .radio:disabled {
+    border-color: var(--mantine-color-default-border);
+    background-color: var(--mantine-color-default);
+  }
+
+  .inner:has(.radio:disabled) {
+    opacity: 0.5;
+  }
+
+  .radio:disabled:checked {
+    border-color: var(--radio-color, var(--mantine-primary-color-filled));
+    background-color: var(--radio-color, var(--mantine-primary-color-filled));
+  }
+
+  .root[data-variant='outline'] .radio:disabled:checked {
+    background-color: transparent;
+  }
+
+  .radio:disabled + .icon {
+    --radio-icon-color: inherit;
+  }
+
+  .root[data-variant='outline'] .radio:disabled + .icon {
+    --radio-icon-color: var(--radio-color);
+  }
 }

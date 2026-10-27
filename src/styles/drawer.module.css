@@ -1,8 +1,30 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.root :global(.mantine-Drawer-content) {
-  border-color: var(--mantine-color-default-border);
-}
+@layer efoo {
+  .inner {
+    inset-inline-start: 0;
+  }
 
-.root :global(.mantine-Drawer-title) {
-  letter-spacing: -0.025em;
+  .contentLeft {
+    border-inline-end: 1px solid var(--mantine-color-default-border);
+  }
+
+  .contentRight {
+    border-inline-start: 1px solid var(--mantine-color-default-border);
+  }
+
+  .contentTop {
+    border-block-end: 1px solid var(--mantine-color-default-border);
+  }
+
+  .contentBottom {
+    border-block-start: 1px solid var(--mantine-color-default-border);
+  }
+
+  .title {
+    font-weight: var(--mantine-font-weight-medium);
+  }
+
+  .close:hover {
+    background-color: var(--mantine-color-default-hover);
+  }
 }

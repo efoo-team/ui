@@ -1,23 +1,59 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.root :global(.mantine-Input-wrapper) {
-  --input-bg: transparent;
-  --input-bd: var(--mantine-color-default-border);
-  --input-bd-focus: var(--mantine-primary-color-filled);
-  --input-disabled-bg: color-mix(in srgb, var(--mantine-color-default-hover) 50%, transparent);
-  --input-disabled-color: color-mix(in srgb, var(--mantine-color-text) 50%, transparent);
-}
+@layer efoo {
+  .wrapper {
+    --input-height-md: calc(2.5rem * var(--mantine-scale));
+    --input-height-lg: calc(2.75rem * var(--mantine-scale));
+    --input-height-xl: calc(3rem * var(--mantine-scale));
+    --input-disabled-bg: var(--input-bg);
+    --input-disabled-color: var(--input-color);
+  }
 
-.root :global(.mantine-Input-wrapper[data-variant='filled']) {
-  --input-bg: var(--mantine-color-default-hover);
-  --input-bd: transparent;
-}
+  .wrapper:not([data-variant='unstyled']) {
+    --input-bd-focus: var(--efoo-color-ring, var(--mantine-primary-color-filled));
+  }
 
-.root :global(.mantine-Input-wrapper[data-variant='unstyled']) {
-  --input-bg: transparent;
-  --input-bd: transparent;
-  --input-bd-focus: transparent;
-}
+  .input {
+    font-size: min(
+      var(--_input-fz, var(--input-fz, var(--mantine-font-size-md))),
+      var(--mantine-font-size-md)
+    );
+    transition-property: border-color, box-shadow;
+    transition-duration: calc(var(--efoo-motion-duration-fast) * var(--efoo-motion-scale));
+    transition-timing-function: var(--efoo-motion-easing);
+  }
 
-.root :global(.mantine-Input-input) {
-  color: var(--mantine-color-text);
+  .wrapper:not([data-variant='unstyled']) .input:where(:focus, :focus-within) {
+    box-shadow: var(--efoo-focus-ring);
+  }
+
+  .wrapper[data-error]:not([data-variant='unstyled']) .input:where(:focus, :focus-within) {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--mantine-color-error) 20%, transparent);
+  }
+
+  .input:where(:disabled, [data-disabled], :has(input:disabled)) {
+    opacity: 0.5;
+  }
+
+  .label {
+    font-size: min(
+      var(--input-label-size, var(--mantine-font-size-sm)),
+      var(--mantine-font-size-md)
+    );
+  }
+
+  .description,
+  .error {
+    font-size: min(
+      var(--input-description-size, var(--input-error-size, var(--mantine-font-size-xs))),
+      var(--mantine-font-size-sm)
+    );
+  }
+
+  .visibilityToggle {
+    color: var(--mantine-color-dimmed);
+  }
+
+  .visibilityToggle:hover {
+    color: var(--mantine-color-text);
+  }
 }

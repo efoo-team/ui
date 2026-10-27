@@ -1,6 +1,11 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.root[data-variant='dot'] {
-  background-color: var(--mantine-color-default-hover);
-  border-color: var(--mantine-color-default-hover);
-  color: var(--mantine-color-text);
+@layer efoo {
+  .root {
+    --badge-fz-md: var(--mantine-font-size-xs);
+    --badge-fz-lg: var(--mantine-font-size-sm);
+    --badge-padding-x-md: calc(0.5rem * var(--mantine-scale));
+    font-weight: var(--mantine-font-weight-medium);
+    letter-spacing: normal;
+    text-transform: none;
+  }
 }

@@ -1,11 +1,19 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.root {
-  transition:
-    color var(--efoo-motion-duration-fast) var(--efoo-motion-easing),
-    background-color var(--efoo-motion-duration-fast) var(--efoo-motion-easing),
-    border-color var(--efoo-motion-duration-fast) var(--efoo-motion-easing);
-}
+@layer efoo {
+  .root {
+    --button-height-md: calc(2.5rem * var(--mantine-scale));
+    --button-height-lg: calc(2.75rem * var(--mantine-scale));
+    --button-height-xl: calc(3rem * var(--mantine-scale));
+    font-size: min(var(--button-fz, var(--mantine-font-size-sm)), var(--mantine-font-size-md));
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-duration: calc(var(--efoo-motion-duration-fast) * var(--efoo-motion-scale));
+    transition-timing-function: var(--efoo-motion-easing);
+  }
 
-.root:global(:where(:disabled:not([data-loading]), [data-disabled]:not([data-loading]))) {
-  opacity: 0.5;
+  .root:where(:disabled, [data-disabled]):not([data-loading]) {
+    border: var(--button-bd, 1px solid transparent);
+    background: var(--button-bg, var(--mantine-primary-color-filled));
+    color: var(--button-color, var(--mantine-color-white));
+    opacity: 0.5;
+  }
 }

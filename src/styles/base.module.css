@@ -1,0 +1,24 @@
+@layer mantine, efoo;
+
+@layer efoo {
+  :root {
+    --efoo-motion-scale: 1;
+    --efoo-focus-ring: 0 0 0 3px
+      color-mix(
+        in srgb,
+        var(--efoo-color-ring, var(--mantine-primary-color-filled)) 50%,
+        transparent
+      );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-respect-reduced-motion] {
+      --efoo-motion-scale: 0;
+    }
+  }
+
+  .focus:where(:focus-visible) {
+    outline: none;
+    box-shadow: var(--efoo-focus-ring);
+  }
+}

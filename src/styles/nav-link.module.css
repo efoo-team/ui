@@ -1,15 +1,25 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.root:hover {
-  background-color: var(--mantine-color-default-hover);
-}
+@layer efoo {
+  .root {
+    min-height: calc(2rem * var(--mantine-scale));
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--mantine-radius-sm);
+    transition-property: color, background-color;
+    transition-duration: calc(var(--efoo-motion-duration-fast) * var(--efoo-motion-scale));
+    transition-timing-function: var(--efoo-motion-easing);
+  }
 
-.root[data-active],
-.root[aria-current='page'] {
-  background-color: var(--mantine-color-default-hover);
-  color: var(--mantine-color-text);
-}
+  .root:hover:where(:not([data-active], [aria-current='page'])) {
+    background-color: var(--mantine-color-default-hover);
+  }
 
-.root[data-active] :global(.mantine-NavLink-description),
-.root[aria-current='page'] :global(.mantine-NavLink-description) {
-  color: var(--mantine-color-dimmed);
+  .root:where([data-active], [aria-current='page']) {
+    font-weight: var(--mantine-font-weight-medium);
+  }
+
+  .children {
+    margin-inline-start: 0.875rem;
+    padding-inline-start: calc(var(--nl-offset, var(--mantine-spacing-lg)) - 0.875rem);
+    border-inline-start: 1px solid var(--mantine-color-default-border);
+  }
 }

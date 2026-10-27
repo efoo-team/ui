@@ -1,22 +1,22 @@
-/* MantineHub-derived component styling with a full-screen sizing fix; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
-.content {
-  border: 1px solid var(--mantine-color-default-border);
-  border-radius: var(--mantine-radius-default);
-}
+/* MantineHub-derived component styling with a viewport alignment fix; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+@layer efoo {
+  .inner {
+    inset-inline-start: 0;
+  }
 
-.fullScreenContent {
-  width: 100vw;
-  height: 100vh;
-  height: 100dvh;
-  max-height: none;
-  border: 0;
-  border-radius: 0;
-}
+  .content {
+    border: 1px solid var(--mantine-color-default-border);
+  }
 
-.fullScreenInner {
-  left: 0;
-}
+  .content[data-full-screen] {
+    border: 0;
+  }
 
-.root :global(.mantine-Modal-title) {
-  letter-spacing: -0.025em;
+  .title {
+    font-weight: var(--mantine-font-weight-medium);
+  }
+
+  .close:hover {
+    background-color: var(--mantine-color-default-hover);
+  }
 }

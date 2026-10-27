@@ -3,67 +3,44 @@
  * https://github.com/RubixCube-Innovations/mantine-theme-builder
  * Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md.
  */
-import { defaultVariantColorsResolver, type VariantColorsResolver } from '@mantine/core';
-import { getContrastColor } from './color-contrast';
+import {
+  defaultVariantColorsResolver,
+  parseThemeColor,
+  type MantineTheme,
+  type VariantColorsResolver,
+} from '@mantine/core';
+import { NEUTRAL_COLOR } from './colors.js';
+
+export const ZINC_CONTRAST = `var(--mantine-color-${NEUTRAL_COLOR}-contrast, var(--mantine-color-white))`;
+
+function isNeutralColor(theme: MantineTheme, color: string | undefined): boolean {
+  const parsed = parseThemeColor({ color: color ?? theme.primaryColor, theme });
+  return parsed.isThemeColor && parsed.color === NEUTRAL_COLOR && parsed.shade === undefined;
+}
+
+// The neutral filled color is light in the dark scheme, so text on it follows the scheme instead of Mantine's fixed white.
+export function getZincContrast(
+  theme: MantineTheme,
+  color: string | undefined,
+): string | undefined {
+  return isNeutralColor(theme, color) ? ZINC_CONTRAST : undefined;
+}
 
 export const efooVariantColorResolver: VariantColorsResolver = (input) => {
   const resolved = defaultVariantColorsResolver(input);
-  const [parsedColorName, colorShade] = (input.color ?? input.theme.primaryColor).split('.');
-  const colorName = parsedColorName ?? input.theme.primaryColor;
-  const palette = input.theme.colors[colorName];
-  const primaryShades =
-    typeof input.theme.primaryShade === 'number'
-      ? { light: input.theme.primaryShade, dark: input.theme.primaryShade }
-      : input.theme.primaryShade;
-  const hasSchemeAwareContrast =
-    Array.isArray(palette) &&
-    getContrastColor(
-      palette[primaryShades.light] ?? palette[8] ?? '#18181b',
-      input.theme.luminanceThreshold,
-    ) !== undefined &&
-    getContrastColor(
-      palette[primaryShades.dark] ?? palette[8] ?? '#18181b',
-      input.theme.luminanceThreshold,
-    ) !== undefined;
-  const isNeutral = input.color === undefined || colorName === 'zinc' || colorName === 'secondary';
-  const isSchemeAwareFilledColor =
-    input.variant === 'filled' &&
-    (input.autoContrast ?? input.theme.autoContrast) &&
-    colorShade === undefined &&
-    hasSchemeAwareContrast;
 
-  if (isSchemeAwareFilledColor) {
-    return {
-      ...resolved,
-      color: `var(--mantine-color-${colorName}-contrast)`,
-    };
-  }
-
-  if (
-    input.variant === 'white' &&
-    colorShade === undefined &&
-    Array.isArray(palette) &&
-    getContrastColor(palette[9] ?? '', input.theme.luminanceThreshold) ===
-      'var(--mantine-color-white)'
-  ) {
-    return {
-      ...resolved,
-      color: `var(--mantine-color-${colorName}-9)`,
-    };
-  }
-
-  if (!isNeutral || (input.variant !== 'light' && input.variant !== 'outline')) {
+  if (!isNeutralColor(input.theme, input.color)) {
     return resolved;
   }
 
-  return {
-    ...resolved,
-    background: input.variant === 'light' ? 'var(--mantine-color-default-hover)' : 'transparent',
-    hover: 'var(--mantine-color-default-hover)',
-    color: 'var(--mantine-color-text)',
-    border:
-      input.variant === 'outline'
-        ? '1px solid var(--mantine-color-default-border)'
-        : resolved.border,
-  };
+  if (input.variant === 'filled') {
+    return { ...resolved, color: ZINC_CONTRAST };
+  }
+
+  // Mantine colors the white variant with the filled color, which is light in the dark scheme.
+  if (input.variant === 'white') {
+    return { ...resolved, color: `var(--mantine-color-${NEUTRAL_COLOR}-9)` };
+  }
+
+  return resolved;
 };
