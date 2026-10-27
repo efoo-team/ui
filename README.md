@@ -1,16 +1,67 @@
 # @efoo-team/ui
 
-efoo のサービスで共有する Mantine theme と、その設定を使った部品の表示例をまとめるリポジトリです。Mantine の部品を使い、共通の色、CSS 変数、部品ごとのスタイルを theme で提供します。
+efoo のサービスで共有する Mantine theme と、その theme を使った部品の表示例（Storybook）をまとめるリポジトリです。画面の部品は Mantine を使い、shadcn/ui の見た目に合わせた色、CSS 変数、部品ごとのスタイルを theme で提供します。
+
+表示例は [GitHub Pages](https://efoo-team.github.io/ui/) で確認できます。上部ツールバーの「ライト」「ダーク」で表示モードを切り替えられます。
+
+## 導入
+
+このパッケージは npm レジストリには置かず、GitHub から導入します。導入時に `prepare` が JavaScript、型定義、CSS を build します。
+
+利用側に必要なパッケージは React と React DOM 19、`@mantine/core` と `@mantine/hooks` の 9.7 系です。通知（`@mantine/notifications`）を使う場合だけ追加します。
+
+### pnpm
+
+pnpm 10 以降は、Git 依存の build を許可制にしています。先に利用側の `pnpm-workspace.yaml` へ許可を書きます。
+
+```yaml
+allowBuilds:
+  '@efoo-team/ui@git+https://github.com/efoo-team/ui.git': true
+```
+
+許可がないと `ERR_PNPM_GIT_DEP_PREPARE_NOT_ALLOWED` で導入が止まります。エラーに追加すべき行が表示されるので、キーが上の行と違う場合は表示された行を使ってください。
+
+```sh
+pnpm add github:efoo-team/ui @mantine/core @mantine/hooks react react-dom
+pnpm add @mantine/notifications # 通知を使う場合
+```
+
+### npm
+
+追加の設定は要りません。
+
+```sh
+npm i github:efoo-team/ui @mantine/core @mantine/hooks react react-dom
+npm i @mantine/notifications # 通知を使う場合
+```
+
+### TypeScript
+
+`moduleResolution` は `Bundler` と `NodeNext` のどちらでも使えます。`@mantine/hooks` の型が使う型を解決するため、`lib` に `ESNext` を含めてください。
 
 ## 使い方
 
-Mantine のスタイルを読み込み、共通 theme と CSS 変数 resolver を `MantineProvider` に渡します。
+### CSS の読み込み
+
+CSS は次の順で読み込みます。
+
+```ts
+import '@mantine/core/styles.layer.css'; // Mantine の CSS は layer 版
+import '@mantine/notifications/styles.layer.css'; // 通知を使う場合だけ
+import '@efoo-team/ui/styles.css';
+```
+
+Mantine の CSS は `styles.css` ではなく `styles.layer.css` を読み込みます。パッケージの CSS は `@layer efoo` に入っており、`@layer mantine` の後に宣言されるため、層なしの `@mantine/core/styles.css` と一緒に使うと、パッケージの規則がすべて Mantine に負けて効きません。`styles.css` と `styles.layer.css` を両方読み込むこともしないでください。
+
+パッケージの CSS は読み込み順に関係なく Mantine の CSS に勝ちます。サービス側で書く層なしの CSS は、パッケージの CSS に常に勝つので、詳細度を気にせずに調整できます。
+
+### MantineProvider
+
+`efooTheme` と `efooCssVariablesResolver` は必ず一緒に `MantineProvider` へ渡します。
 
 ```tsx
 import { MantineProvider } from '@mantine/core';
 import { efooTheme, efooCssVariablesResolver } from '@efoo-team/ui';
-import '@mantine/core/styles.css';
-import '@efoo-team/ui/styles.css';
 
 export function App() {
   return (
@@ -21,16 +72,108 @@ export function App() {
 }
 ```
 
-各サービスは `createTheme` と `mergeThemeOverrides` を使い、必要な値を `efooTheme` に重ねて調整できます。
+`efooCssVariablesResolver` を渡さなくても表示は崩れませんが、次の 4 点が shadcn/ui から外れます。
+
+- ダークで primary の zinc が反転せず、暗い塗りに白文字のままになる。
+- ダークのエラー色が `red-8`（`#9f0712`）になり読みにくい。
+- focus の輪郭が primary の色になる。
+- パッケージの CSS の transition が 0 秒になる。
+
+### サービスごとに調整する
+
+theme の差分は `createTheme` で書き、`mergeThemeOverrides` で `efooTheme` に重ねます。次の例の `primaryColor` と `defaultRadius` は差分の一例なので、サービスで変えたい項目だけを書いてください。
+
+```tsx
+import { createTheme, mergeThemeOverrides } from '@mantine/core';
+import { efooTheme } from '@efoo-team/ui';
+
+// サービスで変えたい項目だけを書く（以下は一例）
+const serviceOverrides = createTheme({
+  primaryColor: 'blue',
+  defaultRadius: 'md',
+});
+
+export const serviceTheme = mergeThemeOverrides(efooTheme, serviceOverrides);
+```
+
+`primaryColor` を `zinc` 以外にすると、resolver は `--mantine-primary-color-contrast` を上書きしません。塗りつぶしの文字色は Mantine の既定で決まります。
+
+サービス独自の CSS 変数 resolver を持つ場合は、`efooCssVariablesResolver` の結果に `deepMerge` でサービスの値を重ねて 1 つの resolver にします。
+
+```tsx
+import { deepMerge, type CSSVariablesResolver } from '@mantine/core';
+import { efooCssVariablesResolver } from '@efoo-team/ui';
+
+const serviceCssVariablesResolver: CSSVariablesResolver = () => ({
+  variables: { '--service-header-height': '3rem' },
+  light: { '--service-accent': '#18181b' },
+  dark: { '--service-accent': '#fafafa' },
+});
+
+export const cssVariablesResolver: CSSVariablesResolver = (theme) =>
+  deepMerge(efooCssVariablesResolver(theme), serviceCssVariablesResolver(theme));
+```
+
+```tsx
+<MantineProvider theme={serviceTheme} cssVariablesResolver={cssVariablesResolver}>
+```
+
+独自の `variantColorResolver` を持つ場合は、`efooVariantColorResolver(input)` の結果を起点に差分を足します。
+
+### 動き
+
+theme の `respectReducedMotion` が `true` です。OS の「視差効果を減らす」を有効にすると、Mantine の Transition とパッケージの CSS の transition が同時に止まります。
+
+### Popover
+
+Popover の中で操作させる場合は、Escape で閉じられるように `trapFocus` を付けます。theme の既定にしていないのは、Popover を内部で使う Select などの dropdown が入力欄からフォーカスを奪うためです。
+
+```tsx
+<Popover trapFocus returnFocus>
+  <Popover.Target>
+    <Button>開く</Button>
+  </Popover.Target>
+  <Popover.Dropdown>{/* 内容 */}</Popover.Dropdown>
+</Popover>
+```
+
+### shadcn/ui の variant との対応
+
+| shadcn/ui の variant | Mantine での指定           |
+| -------------------- | -------------------------- |
+| default              | 既定（`variant="filled"`） |
+| outline              | `variant="default"`        |
+| secondary            | `variant="light"`          |
+| ghost                | `variant="subtle"`         |
+| destructive          | `color="red"` の塗りつぶし |
+
+状態を表す色は `red`・`yellow`・`green`・`blue` です（Tailwind CSS v4 の値）。
 
 ## 表示例
 
-ライト・ダークの表示切り替えと各部品の stories は [GitHub Pages](https://efoo-team.github.io/ui/) で確認できます。
+部品ごとの表示例は、Storybook のサイドバーで「日本語名（Mantine の部品名）」から探せます。
+
+| 部品                                             | サイドバーの場所                                                                      |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| AppShell・NavLink                                | 構造 / 画面の枠組みとナビゲーション（AppShell・NavLink）                              |
+| Button                                           | 操作 / ボタン（Button）                                                               |
+| Tabs                                             | 操作 / タブ（Tabs）                                                                   |
+| TextInput・Textarea・NumberInput・PasswordInput  | 入力 / テキスト入力欄（TextInput・Textarea・NumberInput・PasswordInput）              |
+| Select・MultiSelect                              | 入力 / 選択欄（Select・MultiSelect）                                                  |
+| Checkbox・Radio・Switch                          | 入力 / チェック・選択・切り替え（Checkbox・Radio・Switch）                            |
+| Button・TextInput・Checkbox・Radio・Switch・Tabs | 入力 / フォーカスの見え方（Button・TextInput・Checkbox・Radio・Switch・Tabs）         |
+| Table・Card・Badge                               | 表示 / 表・カード・バッジ（Table・Card・Badge）                                       |
+| Skeleton・Tooltip                                | 表示 / 読み込み表示とツールチップ（Skeleton・Tooltip）                                |
+| Menu・Popover・Modal・Drawer                     | 重ねて表示 / メニュー・補足表示・モーダル・側面パネル（Menu・Popover・Modal・Drawer） |
+| Notification                                     | フィードバック / 通知（Notification）                                                 |
+| 開閉の動き                                       | 動き / 開閉の動き（Transition）                                                       |
 
 ## 開発
 
-Node.js 22 と pnpm を使います。`pnpm install` で依存関係を入れた後、`pnpm storybook` で開発サーバーを起動します。
+Node.js 22 と pnpm を使います。`pnpm install` で依存関係を入れた後、`pnpm storybook` で開発サーバーを起動します。変更を入れる前に、`pnpm typecheck`・`pnpm lint`・`pnpm format:check`・`pnpm build-storybook` が通ることを確認してください。Mantine を更新したときは、Storybook でライトとダークの表示を確認します。
 
 ## ライセンス
 
 このリポジトリは MIT License で提供します。著作権表記と許諾条件は [LICENSE](./LICENSE) を参照してください。
+
+theme の色、CSS 変数の約束、部品ごとのスタイルの一部は、MantineHub の shadcn theme（[RubixCube-Innovations/mantine-theme-builder](https://github.com/RubixCube-Innovations/mantine-theme-builder)、MIT License）を元にしています。出典と許諾条件は [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md) を参照してください。
