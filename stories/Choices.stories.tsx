@@ -23,7 +23,7 @@ export const States: Story = {
     <Stack gap="xl">
       <Stack gap="sm">
         <Text fw={600}>Checkbox</Text>
-        <Group>
+        <Group align="flex-start">
           <Checkbox label="未選択" />
           <Checkbox label="選択済み" defaultChecked />
           <Checkbox label="一部選択" indeterminate />

@@ -1,6 +1,7 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
   .root {
+    --radio-size-xs: calc(0.875rem * var(--mantine-scale));
     --radio-size-sm: calc(1rem * var(--mantine-scale));
   }
 

@@ -12,8 +12,10 @@
     --switch-label-font-size-xl: calc(0.75rem * var(--mantine-scale));
   }
 
+  /* Mantine's off label is gray-6, 3.8:1 on the light track. */
   .track {
     --switch-bg: var(--mantine-color-default-border);
+    --switch-text-color: var(--mantine-color-text);
   }
 
   .input:checked + .track {

@@ -22,6 +22,12 @@
     );
   }
 
+  /* Mantine dims disabled items with both the disabled color and opacity; shadcn/ui keeps the text color at 50%. */
+  .item:where([data-disabled], :disabled) {
+    color: var(--menu-item-color, var(--mantine-color-text));
+    opacity: 0.5;
+  }
+
   .item:focus-visible {
     box-shadow: none;
   }

@@ -245,7 +245,11 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     PasswordInput: PasswordInput.extend({
       classNames: { visibilityToggle: inputClasses.visibilityToggle },
-      defaultProps: { visibilityToggleFocusable: true },
+      defaultProps: {
+        visibilityToggleFocusable: true,
+        // Mantine's label is English. The button reports shown or hidden through aria-pressed.
+        visibilityToggleButtonProps: { 'aria-label': 'パスワードを表示' },
+      },
     }),
     Pill: Pill.extend({ classNames: { root: pillClasses.root }, defaultProps: { radius: 'sm' } }),
     Popover: Popover.extend({

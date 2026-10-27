@@ -6,10 +6,14 @@
     --input-height-xl: calc(3rem * var(--mantine-scale));
     --input-disabled-bg: var(--input-bg);
     --input-disabled-color: var(--input-color);
+    --input-bd-focus: var(--efoo-color-ring, var(--mantine-primary-color-filled));
   }
 
-  .wrapper:not([data-variant='unstyled']) {
-    --input-bd-focus: var(--efoo-color-ring, var(--mantine-primary-color-filled));
+  /* Mantine's multiline padding assumes its taller heights; these keep one row of pills at --input-height. */
+  .wrapper[data-multiline] {
+    --input-padding-y-md: calc(0.375rem * var(--mantine-scale));
+    --input-padding-y-lg: calc(0.5rem * var(--mantine-scale));
+    --input-padding-y-xl: calc(0.625rem * var(--mantine-scale));
   }
 
   .input {
@@ -22,11 +26,11 @@
     transition-timing-function: var(--efoo-motion-easing);
   }
 
-  .wrapper:not([data-variant='unstyled']) .input:where(:focus, :focus-within) {
+  .input:where(:focus, :focus-within) {
     box-shadow: var(--efoo-focus-ring);
   }
 
-  .wrapper[data-error]:not([data-variant='unstyled']) .input:where(:focus, :focus-within) {
+  .wrapper[data-error] .input:where(:focus, :focus-within) {
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--mantine-color-error) 20%, transparent);
   }
 

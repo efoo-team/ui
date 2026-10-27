@@ -12,6 +12,10 @@
     );
   }
 
+  .option[data-combobox-disabled] {
+    opacity: 0.5;
+  }
+
   .option:hover:where(:not([data-combobox-disabled])),
   .option[data-combobox-selected] {
     background-color: var(--mantine-color-default-hover);
