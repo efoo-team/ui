@@ -1,0 +1,14 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.root {
+  --tab-border-color: var(--mantine-color-default-border);
+  --tabs-list-border-width: 1px;
+}
+
+.root :global(.mantine-Tabs-tab) {
+  color: var(--mantine-color-dimmed);
+  transition: color var(--efoo-motion-duration-fast) var(--efoo-motion-easing);
+}
+
+.root :global(.mantine-Tabs-tab[data-active='true']) {
+  color: var(--mantine-color-text);
+}

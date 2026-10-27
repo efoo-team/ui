@@ -1,0 +1,4 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.root[data-visible]::after {
+  background-color: var(--mantine-color-default-hover);
+}

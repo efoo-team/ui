@@ -1,0 +1,8 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.root {
+  background-color: var(--mantine-color-secondary-filled);
+}
+
+.root[data-with-border] {
+  border: 1px solid var(--mantine-color-default-border);
+}

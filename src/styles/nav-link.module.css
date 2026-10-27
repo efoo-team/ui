@@ -1,0 +1,15 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.root:hover {
+  background-color: var(--mantine-color-default-hover);
+}
+
+.root[data-active],
+.root[aria-current='page'] {
+  background-color: var(--mantine-color-default-hover);
+  color: var(--mantine-color-text);
+}
+
+.root[data-active] :global(.mantine-NavLink-description),
+.root[aria-current='page'] :global(.mantine-NavLink-description) {
+  color: var(--mantine-color-dimmed);
+}

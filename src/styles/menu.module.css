@@ -1,0 +1,17 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.dropdown {
+  background-color: var(--mantine-color-body);
+  border-color: var(--mantine-color-default-border);
+}
+
+.dropdown :global(.mantine-Menu-item) {
+  background-color: transparent;
+}
+
+.dropdown :global(.mantine-Menu-item[data-hovered]) {
+  background-color: var(--mantine-color-default-hover);
+}
+
+.dropdown :global(.mantine-Menu-divider) {
+  border-color: var(--mantine-color-default-border);
+}

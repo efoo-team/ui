@@ -1,0 +1,6 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.table {
+  --table-hover-color: var(--mantine-color-default-hover);
+  --table-striped-color: var(--mantine-color-default-hover);
+  --table-border-color: var(--mantine-color-default-border);
+}

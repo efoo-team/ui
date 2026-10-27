@@ -1,0 +1,14 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.root :global(.mantine-Radio-radio) {
+  background-color: transparent;
+  border-color: var(--radio-color, var(--mantine-primary-color-filled));
+}
+
+.root :global(.mantine-Radio-radio:checked) {
+  background-color: var(--radio-color, var(--mantine-primary-color-filled));
+  border-color: var(--radio-color, var(--mantine-primary-color-filled));
+}
+
+.root :global(.mantine-Radio-radio:disabled) {
+  opacity: 0.5;
+}

@@ -1,0 +1,29 @@
+/* MantineHub-derived component styling with a dark-scheme label contrast fix; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.root :global(.mantine-Switch-label) {
+  color: var(--mantine-color-text);
+}
+
+.root :global(.mantine-Switch-trackLabel) {
+  color: var(--mantine-color-white);
+}
+
+:global([data-mantine-color-scheme='dark'])
+  .root
+  :global(.mantine-Switch-input:checked)
+  + :global(.mantine-Switch-track)
+  :global(.mantine-Switch-trackLabel) {
+  color: var(--mantine-primary-color-contrast);
+}
+
+.root :global(.mantine-Switch-description) {
+  color: var(--mantine-color-dimmed);
+}
+
+.root :global(.mantine-Switch-track) {
+  border-color: var(--mantine-color-default-border);
+}
+
+.root :global(.mantine-Switch-thumb) {
+  background-color: var(--mantine-color-default);
+  border-color: var(--mantine-color-default-border);
+}

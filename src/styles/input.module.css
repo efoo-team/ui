@@ -1,0 +1,23 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.root :global(.mantine-Input-wrapper) {
+  --input-bg: transparent;
+  --input-bd: var(--mantine-color-default-border);
+  --input-bd-focus: var(--mantine-primary-color-filled);
+  --input-disabled-bg: color-mix(in srgb, var(--mantine-color-default-hover) 50%, transparent);
+  --input-disabled-color: color-mix(in srgb, var(--mantine-color-text) 50%, transparent);
+}
+
+.root :global(.mantine-Input-wrapper[data-variant='filled']) {
+  --input-bg: var(--mantine-color-default-hover);
+  --input-bd: transparent;
+}
+
+.root :global(.mantine-Input-wrapper[data-variant='unstyled']) {
+  --input-bg: transparent;
+  --input-bd: transparent;
+  --input-bd-focus: transparent;
+}
+
+.root :global(.mantine-Input-input) {
+  color: var(--mantine-color-text);
+}

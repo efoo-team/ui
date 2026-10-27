@@ -1,0 +1,10 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.root {
+  --badge-color: var(--mantine-primary-color-contrast);
+}
+
+.root[data-variant='dot'] {
+  background-color: var(--mantine-color-default-hover);
+  border-color: var(--mantine-color-default-hover);
+  color: var(--mantine-color-text);
+}

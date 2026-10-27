@@ -1,0 +1,18 @@
+/* MantineHub-derived component styling with a full-screen sizing fix; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.content {
+  border: 1px solid var(--mantine-color-default-border);
+  border-radius: var(--mantine-radius-default);
+}
+
+.fullScreenContent {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.root :global(.mantine-Modal-title) {
+  letter-spacing: -0.025em;
+}

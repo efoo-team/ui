@@ -1,0 +1,11 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.root {
+  transition:
+    color var(--efoo-motion-duration-fast) var(--efoo-motion-easing),
+    background-color var(--efoo-motion-duration-fast) var(--efoo-motion-easing),
+    border-color var(--efoo-motion-duration-fast) var(--efoo-motion-easing);
+}
+
+.root:global(:where(:disabled:not([data-loading]), [data-disabled]:not([data-loading]))) {
+  opacity: 0.5;
+}

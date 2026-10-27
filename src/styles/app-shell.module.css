@@ -1,0 +1,13 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.root :global(.mantine-AppShell-header),
+.root :global(.mantine-AppShell-navbar),
+.root :global(.mantine-AppShell-aside),
+.root :global(.mantine-AppShell-footer) {
+  background-color: var(--mantine-color-body);
+  border-color: var(--mantine-color-default-border);
+}
+
+.root :global(.mantine-AppShell-main) {
+  background-color: var(--mantine-color-body);
+  color: var(--mantine-color-text);
+}

@@ -1,0 +1,8 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+.root :global(.mantine-Drawer-content) {
+  border-color: var(--mantine-color-default-border);
+}
+
+.root :global(.mantine-Drawer-title) {
+  letter-spacing: -0.025em;
+}
