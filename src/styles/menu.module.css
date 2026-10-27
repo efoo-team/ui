@@ -1,5 +1,11 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
+  /* Mantine writes --menu-item-color inline as var(--mantine-color-red-6) for color="red".
+     Remapping the variable on the item itself changes only Menu items. */
+  .item {
+    --mantine-color-red-6: var(--efoo-color-menu-item-red);
+  }
+
   .item:focus-visible {
     box-shadow: none;
   }

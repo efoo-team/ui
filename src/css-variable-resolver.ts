@@ -14,6 +14,8 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
     [`--mantine-color-${z}-filled`]: `var(--mantine-color-${z}-9)`,
     [`--mantine-color-${z}-contrast`]: `var(--mantine-color-${z}-0)`,
     '--efoo-color-ring': `var(--mantine-color-${z}-4)`,
+    '--efoo-color-menu-item-red': 'var(--mantine-color-red-6)',
+    '--efoo-color-tab-pills-text': 'var(--mantine-color-gray-7)',
   },
   dark: {
     [`--mantine-color-${z}-filled`]: `var(--mantine-color-${z}-2)`,
@@ -26,5 +28,7 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
       : {}),
     '--mantine-color-error': 'var(--mantine-color-red-4)',
     '--efoo-color-ring': `var(--mantine-color-${z}-5)`,
+    '--efoo-color-menu-item-red': 'var(--mantine-color-red-4)',
+    '--efoo-color-tab-pills-text': 'var(--mantine-color-dimmed)',
   },
 });
