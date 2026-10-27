@@ -5,6 +5,21 @@
      scheme-aware text red (red-filled in light, red-4 in dark), so it also works without the resolver. */
   .item {
     --mantine-color-red-6: var(--mantine-color-red-text);
+    /* Mantine writes --menu-item-hover inline as the red light-hover (red-2 in light). shadcn/ui tints with 10% of the red. */
+    --mantine-color-red-light-hover: color-mix(
+      in srgb,
+      var(--mantine-color-red-text) 10%,
+      transparent
+    );
+  }
+
+  /* On the tinted background red-text falls below 4.5:1 in light; mixing in the body text keeps both schemes above it. */
+  .item:where(:hover, :focus, [data-menu-active]):where(:not(:disabled, [data-disabled])) {
+    --mantine-color-red-6: color-mix(
+      in srgb,
+      var(--mantine-color-red-text) 80%,
+      var(--mantine-color-text)
+    );
   }
 
   .item:focus-visible {

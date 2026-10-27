@@ -1,0 +1,7 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+@layer efoo {
+  /* Mantine uses gray-3 in light and dark-4 in dark. default-border has the same values with this palette. */
+  .root:where([data-visible])::after {
+    background-color: var(--efoo-color-skeleton, var(--mantine-color-default-border));
+  }
+}

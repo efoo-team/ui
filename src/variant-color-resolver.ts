@@ -37,6 +37,16 @@ export const efooVariantColorResolver: VariantColorsResolver = (input) => {
     return { ...resolved, color: ZINC_CONTRAST };
   }
 
+  // shadcn/ui's outline uses the surface border, the body text and the accent hover instead of the filled color.
+  if (input.variant === 'outline') {
+    return {
+      ...resolved,
+      border: '1px solid var(--mantine-color-default-border)',
+      color: 'var(--mantine-color-text)',
+      hover: 'var(--mantine-color-default-hover)',
+    };
+  }
+
   // Mantine colors the white variant with the filled color, which is light in the dark scheme.
   if (input.variant === 'white') {
     return { ...resolved, color: `var(--mantine-color-${NEUTRAL_COLOR}-9)` };

@@ -1,0 +1,7 @@
+/* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
+@layer efoo {
+  /* Mantine uses dark-7 in the dark scheme, which is the page background and darker than the input. */
+  .root[data-variant='default'] {
+    background-color: var(--mantine-color-default-hover);
+  }
+}

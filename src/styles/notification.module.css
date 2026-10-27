@@ -1,5 +1,10 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
+  /* The bar keeps the icon and loader on --notification-color and only takes the line color of the status. */
+  .root::before {
+    background-color: var(--efoo-notification-bar, var(--notification-color));
+  }
+
   .closeButton:hover {
     background-color: var(--mantine-color-default-hover);
   }

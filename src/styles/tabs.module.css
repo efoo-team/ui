@@ -37,7 +37,7 @@
   }
 
   .root[data-variant='pills'] .tab[data-active] {
-    --tab-bg: var(--mantine-color-default);
+    --tab-bg: var(--efoo-color-tab-pills-active, var(--mantine-color-default));
     border-color: var(--mantine-color-default-border);
   }
 

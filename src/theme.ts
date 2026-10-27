@@ -20,6 +20,7 @@ import {
   MultiSelect,
   NavLink,
   Notification,
+  parseThemeColor,
   PasswordInput,
   Pill,
   Popover,
@@ -27,6 +28,7 @@ import {
   RadioGroup,
   RadioIndicator,
   Select,
+  Skeleton,
   Switch,
   Table,
   Tabs,
@@ -40,6 +42,7 @@ import {
   darkColors,
   grayColors,
   greenColors,
+  NEUTRAL_COLOR,
   redColors,
   yellowColors,
   zincColors,
@@ -58,8 +61,10 @@ import menuClasses from './styles/menu.module.css';
 import modalClasses from './styles/modal.module.css';
 import navLinkClasses from './styles/nav-link.module.css';
 import notificationClasses from './styles/notification.module.css';
+import pillClasses from './styles/pill.module.css';
 import radioClasses from './styles/radio.module.css';
 import selectClasses from './styles/select.module.css';
+import skeletonClasses from './styles/skeleton.module.css';
 import switchClasses from './styles/switch.module.css';
 import tableClasses from './styles/table.module.css';
 import tabsClasses from './styles/tabs.module.css';
@@ -83,6 +88,15 @@ function getRadioIconColor(theme: MantineTheme, props: IconColorProps) {
     return undefined;
   }
   return getZincContrast(theme, props.color);
+}
+
+// The dark filled shade is too dark for the thin bar on the dark surface. The outline color is each scheme's line color.
+function getNotificationBarColor(theme: MantineTheme, color: string | undefined) {
+  if (!color) return undefined;
+  const parsed = parseThemeColor({ color, theme });
+  return parsed.isThemeColor && parsed.shade === undefined && parsed.color !== NEUTRAL_COLOR
+    ? `var(--mantine-color-${parsed.color}-outline)`
+    : undefined;
 }
 
 const comboboxClassNames = { options: selectClasses.options, option: selectClasses.option };
@@ -223,14 +237,17 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: { root: navLinkClasses.root, children: navLinkClasses.children },
     }),
     Notification: Notification.extend({
-      classNames: { closeButton: notificationClasses.closeButton },
+      classNames: { root: notificationClasses.root, closeButton: notificationClasses.closeButton },
+      styles: (theme, props) => ({
+        root: { '--efoo-notification-bar': getNotificationBarColor(theme, props.color) },
+      }),
       defaultProps: { withBorder: true },
     }),
     PasswordInput: PasswordInput.extend({
       classNames: { visibilityToggle: inputClasses.visibilityToggle },
       defaultProps: { visibilityToggleFocusable: true },
     }),
-    Pill: Pill.extend({ defaultProps: { radius: 'sm' } }),
+    Pill: Pill.extend({ classNames: { root: pillClasses.root }, defaultProps: { radius: 'sm' } }),
     Popover: Popover.extend({
       defaultProps: { transitionProps: overlayTransitionProps, shadow: 'md' },
     }),
@@ -256,6 +273,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: comboboxClassNames,
       defaultProps: { checkIconPosition: 'right' },
     }),
+    Skeleton: Skeleton.extend({ classNames: { root: skeletonClasses.root } }),
     Switch: Switch.extend({
       classNames: {
         root: switchClasses.root,
