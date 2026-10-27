@@ -5,8 +5,15 @@
   "type": "module",
   "packageManager": "pnpm@12.15.0",
   "license": "MIT",
-  "files": ["dist", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md"],
-  "sideEffects": ["**/*.css"],
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {

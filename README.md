@@ -14,10 +14,7 @@ import '@efoo-team/ui/styles.css';
 
 export function App() {
   return (
-    <MantineProvider
-      theme={efooTheme}
-      cssVariablesResolver={efooCssVariablesResolver}
-    >
+    <MantineProvider theme={efooTheme} cssVariablesResolver={efooCssVariablesResolver}>
       {/* アプリケーション */}
     </MantineProvider>
   );
