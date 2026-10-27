@@ -47,7 +47,7 @@ import {
   yellowColors,
   zincColors,
 } from './colors.js';
-import { drawerTransitionProps, overlayTransitionProps } from './motion.js';
+import { drawerTransitionProps, modalTransitionProps, overlayTransitionProps } from './motion.js';
 import { efooVariantColorResolver, getZincContrast } from './variant-color-resolver.js';
 // Imported before the other styles so that dist/styles.css starts with the layer order.
 import baseClasses from './styles/base.module.css';
@@ -61,6 +61,7 @@ import menuClasses from './styles/menu.module.css';
 import modalClasses from './styles/modal.module.css';
 import navLinkClasses from './styles/nav-link.module.css';
 import notificationClasses from './styles/notification.module.css';
+import notificationsClasses from './styles/notifications.module.css';
 import pillClasses from './styles/pill.module.css';
 import radioClasses from './styles/radio.module.css';
 import selectClasses from './styles/select.module.css';
@@ -230,7 +231,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
         title: modalClasses.title,
         close: modalClasses.close,
       },
-      defaultProps: { transitionProps: overlayTransitionProps, overlayProps },
+      defaultProps: { transitionProps: modalTransitionProps, overlayProps },
     }),
     MultiSelect: MultiSelect.extend({ classNames: comboboxClassNames }),
     NavLink: NavLink.extend({
@@ -251,6 +252,8 @@ export const efooTheme: MantineThemeOverride = createTheme({
         visibilityToggleButtonProps: { 'aria-label': 'パスワードを表示' },
       },
     }),
+    // @mantine/notifications is optional for services, so the theme refers to it by name instead of importing it.
+    Notifications: { classNames: { notification: notificationsClasses.notification } },
     Pill: Pill.extend({ classNames: { root: pillClasses.root }, defaultProps: { radius: 'sm' } }),
     Popover: Popover.extend({
       defaultProps: { transitionProps: overlayTransitionProps, shadow: 'md' },

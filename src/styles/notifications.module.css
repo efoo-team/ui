@@ -1,0 +1,7 @@
+@layer efoo {
+  /* @mantine/notifications writes an overshooting easing inline, so only !important can replace it.
+     The duration and the 100% slide stay Mantine's. */
+  .notification {
+    transition-timing-function: var(--efoo-motion-easing) !important;
+  }
+}

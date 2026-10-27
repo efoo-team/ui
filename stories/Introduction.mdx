@@ -91,6 +91,7 @@ export function App() {
 - ダークで状態色の塗りつぶしの hover が暗くなる向きに変わる。
 - ダークの Tabs の pills で、選択中のタブの面が帯より暗くなる。
 - ライトの Skeleton が `gray-3` になり、shadcn/ui より濃くなる。
+- 通知（`@mantine/notifications`）の出入りの緩急が `ease` になる。
 
 ### サービスごとに調整する
 
@@ -136,6 +137,8 @@ export const cssVariablesResolver: CSSVariablesResolver = (theme) =>
 ### 動き
 
 theme の `respectReducedMotion` が `true` です。OS の「視差効果を減らす」を有効にすると、Mantine の Transition とパッケージの CSS の transition が同時に止まります。
+
+通知（`@mantine/notifications`）は、Mantine が inline style で書く行き過ぎのある緩急を、パッケージの CSS が `!important` で `--efoo-motion-easing` に置き換えます。移動量（通知の幅の分）と時間は Mantine の既定のままです。Mantine の緩急に戻す場合は、サービスの theme で `components.Notifications.classNames.notification` を別の class に差し替えます。
 
 ### Popover
 

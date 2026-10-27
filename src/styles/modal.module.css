@@ -9,6 +9,7 @@
   }
 
   .content[data-full-screen] {
+    --efoo-modal-scale: 1;
     border: 0;
   }
 
