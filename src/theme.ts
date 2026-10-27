@@ -135,6 +135,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     Badge: Badge.extend({
       classNames: { root: badgeClasses.root },
+      defaultProps: { variant: 'filled' },
     }),
     Button: Button.extend({
       classNames: { root: buttonClasses.root },

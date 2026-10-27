@@ -5,17 +5,23 @@
  */
 import type { CSSVariablesResolver } from '@mantine/core';
 import { zincColors } from './colors';
+import { getContrastColor } from './color-contrast';
 
-function getContrastColor(hex: string, threshold: number): string {
-  const normalized = hex.replace('#', '');
-  const red = Number.parseInt(normalized.slice(0, 2), 16) / 255;
-  const green = Number.parseInt(normalized.slice(2, 4), 16) / 255;
-  const blue = Number.parseInt(normalized.slice(4, 6), 16) / 255;
-  const linearize = (channel: number) =>
-    channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
-  const luminance = 0.2126 * linearize(red) + 0.7152 * linearize(green) + 0.0722 * linearize(blue);
+function getSchemeColorContrastVariables(
+  theme: Parameters<CSSVariablesResolver>[0],
+  shade: number,
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(theme.colors).flatMap(([colorName, palette]) => {
+      if (!Array.isArray(palette)) {
+        return [];
+      }
 
-  return luminance > threshold ? 'var(--mantine-color-black)' : 'var(--mantine-color-white)';
+      const color = palette[shade] ?? palette[8] ?? '#18181b';
+      const contrast = getContrastColor(color, theme.luminanceThreshold);
+      return contrast ? [[`--mantine-color-${colorName}-contrast`, contrast]] : [];
+    }),
+  );
 }
 
 export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => {
@@ -26,6 +32,8 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => {
       : theme.primaryShade;
   const lightPrimary = primaryPalette[primaryShades.light] ?? primaryPalette[8] ?? '#18181b';
   const darkPrimary = primaryPalette[primaryShades.dark] ?? primaryPalette[0] ?? '#fafafa';
+  const lightPrimaryContrast = getContrastColor(lightPrimary, theme.luminanceThreshold);
+  const darkPrimaryContrast = getContrastColor(darkPrimary, theme.luminanceThreshold);
 
   return {
     variables: {
@@ -35,7 +43,7 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => {
       '--mantine-heading-font-weight': '600',
     },
     light: {
-      '--mantine-primary-color-contrast': getContrastColor(lightPrimary, theme.luminanceThreshold),
+      ...(lightPrimaryContrast ? { '--mantine-primary-color-contrast': lightPrimaryContrast } : {}),
       '--mantine-color-text': 'var(--mantine-color-zinc-9)',
       '--mantine-color-body': 'var(--mantine-color-white)',
       '--mantine-color-error': 'var(--mantine-color-red-6)',
@@ -57,10 +65,10 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => {
       '--mantine-color-zinc-light-color': 'var(--mantine-color-zinc-9)',
       '--mantine-color-zinc-outline': 'var(--mantine-color-zinc-8)',
       '--mantine-color-zinc-outline-hover': 'var(--mantine-color-zinc-1)',
-      '--mantine-color-zinc-contrast': getContrastColor(lightPrimary, theme.luminanceThreshold),
+      ...getSchemeColorContrastVariables(theme, primaryShades.light),
     },
     dark: {
-      '--mantine-primary-color-contrast': getContrastColor(darkPrimary, theme.luminanceThreshold),
+      ...(darkPrimaryContrast ? { '--mantine-primary-color-contrast': darkPrimaryContrast } : {}),
       '--mantine-color-text': 'var(--mantine-color-zinc-0)',
       '--mantine-color-body': 'var(--mantine-color-zinc-9)',
       '--mantine-color-error': 'var(--mantine-color-red-4)',
@@ -82,7 +90,7 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => {
       '--mantine-color-zinc-light-color': 'var(--mantine-color-zinc-0)',
       '--mantine-color-zinc-outline': 'var(--mantine-color-zinc-0)',
       '--mantine-color-zinc-outline-hover': 'var(--mantine-color-zinc-8)',
-      '--mantine-color-zinc-contrast': getContrastColor(darkPrimary, theme.luminanceThreshold),
+      ...getSchemeColorContrastVariables(theme, primaryShades.dark),
     },
   };
 };
