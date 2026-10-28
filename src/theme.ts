@@ -399,7 +399,13 @@ export const efooTheme: MantineThemeOverride = createTheme({
         close: modalClasses.close,
       },
       // shadcn/ui's dialog is drawn by its 1px line, with no large shadow.
-      defaultProps: { transitionProps: modalTransitionProps, overlayProps, shadow: 'xs' },
+      // shadcn/ui's dialog opens in the middle of the viewport.
+      defaultProps: {
+        transitionProps: modalTransitionProps,
+        overlayProps,
+        shadow: 'xs',
+        centered: true,
+      },
     }),
     MultiSelect: MultiSelect.extend({
       classNames: { ...comboboxClassNames, inputField: inputClasses.pillsField },
