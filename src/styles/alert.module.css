@@ -1,0 +1,9 @@
+@layer efoo {
+  .root {
+    line-height: var(--mantine-line-height-sm);
+  }
+
+  .title {
+    font-weight: var(--mantine-font-weight-medium);
+  }
+}

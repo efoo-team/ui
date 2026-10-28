@@ -27,6 +27,11 @@
     --input-padding-y-xl: calc(0.3125rem * var(--mantine-scale));
   }
 
+  /* Mantine gives Textarea the body line height; inputs set their text at the 14/20 pair. */
+  .wrapper:has(> textarea) {
+    --input-line-height: var(--mantine-line-height-sm);
+  }
+
   .input {
     font-size: min(
       var(--_input-fz, var(--input-fz, var(--mantine-font-size-md))),

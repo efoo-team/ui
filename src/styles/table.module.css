@@ -3,6 +3,7 @@
   .table {
     --table-hover-color: var(--mantine-color-default-hover);
     --table-striped-color: color-mix(in srgb, var(--mantine-color-default-hover) 50%, transparent);
+    line-height: var(--mantine-line-height-sm);
   }
 
   .th {

@@ -6,6 +6,7 @@
   }
 
   .option {
+    line-height: var(--mantine-line-height-sm);
     font-size: min(
       var(--combobox-option-fz, var(--mantine-font-size-sm)),
       var(--mantine-font-size-md)

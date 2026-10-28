@@ -4,6 +4,7 @@
     min-height: calc(2rem * var(--mantine-scale));
     padding: 0.25rem 0.5rem;
     border-radius: var(--mantine-radius-sm);
+    line-height: var(--mantine-line-height-sm);
     transition-property: color, background-color;
     transition-duration: calc(var(--efoo-motion-duration-fast) * var(--efoo-motion-scale));
     transition-timing-function: var(--efoo-motion-easing);

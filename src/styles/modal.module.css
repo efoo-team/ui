@@ -17,6 +17,14 @@
     font-weight: var(--mantine-font-weight-medium);
   }
 
+  /* shadcn/ui's dialog text is 14/20. Text without a size inside the body follows it through Mantine's Text variables. */
+  .body {
+    --text-fz: var(--mantine-font-size-sm);
+    --text-lh: var(--mantine-line-height-sm);
+    font-size: var(--mantine-font-size-sm);
+    line-height: var(--mantine-line-height-sm);
+  }
+
   .close:hover {
     background-color: var(--mantine-color-default-hover);
   }

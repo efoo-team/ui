@@ -4,7 +4,9 @@
  * Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md.
  */
 import {
+  Accordion,
   ActionIcon,
+  Alert,
   Autocomplete,
   Badge,
   Button,
@@ -52,7 +54,9 @@ import { drawerTransitionProps, modalTransitionProps, overlayTransitionProps } f
 import { efooVariantColorResolver, getZincContrast } from './variant-color-resolver.js';
 // Imported before the other styles so that dist/styles.css starts with the layer order.
 import baseClasses from './styles/base.module.css';
+import accordionClasses from './styles/accordion.module.css';
 import actionIconClasses from './styles/action-icon.module.css';
+import alertClasses from './styles/alert.module.css';
 import badgeClasses from './styles/badge.module.css';
 import buttonClasses from './styles/button.module.css';
 import checkboxClasses from './styles/checkbox.module.css';
@@ -152,6 +156,14 @@ export const efooTheme: MantineThemeOverride = createTheme({
     lg: '1.125rem',
     xl: '1.25rem',
   },
+  // Tailwind's leading for each text size: 12/16, 14/20, 16/24, 18/28 and 20/28.
+  lineHeights: {
+    xs: '1.3333',
+    sm: '1.4286',
+    md: '1.5',
+    lg: '1.5556',
+    xl: '1.4',
+  },
   headings: {
     fontFamily: 'Inter, system-ui, sans-serif',
     fontWeight: '600',
@@ -171,7 +183,11 @@ export const efooTheme: MantineThemeOverride = createTheme({
   },
   variantColorResolver: efooVariantColorResolver,
   components: {
+    Accordion: Accordion.extend({
+      classNames: { label: accordionClasses.label, content: accordionClasses.content },
+    }),
     ActionIcon: ActionIcon.extend({ classNames: { root: actionIconClasses.root } }),
+    Alert: Alert.extend({ classNames: { root: alertClasses.root, title: alertClasses.title } }),
     Autocomplete: Autocomplete.extend({ classNames: comboboxClassNames }),
     // Without a variant Mantine leaves the text color to its CSS default (white), which is unreadable on the dark-scheme neutral fill.
     Badge: Badge.extend({
@@ -228,12 +244,13 @@ export const efooTheme: MantineThemeOverride = createTheme({
         error: inputClasses.error,
       },
     }),
-    Menu: Menu.extend({ classNames: { item: menuClasses.item } }),
+    Menu: Menu.extend({ classNames: { item: menuClasses.item, label: menuClasses.label } }),
     Modal: Modal.extend({
       classNames: {
         inner: modalClasses.inner,
         content: modalClasses.content,
         title: modalClasses.title,
+        body: modalClasses.body,
         close: modalClasses.close,
       },
       defaultProps: { transitionProps: modalTransitionProps, overlayProps },

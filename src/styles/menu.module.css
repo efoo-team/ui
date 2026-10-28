@@ -4,6 +4,7 @@
      Remapping the variable on the item itself changes only Menu items. red-text is Mantine's
      scheme-aware text red (red-filled in light, red-4 in dark), so it also works without the resolver. */
   .item {
+    line-height: var(--mantine-line-height-sm);
     --mantine-color-red-6: var(--mantine-color-red-text);
     /* Mantine writes --menu-item-hover inline as the red light-hover (red-2 in light). shadcn/ui tints with 10% of the red. */
     --mantine-color-red-light-hover: color-mix(
@@ -26,6 +27,10 @@
   .item:where([data-disabled], :disabled) {
     color: var(--menu-item-color, var(--mantine-color-text));
     opacity: 0.5;
+  }
+
+  .label {
+    line-height: var(--mantine-line-height-xs);
   }
 
   .item:focus-visible {

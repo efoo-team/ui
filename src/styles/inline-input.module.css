@@ -1,5 +1,9 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
+  .label {
+    font-weight: var(--mantine-font-weight-medium);
+  }
+
   .label[data-disabled] {
     color: inherit;
     opacity: 0.5;

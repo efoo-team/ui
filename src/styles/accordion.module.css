@@ -1,0 +1,13 @@
+@layer efoo {
+  /* shadcn/ui's accordion is 14/20 text with a medium trigger. */
+  .label {
+    font-size: var(--mantine-font-size-sm);
+    font-weight: var(--mantine-font-weight-medium);
+    line-height: var(--mantine-line-height-sm);
+  }
+
+  .content {
+    font-size: var(--mantine-font-size-sm);
+    line-height: var(--mantine-line-height-sm);
+  }
+}
