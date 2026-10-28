@@ -11,6 +11,7 @@ import {
   Grid,
   Group,
   Menu,
+  Modal,
   NavLink,
   Pagination,
   Progress,
@@ -115,11 +116,17 @@ const SEPTEMBER = salesOfMonth(9);
 const OCTOBER_GROWTH =
   (sum(OCTOBER) / OCTOBER.length / (sum(SEPTEMBER) / SEPTEMBER.length) - 1) * 100;
 
+// The default period is the current month, so the chart total matches the first card.
 const PERIODS = [
-  { value: '7', label: '7 日' },
-  { value: '30', label: '30 日' },
-  { value: '90', label: '90 日' },
+  { value: 'week', label: '過去 7 日' },
+  { value: 'month', label: '今月' },
+  { value: 'quarter', label: '過去 90 日' },
 ];
+
+const salesOfPeriod = (period: string) =>
+  period === 'month'
+    ? SALES.filter((point) => point.month === 10)
+    : SALES.slice(period === 'week' ? -7 : -90);
 
 interface StockItem {
   name: string;
@@ -153,7 +160,7 @@ const STATS: Stat[] = [
   {
     label: '10 月の受注額',
     value: yen(sum(OCTOBER)),
-    note: '10/1〜10/31 の合計。増減は 1 日平均の 9 月比',
+    note: `9 月より ${OCTOBER_GROWTH.toFixed(1)}% 多い`,
     badge: { label: `+${OCTOBER_GROWTH.toFixed(1)}%`, attention: false, trend: true },
   },
   {
@@ -301,7 +308,7 @@ function AccountMenu() {
   return (
     <Menu position="bottom-end" width={200}>
       <Menu.Target>
-        <ActionIcon variant="subtle" size="input-sm" aria-label="アカウントのメニュー">
+        <ActionIcon variant="subtle" aria-label="アカウントのメニュー">
           <Avatar size="sm">青</Avatar>
         </ActionIcon>
       </Menu.Target>
@@ -331,9 +338,7 @@ function StatCard({ stat }: { stat: Stat }) {
             </Badge>
           )}
         </Group>
-        <Title order={2} size="h2">
-          {stat.value}
-        </Title>
+        <Text size="xl">{stat.value}</Text>
         <Text size="sm" c="dimmed">
           {stat.note}
         </Text>
@@ -343,8 +348,8 @@ function StatCard({ stat }: { stat: Stat }) {
 }
 
 function SalesCard() {
-  const [period, setPeriod] = useState('30');
-  const data = SALES.slice(-Number(period));
+  const [period, setPeriod] = useState('month');
+  const data = salesOfPeriod(period);
   const first = data[0]?.date ?? '';
   const last = data[data.length - 1]?.date ?? '';
 
@@ -417,11 +422,22 @@ function StockCard() {
   );
 }
 
-function OrdersTable({ status }: { status: 'all' | OrderStatus }) {
-  const [query, setQuery] = useState('');
-  const [staff, setStaff] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
+interface OrderFilters {
+  query: string;
+  staff: string | null;
+  page: number;
+}
 
+function OrdersTable({
+  status,
+  filters,
+  onChange,
+}: {
+  status: 'all' | OrderStatus;
+  filters: OrderFilters;
+  onChange: (next: Partial<OrderFilters>) => void;
+}) {
+  const { query, staff, page } = filters;
   const filtered = ORDERS.filter(
     (order) =>
       (status === 'all' || order.status === status) &&
@@ -440,10 +456,7 @@ function OrdersTable({ status }: { status: 'all' | OrderStatus }) {
           placeholder="受注番号・顧客名で検索"
           aria-label="受注を検索"
           value={query}
-          onChange={(event) => {
-            setQuery(event.currentTarget.value);
-            setPage(1);
-          }}
+          onChange={(event) => onChange({ query: event.currentTarget.value, page: 1 })}
         />
         <Select
           flex="0 1 180px"
@@ -451,10 +464,7 @@ function OrdersTable({ status }: { status: 'all' | OrderStatus }) {
           aria-label="担当者で絞り込み"
           data={STAFF}
           value={staff}
-          onChange={(value) => {
-            setStaff(value);
-            setPage(1);
-          }}
+          onChange={(value) => onChange({ staff: value, page: 1 })}
           clearable
         />
       </Group>
@@ -524,13 +534,19 @@ function OrdersTable({ status }: { status: 'all' | OrderStatus }) {
         <Text size="sm" c="dimmed">
           {filtered.length} 件中 {rows.length} 件を表示
         </Text>
-        <Pagination total={totalPages} value={page} onChange={setPage} />
+        <Pagination total={totalPages} value={page} onChange={(next) => onChange({ page: next })} />
       </Group>
     </>
   );
 }
 
 function OrdersCard() {
+  // The search and staff filter live outside the tabs so switching tabs keeps them.
+  const [tab, setTab] = useState<string>('all');
+  const [filters, setFilters] = useState<OrderFilters>({ query: '', staff: null, page: 1 });
+  const updateFilters = (next: Partial<OrderFilters>) =>
+    setFilters((current) => ({ ...current, ...next }));
+
   return (
     <Card>
       <Group justify="space-between" mb="md">
@@ -541,7 +557,14 @@ function OrdersCard() {
           受注を登録
         </Button>
       </Group>
-      <Tabs defaultValue="all" keepMounted={false}>
+      <Tabs
+        value={tab}
+        onChange={(value) => {
+          setTab(value ?? 'all');
+          updateFilters({ page: 1 });
+        }}
+        keepMounted={false}
+      >
         <Tabs.List>
           {ORDER_TABS.map((item) => (
             <Tabs.Tab key={item.value} value={item.value}>
@@ -551,7 +574,7 @@ function OrdersCard() {
         </Tabs.List>
         {ORDER_TABS.map((item) => (
           <Tabs.Panel key={item.value} value={item.value}>
-            <OrdersTable status={item.value} />
+            <OrdersTable status={item.value} filters={filters} onChange={updateFilters} />
           </Tabs.Panel>
         ))}
       </Tabs>
@@ -623,6 +646,7 @@ function BestSellersCard() {
 
 function DashboardPage() {
   const [opened, { toggle, close }] = useDisclosure(false);
+  const [searchOpened, { open: openSearch, close: closeSearch }] = useDisclosure(false);
   const navbarId = useId();
   useHotkeys([['Escape', close]]);
 
@@ -644,9 +668,7 @@ function DashboardPage() {
               aria-expanded={opened}
               aria-controls={navbarId}
             />
-            <Title order={5} component="p">
-              サンプル販売管理
-            </Title>
+            <Text>サンプル販売管理</Text>
           </Group>
           <Group gap="sm" wrap="nowrap">
             <TextInput
@@ -656,10 +678,26 @@ function DashboardPage() {
               placeholder="受注・顧客・商品を検索"
               aria-label="全体を検索"
             />
+            <ActionIcon
+              variant="subtle"
+              hiddenFrom="sm"
+              onClick={openSearch}
+              aria-label="全体を検索"
+            >
+              <IconSearch size={ICON_SIZE} />
+            </ActionIcon>
             <AccountMenu />
           </Group>
         </Group>
       </AppShell.Header>
+      <Modal opened={searchOpened} onClose={closeSearch} title="全体を検索">
+        <TextInput
+          data-autofocus
+          leftSection={<IconSearch size={16} />}
+          placeholder="受注・顧客・商品を検索"
+          aria-label="検索する言葉"
+        />
+      </Modal>
       <AppShell.Navbar p="sm" id={navbarId} aria-label="メインナビゲーション">
         <Navbar onNavigate={close} />
       </AppShell.Navbar>
