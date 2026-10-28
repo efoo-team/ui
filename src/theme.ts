@@ -432,6 +432,8 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: { control: paginationClasses.control },
       defaultProps: {
         getControlProps: (control) => ({ 'aria-label': PAGINATION_CONTROL_LABELS[control] }),
+        // The ellipsis is drawn as an unnamed image; the page numbers around it already tell the gap.
+        attributes: { dots: { 'aria-hidden': true } },
       },
       vars: (theme, props) => ({
         root: { '--pagination-active-color': getFilledContrast(theme, props.color) },
