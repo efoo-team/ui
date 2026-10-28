@@ -4,11 +4,11 @@ import {
   Button,
   Card,
   Center,
-  Group,
   PasswordInput,
   Stack,
   Text,
   TextInput,
+  Title,
 } from '@mantine/core';
 
 const meta = {
@@ -21,57 +21,45 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function LoginPage() {
+function SignInPage() {
   return (
-    <Center mih="100dvh" p={{ base: 'lg', sm: 'xl' }} bg="var(--mantine-color-body)">
-      <Card w="100%" maw={384} padding="lg" radius="lg" shadow="sm">
+    <Center mih="100dvh" p="md">
+      <Card w="100%" maw={384}>
         <Stack gap="lg">
-          <Stack gap={6}>
-            <Text component="h1" fw={600}>
-              アカウントにログイン
-            </Text>
-            <Text fz="sm" c="dimmed">
-              登録したメールアドレスを入力してください
+          <Stack gap={4}>
+            <Title order={3} component="h1">
+              サインイン
+            </Title>
+            <Text size="sm" c="dimmed">
+              登録したメールアドレスとパスワードを入力してください
             </Text>
           </Stack>
           <form onSubmit={(event) => event.preventDefault()}>
-            <Stack gap="lg">
+            <Stack gap="md">
               <TextInput
-                size="sm"
                 type="email"
                 label="メールアドレス"
                 placeholder="user@example.com"
                 autoComplete="email"
                 required
-                withAsterisk={false}
               />
-              <Stack gap="xs">
-                <Group justify="space-between">
-                  <Text component="label" htmlFor="login-password" fz="sm" fw={500}>
-                    パスワード
-                  </Text>
-                  <Anchor href="#" fz="sm" c="var(--mantine-color-text)">
-                    パスワードを忘れた場合
-                  </Anchor>
-                </Group>
-                <PasswordInput
-                  id="login-password"
-                  size="sm"
-                  autoComplete="current-password"
-                  required
-                />
+              <Stack gap={4}>
+                <PasswordInput label="パスワード" autoComplete="current-password" required />
+                <Anchor href="#" size="sm" ta="right">
+                  パスワードを忘れた場合
+                </Anchor>
               </Stack>
               <Stack gap="sm">
-                <Button type="submit" size="sm" fullWidth>
-                  ログイン
+                <Button type="submit" fullWidth>
+                  サインイン
                 </Button>
-                <Button variant="outline" size="sm" fullWidth>
-                  シングルサインオンでログイン
+                <Button variant="outline" fullWidth>
+                  シングルサインオンでサインイン
                 </Button>
               </Stack>
-              <Text fz="sm" c="dimmed" ta="center">
+              <Text size="sm" c="dimmed" ta="center">
                 アカウントをお持ちでない場合は{' '}
-                <Anchor href="#" inherit c="var(--mantine-color-text)" underline="always">
+                <Anchor href="#" inherit>
                   新規登録
                 </Anchor>
               </Text>
@@ -85,5 +73,5 @@ function LoginPage() {
 
 export const SignIn: Story = {
   name: 'サインイン',
-  render: () => <LoginPage />,
+  render: () => <SignInPage />,
 };
