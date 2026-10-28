@@ -7,6 +7,11 @@
     line-height: var(--mantine-line-height-sm);
   }
 
+  /* The stripes are already the hover color at 50%; with striped rows the hover takes the full muted surface. */
+  .table:has(> tbody > tr[data-striped]) {
+    --table-hover-color: var(--mantine-color-default-hover);
+  }
+
   /* shadcn/ui's table head is 40px high with no background; a table cell's height is its minimum. */
   .th {
     height: calc(2.5rem * var(--mantine-scale));
