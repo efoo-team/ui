@@ -209,6 +209,8 @@ function OrganizationMenu({ rail }) {
     <AppShell.Section grow component={ScrollArea}>
       <Tooltip label="ダッシュボード" position="right" disabled={!rail}>
         <NavLink
+          component="a"
+          href="/dashboard"
           label="ダッシュボード"
           aria-label="ダッシュボード"
           leftSection={<IconHome size={16} />}
@@ -224,8 +226,8 @@ function OrganizationMenu({ rail }) {
           onChange={() => (rail ? expandParent('設定') : toggleParent('設定'))}
           aria-expanded={rail ? false : openedParents.includes('設定')}
         >
-          <NavLink label="全般" active aria-current="page" />
-          <NavLink label="通知" />
+          <NavLink component="a" href="/settings/general" label="全般" active aria-current="page" />
+          <NavLink component="a" href="/settings/notifications" label="通知" />
         </NavLink>
       </Tooltip>
     </AppShell.Section>
