@@ -21,9 +21,20 @@
     color: var(--mantine-color-text);
   }
 
+  .day:where([data-today][data-highlight-today]):not([data-selected], [data-in-range]) {
+    border: 0;
+    background: var(--mantine-color-default-hover);
+  }
+
   .calendarHeader {
     --dch-control-size-xs: calc(1.5rem * var(--mantine-scale));
     --dch-control-size-sm: calc(1.75rem * var(--mantine-scale));
+  }
+
+  .calendarHeaderControlIcon {
+    /* Mantine sets the chevron size inline to 45%. */
+    width: calc(1rem * var(--mantine-scale)) !important;
+    height: calc(1rem * var(--mantine-scale)) !important;
   }
 
   .monthsListControl,

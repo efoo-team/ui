@@ -214,6 +214,7 @@ const sliderTheme = {
 const dateClassNames = {
   day: datesClasses.day,
   calendarHeader: datesClasses.calendarHeader,
+  calendarHeaderControlIcon: datesClasses.calendarHeaderControlIcon,
   monthsListControl: datesClasses.monthsListControl,
   yearsListControl: datesClasses.yearsListControl,
 };
@@ -230,23 +231,34 @@ const dateDefaults = {
     yearLevelControl: '年を選択',
   },
 };
-const calendarDefaults = { ...dateDefaults, firstDayOfWeek: 0, monthLabelFormat: 'YYYY年M月' };
+const yearDefaults = { ...dateDefaults, decadeLabelFormat: 'YYYY年', yearsListFormat: 'YYYY年' };
+const monthDefaults = { ...yearDefaults, yearLabelFormat: 'YYYY年' };
+const calendarDefaults = {
+  ...monthDefaults,
+  firstDayOfWeek: 0,
+  monthLabelFormat: 'YYYY年M月',
+  highlightToday: true,
+  getDayAriaLabel: (date: string) => {
+    const [year, month, day] = date.split('-');
+    return `${Number(year)}年${Number(month)}月${Number(day)}日`;
+  },
+};
 const dateComponents = {
   Calendar: { classNames: dateClassNames, defaultProps: calendarDefaults },
   DatePicker: { classNames: dateClassNames, defaultProps: calendarDefaults },
-  MonthPicker: { classNames: dateClassNames, defaultProps: dateDefaults },
-  YearPicker: { classNames: dateClassNames, defaultProps: dateDefaults },
+  MonthPicker: { classNames: dateClassNames, defaultProps: monthDefaults },
+  YearPicker: { classNames: dateClassNames, defaultProps: yearDefaults },
   MonthPickerInput: {
     classNames: dateClassNames,
     defaultProps: {
-      ...dateDefaults,
+      ...monthDefaults,
       valueFormat: 'YYYY年M月',
       clearButtonProps: clearSelectionProps,
     },
   },
   YearPickerInput: {
     classNames: dateClassNames,
-    defaultProps: { ...dateDefaults, valueFormat: 'YYYY年', clearButtonProps: clearSelectionProps },
+    defaultProps: { ...yearDefaults, valueFormat: 'YYYY年', clearButtonProps: clearSelectionProps },
   },
   DateInput: {
     classNames: dateClassNames,
@@ -274,6 +286,9 @@ const dateComponents = {
     },
   },
   InlineDateTimePicker: { classNames: dateClassNames, defaultProps: calendarDefaults },
+  TimePicker: {
+    defaultProps: { hoursInputLabel: '時', minutesInputLabel: '分', secondsInputLabel: '秒' },
+  },
 };
 
 const comboboxClassNames = {
