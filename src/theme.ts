@@ -43,6 +43,7 @@ import {
   Switch,
   Table,
   Tabs,
+  TagsInput,
   ThemeIcon,
   Timeline,
   Tooltip,
@@ -445,6 +446,9 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     Tabs: Tabs.extend({
       classNames: { root: tabsClasses.root, list: tabsClasses.list, tab: tabsClasses.tab },
+    }),
+    TagsInput: TagsInput.extend({
+      classNames: { ...comboboxClassNames, inputField: inputClasses.pillsField },
     }),
     ThemeIcon: ThemeIcon.extend({ defaultProps: { variant: 'filled' } }),
     Timeline: Timeline.extend({
