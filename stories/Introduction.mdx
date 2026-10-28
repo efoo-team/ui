@@ -10,7 +10,7 @@ efoo のサービスで共通して使う Mantine の theme と、その theme �
 
 このパッケージは npm レジストリには置かず、GitHub から導入します。導入時に `prepare` が JavaScript、型定義、CSS を build します。
 
-利用側に必要なパッケージは React と React DOM 19、`@mantine/core` と `@mantine/hooks` の 9.7 系です。通知（`@mantine/notifications`）を使う場合だけ追加します。
+利用側に必要なパッケージは React と React DOM 19、`@mantine/core` と `@mantine/hooks` の 9.7 系です。通知（`@mantine/notifications`）、日付・時刻（`@mantine/dates` と `dayjs`）、ファイルの選択（`@mantine/dropzone`）は、それぞれ使う場合だけ追加します。`@mantine/dates` と `@mantine/dropzone` は optional peer dependency です。Mantine の各パッケージは同じバージョンを使ってください。
 
 ### pnpm
 
@@ -26,6 +26,8 @@ allowBuilds:
 ```sh
 pnpm add github:efoo-team/ui @mantine/core @mantine/hooks react react-dom
 pnpm add @mantine/notifications # 通知を使う場合
+pnpm add @mantine/dates dayjs # 日付・時刻を使う場合
+pnpm add @mantine/dropzone # ファイルの選択を使う場合
 ```
 
 ### npm
@@ -35,6 +37,8 @@ pnpm add @mantine/notifications # 通知を使う場合
 ```sh
 npm i github:efoo-team/ui @mantine/core @mantine/hooks react react-dom
 npm i @mantine/notifications # 通知を使う場合
+npm i @mantine/dates dayjs # 日付・時刻を使う場合
+npm i @mantine/dropzone # ファイルの選択を使う場合
 ```
 
 ### TypeScript
@@ -50,6 +54,8 @@ CSS は次の順で読み込みます。
 ```ts
 import '@mantine/core/styles.layer.css'; // Mantine の CSS は layer 版
 import '@mantine/notifications/styles.layer.css'; // 通知を使う場合だけ
+import '@mantine/dates/styles.layer.css'; // 日付・時刻を使う場合だけ
+import '@mantine/dropzone/styles.layer.css'; // ファイルの選択を使う場合だけ
 import '@efoo-team/ui/styles.css';
 ```
 
@@ -99,6 +105,22 @@ export function App() {
 - ライトの Skeleton が `gray-3` になり、shadcn/ui より濃くなる。
 - ダークの Skeleton が白 10% になり、Card の上ではほとんど見えない。
 - 通知（`@mantine/notifications`）の出入りの緩急が `ease` になる。
+
+### 日付・時刻の日本語設定
+
+日付・時刻を使う場合は、アプリケーションで日本語ロケールと入力解析用のプラグインを読み込み、`DatesProvider` に `efooDatesSettings` を渡します。
+
+```tsx
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import 'dayjs/locale/ja';
+import { DatesProvider } from '@mantine/dates';
+import { efooDatesSettings } from '@efoo-team/ui';
+
+dayjs.extend(customParseFormat);
+
+<DatesProvider settings={efooDatesSettings}>{/* アプリケーション */}</DatesProvider>;
+```
 
 ### サービスごとに調整する
 
@@ -261,25 +283,28 @@ Badge の既定は `variant="light"` です。`color` を指定しない Badge �
 
 部品ごとの表示例は、サイドバーの「日本語名（Mantine の部品名）」から探せます。サイドバーの検索欄に Mantine の部品名（例: `Radio`）を入れても見つかります。上部ツールバーの「ライト」「ダーク」のボタンで、表示を切り替えられます。
 
-| 部品                                             | サイドバーの場所                                                                                                                                                          |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AppShell・NavLink                                | [構造 / 画面の枠組みとナビゲーション（AppShell, NavLink）](?path=/docs/構造-画面の枠組みとナビゲーション（appshell-navlink）--docs)                                       |
-| Button                                           | [操作 / ボタン（Button）](?path=/docs/操作-ボタン（button）--docs)                                                                                                        |
-| Tabs                                             | [操作 / タブ（Tabs）](?path=/docs/操作-タブ（tabs）--docs)                                                                                                                |
-| ActionIcon                                       | [操作 / アイコンボタン（ActionIcon）](?path=/docs/操作-アイコンボタン（actionicon）--docs)                                                                                |
-| SegmentedControl                                 | [操作 / 切り替え（SegmentedControl）](?path=/docs/操作-切り替え（segmentedcontrol）--docs)                                                                                |
-| Pagination                                       | [操作 / ページ送り（Pagination）](?path=/docs/操作-ページ送り（pagination）--docs)                                                                                        |
-| TextInput・Textarea・NumberInput・PasswordInput  | [入力 / テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）](?path=/docs/入力-テキスト入力欄（textinput-textarea-numberinput-passwordinput）--docs)         |
-| Select・MultiSelect                              | [入力 / 選択欄（Select, MultiSelect）](?path=/docs/入力-選択欄（select-multiselect）--docs)                                                                               |
-| Checkbox・Radio・Switch                          | [入力 / チェック・選択・切り替え（Checkbox, Radio, Switch）](?path=/docs/入力-チェック・選択・切り替え（checkbox-radio-switch）--docs)                                    |
-| Button・TextInput・Checkbox・Radio・Switch・Tabs | [入力 / フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs）](?path=/docs/入力-フォーカスの見え方（button-textinput-checkbox-radio-switch-tabs）--docs) |
-| Table・Card・Badge                               | [表示 / 表・カード・バッジ（Table, Card, Badge）](?path=/docs/表示-表・カード・バッジ（table-card-badge）--docs)                                                          |
-| Avatar                                           | [表示 / アバター（Avatar）](?path=/docs/表示-アバター（avatar）--docs)                                                                                                    |
-| Progress                                         | [表示 / 進捗バー（Progress）](?path=/docs/表示-進捗バー（progress）--docs)                                                                                                |
-| Skeleton・Tooltip                                | [表示 / 読み込み表示とツールチップ（Skeleton, Tooltip）](?path=/docs/表示-読み込み表示とツールチップ（skeleton-tooltip）--docs)                                           |
-| Menu・Popover・Modal・Drawer                     | [重ねて表示 / メニュー・モーダルほか（Menu, Popover, Modal, Drawer）](?path=/docs/重ねて表示-メニュー・モーダルほか（menu-popover-modal-drawer）--docs)                   |
-| Notification                                     | [フィードバック / 通知（Notification）](?path=/docs/フィードバック-通知（notification）--docs)                                                                            |
-| 開閉の動き                                       | [動き / 開閉の動き（Transition）](?path=/docs/動き-開閉の動き（transition）--docs)                                                                                        |
+| 部品                                                                              | サイドバーの場所                                                                                                                                                          |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| AppShell・NavLink                                                                 | [構造 / 画面の枠組みとナビゲーション（AppShell, NavLink）](?path=/docs/構造-画面の枠組みとナビゲーション（appshell-navlink）--docs)                                       |
+| Button                                                                            | [操作 / ボタン（Button）](?path=/docs/操作-ボタン（button）--docs)                                                                                                        |
+| Tabs                                                                              | [操作 / タブ（Tabs）](?path=/docs/操作-タブ（tabs）--docs)                                                                                                                |
+| ActionIcon                                                                        | [操作 / アイコンボタン（ActionIcon）](?path=/docs/操作-アイコンボタン（actionicon）--docs)                                                                                |
+| SegmentedControl                                                                  | [操作 / 切り替え（SegmentedControl）](?path=/docs/操作-切り替え（segmentedcontrol）--docs)                                                                                |
+| Pagination                                                                        | [操作 / ページ送り（Pagination）](?path=/docs/操作-ページ送り（pagination）--docs)                                                                                        |
+| TextInput・Textarea・NumberInput・PasswordInput                                   | [入力 / テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）](?path=/docs/入力-テキスト入力欄（textinput-textarea-numberinput-passwordinput）--docs)         |
+| Select・MultiSelect                                                               | [入力 / 選択欄（Select, MultiSelect）](?path=/docs/入力-選択欄（select-multiselect）--docs)                                                                               |
+| DateInput・DateTimePicker・TimeInput・DatePicker                                  | [入力 / 日付と時刻（DateInput, DateTimePicker, TimeInput）](?path=/docs/入力-日付と時刻（dateinput-datetimepicker-timeinput）--docs)                                      |
+| Dropzone                                                                          | [入力 / ファイルの選択（Dropzone）](?path=/docs/入力-ファイルの選択（dropzone）--docs)                                                                                    |
+| Checkbox・Radio・Switch                                                           | [入力 / チェック・選択・切り替え（Checkbox, Radio, Switch）](?path=/docs/入力-チェック・選択・切り替え（checkbox-radio-switch）--docs)                                    |
+| Button・TextInput・Checkbox・Radio・Switch・Tabs                                  | [入力 / フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs）](?path=/docs/入力-フォーカスの見え方（button-textinput-checkbox-radio-switch-tabs）--docs) |
+| Table・Card・Badge                                                                | [表示 / 表・カード・バッジ（Table, Card, Badge）](?path=/docs/表示-表・カード・バッジ（table-card-badge）--docs)                                                          |
+| Avatar                                                                            | [表示 / アバター（Avatar）](?path=/docs/表示-アバター（avatar）--docs)                                                                                                    |
+| Progress・RingProgress                                                            | [表示 / 進捗バー（Progress）](?path=/docs/表示-進捗バー（progress）--docs)                                                                                                |
+| Loader・Slider・EmptyState・DataList・Alert・Chip・Timeline・Accordion・TagsInput | [表示 / 汎用コンポーネント](?path=/docs/表示-汎用コンポーネント--docs)                                                                                                    |
+| Skeleton・Tooltip                                                                 | [表示 / 読み込み表示とツールチップ（Skeleton, Tooltip）](?path=/docs/表示-読み込み表示とツールチップ（skeleton-tooltip）--docs)                                           |
+| Menu・Popover・Modal・Drawer                                                      | [重ねて表示 / メニュー・モーダルほか（Menu, Popover, Modal, Drawer）](?path=/docs/重ねて表示-メニュー・モーダルほか（menu-popover-modal-drawer）--docs)                   |
+| Notification                                                                      | [フィードバック / 通知（Notification）](?path=/docs/フィードバック-通知（notification）--docs)                                                                            |
+| 開閉の動き                                                                        | [動き / 開閉の動き（Transition）](?path=/docs/動き-開閉の動き（transition）--docs)                                                                                        |
 
 ## ライセンス
 
