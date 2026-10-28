@@ -139,6 +139,8 @@ export const cssVariablesResolver: CSSVariablesResolver = (theme) =>
 
 独自の `variantColorResolver` を持つ場合は、`efooVariantColorResolver(input)` の結果を起点に差分を足します。
 
+Pagination の `getControlProps`・`attributes` と、Select・MultiSelect・TagsInput・Autocomplete の `clearButtonProps` は、theme が日本語の aria-label を入れた既定値を持っており、サービスでこれらの prop を渡すと既定値ごと置き換わるため、aria-label（Pagination の `…` は `aria-hidden`）も含めて渡してください。
+
 ### 動き
 
 theme の `respectReducedMotion` が `true` です。OS の「視差効果を減らす」を有効にすると、Mantine の Transition とパッケージの CSS の transition が同時に止まります。
