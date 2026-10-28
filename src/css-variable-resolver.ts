@@ -3,7 +3,12 @@
  * shadcn theme: https://github.com/RubixCube-Innovations/mantine-theme-builder
  * Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md.
  */
-import { isLightColor, type CSSVariablesResolver, type MantineTheme } from '@mantine/core';
+import {
+  getPrimaryShade,
+  isLightColor,
+  type CSSVariablesResolver,
+  type MantineTheme,
+} from '@mantine/core';
 import { NEUTRAL_COLOR as z, STATUS_COLORS, type StatusColor } from './colors.js';
 import { motionCssVariables } from './motion.js';
 
@@ -27,18 +32,36 @@ function getContrast(theme: MantineTheme, color: StatusColor, shade: number) {
     : 'var(--mantine-color-white)';
 }
 
+/*
+ * A status color chosen as primaryColor keeps the fill of the service's primaryShade; only its text follows that fill.
+ * hoverStep is +1 in light (darker, like Mantine) and -1 in dark (lighter).
+ */
+function fillVariables(
+  theme: MantineTheme,
+  color: StatusColor,
+  scheme: 'light' | 'dark',
+  shade: number,
+  hoverStep: number,
+): [string, string][] {
+  if (color === theme.primaryColor) {
+    return [
+      [
+        `--mantine-color-${color}-contrast`,
+        getContrast(theme, color, getPrimaryShade(theme, scheme)),
+      ],
+    ];
+  }
+  return [
+    [`--mantine-color-${color}-filled`, `var(--mantine-color-${color}-${shade})`],
+    [`--mantine-color-${color}-filled-hover`, `var(--mantine-color-${color}-${shade + hoverStep})`],
+    [`--mantine-color-${color}-contrast`, getContrast(theme, color, shade)],
+  ];
+}
+
 const lightStatusColors = (theme: MantineTheme) =>
   Object.fromEntries(
     STATUS_COLORS.flatMap((color) => [
-      [
-        `--mantine-color-${color}-filled`,
-        `var(--mantine-color-${color}-${LIGHT_FILLED_SHADE[color]})`,
-      ],
-      [
-        `--mantine-color-${color}-filled-hover`,
-        `var(--mantine-color-${color}-${LIGHT_FILLED_SHADE[color] + 1})`,
-      ],
-      [`--mantine-color-${color}-contrast`, getContrast(theme, color, LIGHT_FILLED_SHADE[color])],
+      ...fillVariables(theme, color, 'light', LIGHT_FILLED_SHADE[color], 1),
       [
         `--mantine-color-${color}-text`,
         `var(--mantine-color-${color}-${LIGHT_PAGE_TEXT_SHADE[color]})`,
@@ -67,15 +90,7 @@ const DARK_FILLED_SHADE: Record<StatusColor, number> = { red: 8, yellow: 5, gree
 const darkStatusColors = (theme: MantineTheme) =>
   Object.fromEntries(
     STATUS_COLORS.flatMap((color) => [
-      [
-        `--mantine-color-${color}-filled`,
-        `var(--mantine-color-${color}-${DARK_FILLED_SHADE[color]})`,
-      ],
-      [
-        `--mantine-color-${color}-filled-hover`,
-        `var(--mantine-color-${color}-${DARK_FILLED_SHADE[color] - 1})`,
-      ],
-      [`--mantine-color-${color}-contrast`, getContrast(theme, color, DARK_FILLED_SHADE[color])],
+      ...fillVariables(theme, color, 'dark', DARK_FILLED_SHADE[color], -1),
       [
         `--mantine-color-${color}-light`,
         `color-mix(in srgb, var(--mantine-color-${color}-${DARK_TEXT_SHADE}) 20%, transparent)`,
@@ -110,7 +125,9 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
     [`--mantine-color-${z}-contrast`]: `var(--mantine-color-${z}-0)`,
     ...lightStatusColors(theme),
     // red-6 is shadcn/ui's destructive and Mantine's light error color, so buttons, text and errors share one red.
-    '--mantine-color-red-outline': 'var(--mantine-color-red-6)',
+    ...(theme.primaryColor === 'red'
+      ? {}
+      : { '--mantine-color-red-outline': 'var(--mantine-color-red-6)' }),
     '--efoo-color-ring': `var(--mantine-color-${z}-4)`,
     '--efoo-color-tab-pills-text': 'var(--mantine-color-gray-7)',
     '--efoo-color-skeleton': 'var(--mantine-color-default-hover)',

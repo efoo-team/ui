@@ -116,7 +116,7 @@ const serviceOverrides = createTheme({
 export const serviceTheme = mergeThemeOverrides(efooTheme, serviceOverrides);
 ```
 
-`primaryColor` を `zinc` 以外にすると、resolver は `--mantine-primary-color-contrast` を上書きしません。塗りつぶしの文字色は Mantine の既定で決まります。
+`primaryColor` を `zinc` 以外にすると、resolver は `--mantine-primary-color-contrast` を上書きしません。塗りつぶしの文字色は Mantine の既定で決まります。`red`・`yellow`・`green`・`blue` を `primaryColor` にした場合、その色の塗りつぶしは resolver の既定の shade ではなく `primaryShade` に従います。
 
 サービス独自の CSS 変数 resolver を持つ場合は、`efooCssVariablesResolver` の結果に `deepMerge` でサービスの値を重ねて 1 つの resolver にします。
 
