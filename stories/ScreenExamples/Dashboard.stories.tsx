@@ -380,7 +380,7 @@ function RailParent({
 }
 
 /*
- * One set of NavLinks serves both widths. With <AppShell.Navbar mod={{ collapsed }}> the theme folds them into
+ * One set of NavLinks serves both widths. With <AppShell.Navbar mod={{ rail }}> the theme folds them into
  * icons and hides labels, badges and child links, so each link carries its name in aria-label and a Tooltip, and a
  * parent opens its child links from a Menu instead.
  */
@@ -902,8 +902,8 @@ function DashboardPage() {
         />
       </Modal>
       <AppShell.Navbar
-        p={rail ? 'xs' : 'sm'}
-        mod={{ collapsed: rail }}
+        p="xs"
+        mod={{ rail }}
         id={navbarId}
         aria-label="メインナビゲーション"
         onKeyDown={closeOnEscape}
