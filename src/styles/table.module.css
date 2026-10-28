@@ -1,7 +1,8 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
   .table {
-    --table-hover-color: var(--mantine-color-default-hover);
+    /* shadcn/ui's row hover is the muted surface at 50%. */
+    --table-hover-color: color-mix(in srgb, var(--mantine-color-default-hover) 50%, transparent);
     --table-striped-color: color-mix(in srgb, var(--mantine-color-default-hover) 50%, transparent);
     line-height: var(--mantine-line-height-sm);
   }

@@ -14,8 +14,15 @@
     background-color: var(--mantine-color-default-hover);
   }
 
+  /* shadcn/ui keeps the active item on the accent surface while hovered. */
   .root:where([data-active], [aria-current='page']) {
+    --nl-hover: var(--nl-bg);
     font-weight: var(--mantine-font-weight-medium);
+  }
+
+  /* Disabled items fade to 50% like Menu items and options instead of Mantine's 40%. */
+  .root:where([data-disabled]) {
+    opacity: 0.5;
   }
 
   .children {

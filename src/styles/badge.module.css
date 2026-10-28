@@ -17,4 +17,10 @@
   .root[data-variant='outline'] {
     background: transparent;
   }
+
+  /* Mantine fills the dot badge with dark-5 in dark; like outline, the dot alone carries the color. */
+  .root[data-variant='dot'] {
+    border-color: var(--mantine-color-default-border);
+    background: transparent;
+  }
 }

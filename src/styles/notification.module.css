@@ -8,7 +8,9 @@
   }
 
   /* The bar keeps the icon and loader on --notification-color and only takes the line color of the status. */
+  /* The 6px bar keeps small corners instead of the 10px of the toast, which turned its ends into half circles. */
   .root::before {
+    border-radius: var(--mantine-radius-xs);
     background-color: var(--efoo-notification-bar, var(--notification-color));
   }
 

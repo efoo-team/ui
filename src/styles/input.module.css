@@ -1,7 +1,9 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
-  /* The same heights as Button, so inputs and buttons line up at every size. */
+  /* The same heights as Button, so inputs and buttons line up at every size. The sides are 10px at the default
+     32px, like shadcn/ui, instead of Mantine's height / 3. */
   .wrapper {
+    --input-padding: calc(var(--input-height) * 0.3125);
     --input-height-xs: calc(1.75rem * var(--mantine-scale));
     --input-height-sm: calc(2rem * var(--mantine-scale));
     --input-height-md: calc(2.25rem * var(--mantine-scale));

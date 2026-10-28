@@ -4,7 +4,9 @@
     --tab-hover-color: transparent;
   }
 
+  /* shadcn/ui's tab triggers are medium in every variant. */
   .tab {
+    font-weight: var(--mantine-font-weight-medium);
     color: var(--mantine-color-dimmed);
     transition-property: color, background-color, box-shadow;
     transition-duration: calc(var(--efoo-motion-duration-fast) * var(--efoo-motion-scale));
