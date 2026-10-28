@@ -4,6 +4,7 @@
  * Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md.
  */
 import {
+  ActionIcon,
   Autocomplete,
   Badge,
   Button,
@@ -51,6 +52,7 @@ import { drawerTransitionProps, modalTransitionProps, overlayTransitionProps } f
 import { efooVariantColorResolver, getZincContrast } from './variant-color-resolver.js';
 // Imported before the other styles so that dist/styles.css starts with the layer order.
 import baseClasses from './styles/base.module.css';
+import actionIconClasses from './styles/action-icon.module.css';
 import badgeClasses from './styles/badge.module.css';
 import buttonClasses from './styles/button.module.css';
 import checkboxClasses from './styles/checkbox.module.css';
@@ -169,13 +171,16 @@ export const efooTheme: MantineThemeOverride = createTheme({
   },
   variantColorResolver: efooVariantColorResolver,
   components: {
+    ActionIcon: ActionIcon.extend({ classNames: { root: actionIconClasses.root } }),
     Autocomplete: Autocomplete.extend({ classNames: comboboxClassNames }),
     // Without a variant Mantine leaves the text color to its CSS default (white), which is unreadable on the dark-scheme neutral fill.
     Badge: Badge.extend({
       classNames: { root: badgeClasses.root },
       defaultProps: { variant: 'filled' },
     }),
-    Button: Button.extend({ classNames: { root: buttonClasses.root } }),
+    Button: Button.extend({
+      classNames: { root: buttonClasses.root, section: buttonClasses.section },
+    }),
     Card: Card.extend({ defaultProps: { withBorder: true } }),
     Checkbox: Checkbox.extend({
       classNames: {

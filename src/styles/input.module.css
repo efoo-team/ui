@@ -1,9 +1,12 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
+  /* The same heights as Button, so inputs and buttons line up at every size. */
   .wrapper {
-    --input-height-md: calc(2.5rem * var(--mantine-scale));
-    --input-height-lg: calc(2.75rem * var(--mantine-scale));
-    --input-height-xl: calc(3rem * var(--mantine-scale));
+    --input-height-xs: calc(1.75rem * var(--mantine-scale));
+    --input-height-sm: calc(2rem * var(--mantine-scale));
+    --input-height-md: calc(2.25rem * var(--mantine-scale));
+    --input-height-lg: calc(2.5rem * var(--mantine-scale));
+    --input-height-xl: calc(2.75rem * var(--mantine-scale));
     --input-disabled-bg: var(--input-bg);
     --input-disabled-color: var(--input-color);
     --input-bd-focus: var(--efoo-color-ring, var(--mantine-primary-color-filled));
@@ -14,11 +17,14 @@
     --input-bd-focus: transparent;
   }
 
-  /* Mantine's multiline padding assumes its taller heights; these keep one row of pills at --input-height. */
-  .wrapper[data-multiline] {
-    --input-padding-y-md: calc(0.375rem * var(--mantine-scale));
-    --input-padding-y-lg: calc(0.4375rem * var(--mantine-scale));
-    --input-padding-y-xl: calc(0.625rem * var(--mantine-scale));
+  /* Mantine's multiline padding assumes its taller heights; these keep one row of pills at --input-height.
+     Textarea has no pills and keeps Mantine's padding. */
+  .wrapper[data-multiline]:not(:has(> textarea)) {
+    --input-padding-y-xs: calc(0.25rem * var(--mantine-scale));
+    --input-padding-y-sm: calc(0.25rem * var(--mantine-scale));
+    --input-padding-y-md: calc(0.28125rem * var(--mantine-scale));
+    --input-padding-y-lg: calc(0.3125rem * var(--mantine-scale));
+    --input-padding-y-xl: calc(0.3125rem * var(--mantine-scale));
   }
 
   .input {

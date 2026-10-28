@@ -1,0 +1,10 @@
+@layer efoo {
+  /* The input-* sizes stand next to inputs, so they follow the input heights. */
+  .root {
+    --ai-size-input-xs: calc(1.75rem * var(--mantine-scale));
+    --ai-size-input-sm: calc(2rem * var(--mantine-scale));
+    --ai-size-input-md: calc(2.25rem * var(--mantine-scale));
+    --ai-size-input-lg: calc(2.5rem * var(--mantine-scale));
+    --ai-size-input-xl: calc(2.75rem * var(--mantine-scale));
+  }
+}
