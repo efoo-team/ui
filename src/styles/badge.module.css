@@ -9,6 +9,9 @@
     --badge-fz-lg: var(--mantine-font-size-sm);
     --badge-padding-x-md: calc(0.5rem * var(--mantine-scale));
     font-weight: var(--mantine-font-weight-medium);
+    /* Like shadcn/ui's badge: it keeps its width in a tight row instead of shrinking into an ellipsis. */
+    flex-shrink: 0;
+    white-space: nowrap;
     letter-spacing: normal;
     text-transform: none;
   }

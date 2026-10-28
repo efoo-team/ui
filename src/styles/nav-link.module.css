@@ -59,8 +59,27 @@
     min-height: calc(1.75rem * var(--mantine-scale));
   }
 
+  /* Labels stay on one line and end in an ellipsis like shadcn/ui's menu buttons, so a narrowing navbar never
+     wraps them into tall rows. */
+  .body {
+    white-space: nowrap;
+  }
+
+  .label,
+  .description {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .description {
     line-height: var(--mantine-line-height-xs);
+  }
+
+  /* The avatar sits in a 32px slot, so a smaller one stays on the icon column in the open navbar and in the rail. */
+  .section[data-position='left']:has(> :global(.mantine-Avatar-root)) {
+    justify-content: center;
+    min-width: calc(2rem * var(--mantine-scale));
   }
 
   /* A NavLink that leads with an Avatar is a switcher row, like shadcn/ui's size="lg" menu button: 48px high with an
