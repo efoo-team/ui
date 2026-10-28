@@ -94,6 +94,8 @@ const preview: Preview = {
       storySort: {
         order: [
           'はじめに',
+          '画面例',
+          ['ダッシュボード', 'サインイン'],
           '構造',
           '操作',
           ['ボタン（Button）', 'タブ（Tabs）'],

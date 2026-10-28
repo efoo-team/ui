@@ -11,7 +11,7 @@ body,
   color: var(--mantine-color-text);
 }
 
-/* Full-screen stories such as Blocks draw their own page surface edge to edge. */
+/* Full-screen stories such as the 画面例 pages draw their own page surface edge to edge. */
 .storybook-canvas[data-layout='fullscreen'] {
   padding: 0;
 }
