@@ -90,6 +90,7 @@ export function App() {
 - `red`・`yellow`・`green`・`blue` の `variant="light"` の背景が色の 10%（ダークは 20%）の透過にならず、ライトは 100 番台の不透明な面、文字は 900 番台になる。
 - ダークで `red`・`yellow`・`green`・`blue` の `variant="light"`（Badge・Alert など）の文字がほぼ白になり、状態の色が文字に出ない。
 - ダークの入力欄の枠が白 15% にならず、白 10% のままになる。
+- ダークで `gray` の `variant="light"`（Badge など）の面がほぼ黒になり、Card の上で沈む。
 - AppShell の navbar の面が page と同じ色になる。
 - ダークで状態色の塗りつぶしの hover が暗くなる向きに変わる。
 - ダークの Tabs の pills で、選択中のタブの面が帯より暗くなる。
@@ -168,6 +169,8 @@ Popover の中で操作させる場合は、Escape で閉じられるように `
 | destructive          | `color="red"` の塗りつぶし |
 
 状態を表す色は `red`・`yellow`・`green`・`blue` です（Tailwind CSS v4 の値）。
+
+Badge の既定は `variant="light"` です。`color` を指定しない Badge は shadcn/ui の secondary（muted の面に本文の色の文字）、状態色の Badge は色の 10% の面に色の文字になります。塗りつぶしにする場合は `variant="filled"` を指定します。
 
 グラフの系列の色は、CSS 変数 `--efoo-chart-1`〜`--efoo-chart-5`（shadcn/ui の chart と同じ青の濃淡）を使います。`@mantine/charts` では `series` の `color` に `var(--efoo-chart-1)` のように渡します。
 

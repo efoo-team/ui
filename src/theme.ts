@@ -239,7 +239,8 @@ export const efooTheme: MantineThemeOverride = createTheme({
             }
           : { root: {} },
     }),
-    // Without a variant Mantine leaves the text color to its CSS default (white), which is unreadable on the dark-scheme neutral fill.
+    // shadcn/ui's badges are mostly secondary (a muted surface with the text color); status colors default to a tint.
+    // A variant is always set, so Mantine never falls back to its white text on the light dark-scheme fill.
     Badge: Badge.extend({
       classNames: { root: badgeClasses.root },
       // shadcn/ui's outline badge keeps the surface line (white 10% in dark), not the input line of buttons.
@@ -251,7 +252,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
               : undefined,
         },
       }),
-      defaultProps: { variant: 'filled' },
+      defaultProps: { variant: 'light' },
     }),
     Button: Button.extend({
       classNames: { root: buttonClasses.root, section: buttonClasses.section },

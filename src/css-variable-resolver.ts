@@ -145,6 +145,11 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
       ? { '--mantine-primary-color-contrast': `var(--mantine-color-${z}-9)` }
       : {}),
     ...darkStatusColors(theme),
+    // Mantine darkens gray-9 for the dark light variant, which is nearly black (#050506) and sinks into cards;
+    // shadcn/ui's secondary is the muted surface with the text color.
+    '--mantine-color-gray-light': 'var(--mantine-color-default-hover)',
+    '--mantine-color-gray-light-hover': `var(--mantine-color-${z}-7)`,
+    '--mantine-color-gray-light-color': 'var(--mantine-color-text)',
     '--mantine-color-error': 'var(--mantine-color-red-4)',
     '--efoo-color-ring': `var(--mantine-color-${z}-5)`,
     '--efoo-color-sidebar': `var(--mantine-color-${z}-9)`,
