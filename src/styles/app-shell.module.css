@@ -3,5 +3,13 @@
      Mantine already draws the 1px border between them. */
   .navbar {
     background-color: var(--efoo-color-sidebar, var(--mantine-color-body));
+    /* Mantine animates the main padding but not the navbar width, so a narrowing navbar jumped. */
+    transition-property: transform, top, height, width;
+  }
+
+  /* AppShell's transition takes the theme motion and stops with reduced motion. */
+  .navbar,
+  .main {
+    transition-duration: calc(var(--app-shell-transition-duration) * var(--efoo-motion-scale));
   }
 }

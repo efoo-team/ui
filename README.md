@@ -160,6 +160,43 @@ Popover の中で操作させる場合は、Escape で閉じられるように `
 </Popover>
 ```
 
+### サイドメニュー
+
+AppShell の navbar に NavLink を並べると、shadcn/ui の sidebar と同じ見た目になります。入れ子は NavLink の `children` に子の NavLink を渡すと、左の線と字下げつきで開閉します。`leftSection` に Avatar を置いた NavLink は、組織の切り替えの起点（高さ 48px）になるので、`Menu.Target` で包みます。
+
+```tsx
+const [collapsed, setCollapsed] = useState(false);
+
+<AppShell navbar={{ width: collapsed ? 48 : 256, breakpoint: 'sm' }}>
+  <AppShell.Navbar p="xs" mod={{ collapsed }}>
+    <Menu position="right-start">
+      <Menu.Target>
+        <NavLink
+          component="button"
+          label="組織名"
+          description="プラン"
+          leftSection={
+            <Avatar radius="md" color="zinc" variant="filled">
+              A
+            </Avatar>
+          }
+          rightSection={<IconSelector size={16} />}
+        />
+      </Menu.Target>
+      <Menu.Dropdown>{/* 組織の一覧 */}</Menu.Dropdown>
+    </Menu>
+    <Tooltip label="設定" position="right" disabled={!collapsed}>
+      <NavLink label="設定" leftSection={<IconSettings size={16} />} defaultOpened>
+        <NavLink label="全般" active />
+        <NavLink label="通知" />
+      </NavLink>
+    </Tooltip>
+  </AppShell.Navbar>
+</AppShell>;
+```
+
+アイコンだけの帯に閉じるときは、`AppShell` の `navbar.width` を 48（3rem）にし、`AppShell.Navbar` に `mod={{ collapsed }}` を渡します。theme が NavLink を 32px のアイコンだけの見え方にし（Avatar の起点は Avatar だけ）、名前・説明・chevron・子の項目を隠します。navbar の `p="xs"`（8px）で、アイコンが帯の中央に並びます。見出しなど NavLink 以外の文字は、`collapsed` のときに描かないようにしてください。閉じた状態で名前を示すには、上の例のように Tooltip で包みます。
+
 ### shadcn/ui の variant との対応
 
 | shadcn/ui の variant | Mantine での指定           |

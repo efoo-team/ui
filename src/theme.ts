@@ -292,14 +292,28 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: { root: anchorClasses.root },
       defaultProps: { underline: 'always' },
     }),
-    AppShell: AppShell.extend({ classNames: { navbar: appShellClasses.navbar } }),
+    // navbar also carries the NavLink scope that folds links into icons under mod={{ collapsed }}.
+    AppShell: AppShell.extend({
+      classNames: {
+        navbar: `${appShellClasses.navbar} ${navLinkClasses.navbar}`,
+        main: appShellClasses.main,
+      },
+      defaultProps: {
+        transitionDuration: motion.durationStandard,
+        transitionTimingFunction: motion.easing,
+      },
+    }),
     Autocomplete: Autocomplete.extend({
       classNames: comboboxClassNames,
       defaultProps: { clearButtonProps: clearInputProps },
     }),
     // Without a color the fallback is shadcn/ui's muted surface and text; Mantine's dark gray light variant is nearly black.
     Avatar: Avatar.extend({
-      classNames: { root: avatarClasses.root, placeholder: avatarClasses.placeholder },
+      // navLinkClasses.avatar lets a NavLink that leads with an Avatar become a switcher row.
+      classNames: {
+        root: `${avatarClasses.root} ${navLinkClasses.avatar}`,
+        placeholder: avatarClasses.placeholder,
+      },
       vars: (_theme, props) =>
         props.color === undefined && (props.variant === undefined || props.variant === 'light')
           ? {
@@ -446,6 +460,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: {
         root: navLinkClasses.root,
         section: navLinkClasses.section,
+        body: navLinkClasses.body,
+        label: navLinkClasses.label,
+        description: navLinkClasses.description,
+        collapse: navLinkClasses.collapse,
         children: navLinkClasses.children,
       },
     }),
