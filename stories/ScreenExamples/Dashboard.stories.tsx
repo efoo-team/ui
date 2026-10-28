@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactElement, type ReactNode } from 'react';
 import {
   ActionIcon,
   Anchor,
   AppShell,
   Avatar,
   Badge,
+  Box,
   Breadcrumbs,
   Burger,
   Button,
@@ -18,6 +19,7 @@ import {
   Modal,
   NavLink,
   Pagination,
+  type PopoverProps,
   Progress,
   RemoveScroll,
   ScrollArea,
@@ -77,7 +79,9 @@ type Story = StoryObj<typeof meta>;
 const ICON_SIZE = 16;
 
 // Container breakpoints for the Grids in the main area; Mantine needs exact widths for container queries.
-const CONTENT_BREAKPOINTS = { xs: '36rem', sm: '48rem', md: '48rem', lg: '64rem', xl: '80rem' };
+// lg (66rem = 1056px) is where the four stat cards and the 8/4 chart row start; it stays clear of the main width at
+// common viewports (1440: 1152 open / 1360 rail, 1280: 992 / 1200, 1200: 912 / 1120, 1024: 736 / 944).
+const CONTENT_BREAKPOINTS = { xs: '36rem', sm: '48rem', md: '48rem', lg: '66rem', xl: '80rem' };
 
 // Every name and number below is fictional. Figures that appear twice on the screen are computed from one source.
 
@@ -304,28 +308,76 @@ interface NavbarProps {
   onNavigate: () => void;
 }
 
+/*
+ * A link that opens a Menu, with its name in a Tooltip for the rail. The Tooltip sits between Menu and Menu.Target:
+ * Tooltip hands its hover and focus handlers and ref to Menu.Target, Menu.Target passes them on through
+ * Popover.Target, and Popover.Target puts them and aria-haspopup / aria-expanded / aria-controls on the NavLink.
+ * The Menu is controlled so the Tooltip stays hidden while the Menu is open.
+ */
+function MenuLink({
+  rail,
+  name,
+  menuEnabled,
+  position,
+  width,
+  dropdown,
+  link,
+}: {
+  rail: boolean;
+  name: string;
+  menuEnabled: boolean;
+  position: 'right-start' | 'bottom-start';
+  width: number;
+  dropdown: ReactNode;
+  link: ReactElement;
+}) {
+  const [menuOpened, setMenuOpened] = useState(false);
+  const opened = menuEnabled && menuOpened;
+  // Menu's type leaves out Popover's withRoles, but Menu passes it on to Popover. Without it, Popover.Target would
+  // put the Menu's aria-expanded on a parent link that is opening its own children instead.
+  const popoverRoles: Pick<PopoverProps, 'withRoles'> = { withRoles: menuEnabled };
+  return (
+    <Menu
+      {...popoverRoles}
+      opened={opened}
+      onChange={setMenuOpened}
+      disabled={!menuEnabled}
+      position={position}
+      width={width}
+    >
+      <Tooltip label={name} position="right" disabled={!rail || opened}>
+        <Menu.Target>{link}</Menu.Target>
+      </Tooltip>
+      {dropdown}
+    </Menu>
+  );
+}
+
 // The organization switcher is a NavLink that leads with an Avatar; in the rail the theme shows only the avatar.
 function OrganizationMenu({
   rail,
   organization,
   onOrganizationChange,
 }: Pick<NavbarProps, 'rail' | 'organization' | 'onOrganizationChange'>) {
-  const ref = useRef<HTMLButtonElement>(null);
   return (
-    <>
-      <Menu position={rail ? 'right-start' : 'bottom-start'} width={240}>
-        <Menu.Target>
-          <NavLink
-            ref={ref}
-            component="button"
-            type="button"
-            label={organization.name}
-            description={organization.note}
-            leftSection={<Avatar aria-hidden>{organization.initial}</Avatar>}
-            rightSection={<IconSelector size={16} />}
-            aria-label={`組織を切り替える（現在：${organization.name}）`}
-          />
-        </Menu.Target>
+    <MenuLink
+      rail={rail}
+      name={organization.name}
+      menuEnabled
+      position={rail ? 'right-start' : 'bottom-start'}
+      width={240}
+      link={
+        <NavLink
+          component="button"
+          type="button"
+          label={organization.name}
+          description={organization.note}
+          leftSection={<Avatar aria-hidden>{organization.initial}</Avatar>}
+          rightSection={<IconSelector size={16} />}
+          aria-label={`組織を切り替える（現在：${organization.name}）`}
+        />
+      }
+      dropdown={
         <Menu.Dropdown>
           <Menu.Label>組織</Menu.Label>
           {ORGANIZATIONS.map((item) => (
@@ -346,63 +398,16 @@ function OrganizationMenu({
           <Menu.Divider />
           <Menu.Item leftSection={<IconPlus size={16} />}>組織を追加</Menu.Item>
         </Menu.Dropdown>
-      </Menu>
-      {/* In the rail only the avatar shows, so the name comes from a Tooltip pointed at the Menu.Target link. */}
-      <Tooltip label={organization.name} position="right" target={ref} disabled={!rail} />
-    </>
+      }
+    />
   );
 }
 
 /*
- * A parent link in the rail opens its children from a Menu. The NavLink sits directly under Menu.Target so it
- * receives aria-haspopup, aria-expanded and aria-controls; the Tooltip points at it through \`target\` instead of
- * wrapping it, because a wrapping Tooltip would take those attributes.
- */
-function RailParent({
-  label,
-  name,
-  icon,
-  items,
-}: {
-  label: string;
-  name: string;
-  icon: ReactNode;
-  items: string[];
-}) {
-  const current = label === CURRENT_PARENT;
-  const ref = useRef<HTMLButtonElement>(null);
-  return (
-    <>
-      <Menu position="right-start" width={180}>
-        <Menu.Target>
-          <NavLink
-            ref={ref}
-            component="button"
-            type="button"
-            label={label}
-            aria-label={name}
-            active={current}
-            leftSection={icon}
-          />
-        </Menu.Target>
-        <Menu.Dropdown>
-          <Menu.Label>{label}</Menu.Label>
-          {items.map((child) => (
-            <Menu.Item key={child} aria-current={child === CURRENT_PAGE ? 'page' : undefined}>
-              {child}
-            </Menu.Item>
-          ))}
-        </Menu.Dropdown>
-      </Menu>
-      <Tooltip label={label} position="right" target={ref} />
-    </>
-  );
-}
-
-/*
- * One set of NavLinks serves both widths. With <AppShell.Navbar mod={{ rail }}> the theme folds them into
- * icons and hides labels, badges and child links, so each link carries its name in aria-label and a Tooltip, and a
- * parent opens its child links from a Menu instead.
+ * One set of NavLinks serves both widths and keeps the same elements when the navbar folds, so the theme can cut the
+ * labels at the edge and hide them at the end. With <AppShell.Navbar mod={{ rail }}> the theme folds the links into
+ * icons, so each link carries its name in aria-label and a Tooltip, and a parent opens its child links from a Menu
+ * instead of its own children, which the theme hides in the rail.
  */
 function Navbar({
   rail,
@@ -424,7 +429,7 @@ function Navbar({
             />
           </Stack>
           {/* With layout="alt" the open navbar covers the header on narrow screens, so it carries its own close button. */}
-          <CloseButton hiddenFrom="sm" onClick={onNavigate} aria-label="ナビゲーションを閉じる" />
+          <CloseButton hiddenFrom="sm" onClick={onNavigate} aria-label="サイドバーを閉じる" />
         </Group>
       </AppShell.Section>
       <AppShell.Section grow component={ScrollArea} scrollbars="y">
@@ -432,34 +437,54 @@ function Navbar({
           {NAV_ITEMS.map(({ label, icon: ItemIcon, count, children }) => {
             const name = count ? `${label}（未対応 ${count} 件）` : label;
             const icon = <ItemIcon size={ICON_SIZE} />;
-            if (children && rail) {
-              return (
-                <RailParent key={label} label={label} name={name} icon={icon} items={children} />
-              );
-            }
             if (children) {
               return (
-                <NavLink
+                <MenuLink
                   key={label}
-                  component="button"
-                  type="button"
-                  label={label}
-                  leftSection={icon}
-                  opened={openedParents.includes(label)}
-                  onChange={() => onToggleParent(label)}
-                >
-                  {children.map((child) => (
+                  rail={rail}
+                  name={label}
+                  menuEnabled={rail}
+                  position="right-start"
+                  width={180}
+                  link={
                     <NavLink
-                      key={child}
                       component="button"
                       type="button"
-                      label={child}
-                      active={child === CURRENT_PAGE}
-                      aria-current={child === CURRENT_PAGE ? 'page' : undefined}
-                      onClick={onNavigate}
-                    />
-                  ))}
-                </NavLink>
+                      label={label}
+                      aria-label={label}
+                      leftSection={icon}
+                      // In the rail the open child is not visible, so its parent shows the current place.
+                      active={rail && label === CURRENT_PARENT}
+                      opened={openedParents.includes(label)}
+                      onChange={() => onToggleParent(label)}
+                    >
+                      {children.map((child) => (
+                        <NavLink
+                          key={child}
+                          component="button"
+                          type="button"
+                          label={child}
+                          active={child === CURRENT_PAGE}
+                          aria-current={child === CURRENT_PAGE ? 'page' : undefined}
+                          onClick={onNavigate}
+                        />
+                      ))}
+                    </NavLink>
+                  }
+                  dropdown={
+                    <Menu.Dropdown>
+                      <Menu.Label>{label}</Menu.Label>
+                      {children.map((child) => (
+                        <Menu.Item
+                          key={child}
+                          aria-current={child === CURRENT_PAGE ? 'page' : undefined}
+                        >
+                          {child}
+                        </Menu.Item>
+                      ))}
+                    </Menu.Dropdown>
+                  }
+                />
               );
             }
             return (
@@ -470,8 +495,6 @@ function Navbar({
                   type="button"
                   label={label}
                   aria-label={name}
-                  active={label === CURRENT_PAGE}
-                  aria-current={label === CURRENT_PAGE ? 'page' : undefined}
                   onClick={onNavigate}
                   leftSection={icon}
                   rightSection={
@@ -850,6 +873,7 @@ function BestSellersCard() {
 
 function DashboardPage() {
   const [opened, { toggle, close }] = useDisclosure(false);
+  const burgerRef = useRef<HTMLButtonElement>(null);
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [searchOpened, { open: openSearch, close: closeSearch }] = useDisclosure(false);
   const [organization, setOrganization] = useState<Organization>(ORGANIZATIONS[0]!);
@@ -871,6 +895,16 @@ function DashboardPage() {
     ],
   ]);
   const narrowOpen = wide === false && opened;
+  // On narrow screens the open navbar covers the page like a dialog: focus moves into it when it opens and back to
+  // the Burger when it closes.
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (wide !== false) return;
+    // RemoveScroll takes the navbar's ref, so the navbar is found by its id.
+    if (opened) document.getElementById(navbarId)?.querySelector<HTMLElement>('button')?.focus();
+    else if (wasOpen.current) burgerRef.current?.focus();
+    wasOpen.current = opened;
+  }, [opened, wide, navbarId]);
   const toggleParent = (label: string) =>
     setOpenedParents((current) =>
       current.includes(label) ? current.filter((value) => value !== label) : [...current, label],
@@ -879,19 +913,40 @@ function DashboardPage() {
   return (
     <AppShell
       layout="alt"
-      header={{ height: 56 }}
+      // 64px puts the header's center on the organization row's center (8px inset + 48px row).
+      header={{ height: 64 }}
       navbar={{ width: rail ? 48 : 256, breakpoint: 'sm', collapsed: { mobile: !opened } }}
       padding="md"
     >
+      {/* The navbar comes first in the DOM, so Tab reaches the sidebar before the header, as it reads on screen. */}
+      {/* While the narrow-screen navbar is open the page behind it does not scroll; while it is closed it is inert. */}
+      <RemoveScroll enabled={narrowOpen} forwardProps>
+        <AppShell.Navbar
+          mod={{ rail }}
+          id={navbarId}
+          aria-label="サイドバー"
+          inert={wide === false && !opened ? true : undefined}
+        >
+          <Navbar
+            rail={rail}
+            organization={organization}
+            onOrganizationChange={setOrganization}
+            openedParents={openedParents}
+            onToggleParent={toggleParent}
+            onNavigate={close}
+          />
+        </AppShell.Navbar>
+      </RemoveScroll>
       <AppShell.Header px="md">
         <Group h="100%" justify="space-between" wrap="nowrap">
-          <Group gap="xs" wrap="nowrap">
+          <Group gap="xs" wrap="nowrap" miw={0}>
             <Burger
+              ref={burgerRef}
               opened={opened}
               onClick={toggle}
               hiddenFrom="sm"
               size="lg"
-              aria-label="ナビゲーション"
+              aria-label="サイドバー"
               aria-expanded={opened}
               aria-controls={navbarId}
             />
@@ -905,8 +960,15 @@ function DashboardPage() {
             >
               <IconLayoutSidebar size={ICON_SIZE} />
             </ActionIcon>
-            <Divider orientation="vertical" my="md" />
-            <Breadcrumbs>
+            {/* The vertical Divider stretches to its box, so a 16px box gives it its height. */}
+            <Box h={16} display="flex">
+              <Divider orientation="vertical" />
+            </Box>
+            {/* On narrow screens the sidebar is hidden, so the header names the organization instead of the path. */}
+            <Text variant="emphasis" hiddenFrom="sm" truncate>
+              {organization.name}
+            </Text>
+            <Breadcrumbs visibleFrom="sm">
               <Anchor href="#" size="sm">
                 {CURRENT_PARENT}
               </Anchor>
@@ -943,24 +1005,6 @@ function DashboardPage() {
           aria-label="検索する言葉"
         />
       </Modal>
-      {/* While the narrow-screen navbar is open the page behind it does not scroll; while it is closed it is inert. */}
-      <RemoveScroll enabled={narrowOpen} forwardProps>
-        <AppShell.Navbar
-          mod={{ rail }}
-          id={navbarId}
-          aria-label="メインナビゲーション"
-          inert={wide === false && !opened ? true : undefined}
-        >
-          <Navbar
-            rail={rail}
-            organization={organization}
-            onOrganizationChange={setOrganization}
-            openedParents={openedParents}
-            onToggleParent={toggleParent}
-            onNavigate={close}
-          />
-        </AppShell.Navbar>
-      </RemoveScroll>
       <AppShell.Main>
         <Stack gap="lg">
           <Stack gap={4}>
@@ -972,7 +1016,7 @@ function DashboardPage() {
             </Text>
           </Stack>
           {/* Columns follow the width of the main area, not the viewport, so an open sidebar is taken into account. */}
-          <SimpleGrid type="container" cols={{ base: 1, '36rem': 2, '72rem': 4 }}>
+          <SimpleGrid type="container" cols={{ base: 1, '36rem': 2, [CONTENT_BREAKPOINTS.lg]: 4 }}>
             {STATS.map((stat) => (
               <StatCard key={stat.label} stat={stat} />
             ))}
