@@ -119,15 +119,31 @@ interface SalesPoint {
   amount: number;
 }
 
-// 90 days ending on October 31. The values are generated so the story is deterministic.
-const SALES: SalesPoint[] = Array.from({ length: 90 }, (_, index) => {
-  const day = new Date(2026, 7, 3 + index);
-  const weekday = day.getDay();
-  const base = 120_000 + index * 900;
-  const weekly = weekday === 0 || weekday === 6 ? -60_000 : 25_000;
-  const wave = Math.round(30_000 * Math.sin(index / 4.5));
-  return { date: `${day.getMonth() + 1}/${day.getDate()}`, amount: base + weekly + wave };
-});
+// Deterministic pseudo-random numbers (mulberry32) so the chart is the same on every render.
+function seededRandom(seed: number) {
+  let state = seed;
+  return () => {
+    state = (state + 0x6d2b79f5) | 0;
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Orders dip on weekends (Sunday first), rise slowly over the quarter and vary a little from day to day.
+const WEEKDAY_FACTOR = [0.66, 0.96, 1.06, 1.12, 1.0, 1.16, 0.78];
+
+// 90 days from August 3 to October 31.
+const SALES: SalesPoint[] = (() => {
+  const random = seededRandom(20261031);
+  return Array.from({ length: 90 }, (_, index) => {
+    const day = new Date(2026, 7, 3 + index);
+    const trend = 150_000 + index * 650;
+    const noise = 1 + (random() - 0.5) * 0.24;
+    const amount = Math.round((trend * (WEEKDAY_FACTOR[day.getDay()] ?? 1) * noise) / 100) * 100;
+    return { date: `${day.getMonth() + 1}/${day.getDate()}`, amount };
+  });
+})();
 
 const PERIODS = [
   { value: '7', label: '7 日' },
@@ -258,7 +274,7 @@ function AccountMenu() {
     <Menu position="bottom-end" width={200}>
       <Menu.Target>
         <ActionIcon variant="subtle" size="lg" aria-label="アカウントのメニュー">
-          <Avatar name="青木 陽" size="sm" />
+          <Avatar size="sm">青</Avatar>
         </ActionIcon>
       </Menu.Target>
       <Menu.Dropdown>
@@ -459,7 +475,7 @@ function OrdersCard() {
                 </Table.Td>
                 <Table.Td>
                   <Group gap="xs" wrap="nowrap">
-                    <Avatar name={order.staff} size="sm" />
+                    <Avatar size="sm">{order.staff.charAt(0)}</Avatar>
                     <Text size="sm">{order.staff}</Text>
                   </Group>
                 </Table.Td>
