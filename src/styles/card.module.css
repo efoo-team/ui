@@ -1,0 +1,7 @@
+@layer efoo {
+  /* shadcn/ui's card is 4px rounder than its controls (radius-xl = --radius + 4px). Following the default radius
+     lets a service change both with defaultRadius; a radius prop is written inline and still wins. */
+  .root {
+    --paper-radius: calc(var(--mantine-radius-default) + 4px);
+  }
+}

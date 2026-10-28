@@ -75,6 +75,7 @@ import appShellClasses from './styles/app-shell.module.css';
 import avatarClasses from './styles/avatar.module.css';
 import badgeClasses from './styles/badge.module.css';
 import buttonClasses from './styles/button.module.css';
+import cardClasses from './styles/card.module.css';
 import checkboxClasses from './styles/checkbox.module.css';
 import chipClasses from './styles/chip.module.css';
 import drawerClasses from './styles/drawer.module.css';
@@ -253,9 +254,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
     Button: Button.extend({
       classNames: { root: buttonClasses.root, section: buttonClasses.section },
     }),
-    // shadcn/ui's dashboard-01 card: 24px padding, 14px corners and shadow-xs.
+    // shadcn/ui's dashboard-01 card: 24px padding and shadow-xs. The corners follow the default radius in card.module.css.
     Card: Card.extend({
-      defaultProps: { withBorder: true, radius: 'xl', padding: 'lg', shadow: 'xs' },
+      classNames: { root: cardClasses.root },
+      defaultProps: { withBorder: true, padding: 'lg', shadow: 'xs' },
     }),
     Checkbox: Checkbox.extend({
       classNames: {
@@ -330,6 +332,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     Modal: Modal.extend({
       classNames: {
+        root: modalClasses.root,
         inner: modalClasses.inner,
         content: modalClasses.content,
         header: modalClasses.header,
@@ -337,13 +340,8 @@ export const efooTheme: MantineThemeOverride = createTheme({
         body: modalClasses.body,
         close: modalClasses.close,
       },
-      // shadcn/ui's dialog is a 14px box drawn by its 1px line, with no large shadow.
-      defaultProps: {
-        transitionProps: modalTransitionProps,
-        overlayProps,
-        radius: 'xl',
-        shadow: 'xs',
-      },
+      // shadcn/ui's dialog is drawn by its 1px line, with no large shadow.
+      defaultProps: { transitionProps: modalTransitionProps, overlayProps, shadow: 'xs' },
     }),
     MultiSelect: MultiSelect.extend({
       classNames: { ...comboboxClassNames, inputField: inputClasses.pillsField },

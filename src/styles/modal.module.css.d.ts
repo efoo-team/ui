@@ -4,6 +4,7 @@ declare const classNames: {
   readonly content: string;
   readonly header: string;
   readonly inner: string;
+  readonly root: string;
   readonly title: string;
 };
 export default classNames;

@@ -4,7 +4,13 @@
     inset-inline-start: 0;
   }
 
+  /* Like Card, the dialog is 4px rounder than the default radius; a radius prop sets --modal-radius inline. */
+  .root {
+    --modal-radius: calc(var(--mantine-radius-default) + 4px);
+  }
+
   .content {
+    --paper-radius: var(--modal-radius);
     border: 1px solid var(--mantine-color-default-border);
   }
 
