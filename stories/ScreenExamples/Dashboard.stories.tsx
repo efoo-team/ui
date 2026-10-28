@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import {
   ActionIcon,
   AppShell,
@@ -25,8 +25,9 @@ import {
   Text,
   TextInput,
   Title,
+  VisuallyHidden,
 } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure, useHotkeys } from '@mantine/hooks';
 import { AreaChart } from '@mantine/charts';
 import '@mantine/charts/styles.layer.css';
 import {
@@ -40,6 +41,7 @@ import {
   IconReceipt,
   IconSearch,
   IconSettings,
+  IconTrendingUp,
   IconUserCircle,
   IconUsers,
   type Icon,
@@ -52,7 +54,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '架空の販売管理サービスのダッシュボードです。見た目はすべて theme の既定から来ています。',
+          '架空の販売管理サービスのダッシュボードです。部品の見た目は theme の既定に任せ、色は利用者が対応すべきもの（未発送、発注点割れ、未対応の問い合わせ）にだけ使っています。',
       },
     },
   },
@@ -63,61 +65,13 @@ type Story = StoryObj<typeof meta>;
 
 const ICON_SIZE = 18;
 
-// Every name and number below is fictional.
+// Every name and number below is fictional. Figures that appear twice on the screen are computed from one source.
 
-interface NavItem {
-  label: string;
-  icon: Icon;
-  count?: number;
-}
+// The color for "the user should act on this". Everything else stays neutral.
+const ATTENTION_COLOR = 'red';
 
-const NAV_ITEMS: NavItem[] = [
-  { label: 'ダッシュボード', icon: IconDashboard },
-  { label: '受注', icon: IconReceipt },
-  { label: '顧客', icon: IconUsers },
-  { label: '在庫', icon: IconBox },
-  { label: '問い合わせ', icon: IconMessage, count: 14 },
-  { label: 'レポート', icon: IconChartBar },
-];
-
-interface Stat {
-  label: string;
-  value: string;
-  note: string;
-  badge: { label: string; color: string };
-}
-
-const STATS: Stat[] = [
-  {
-    label: '今月の受注額',
-    value: '¥4,820,000',
-    note: '先月の同じ日までより 8.2% 多い',
-    badge: { label: '+8.2%', color: 'green' },
-  },
-  {
-    label: '新規顧客',
-    value: '128 社',
-    note: '先月の同じ日までより 12 社多い',
-    badge: { label: '+12', color: 'green' },
-  },
-  {
-    label: '在庫切れ間近',
-    value: '7 品目',
-    note: '在庫が発注点を下回っています',
-    badge: { label: '要発注', color: 'yellow' },
-  },
-  {
-    label: '未対応の問い合わせ',
-    value: '14 件',
-    note: 'うち 3 件は受付から 2 日以上',
-    badge: { label: '要対応', color: 'red' },
-  },
-];
-
-interface SalesPoint {
-  date: string;
-  amount: number;
-}
+const yen = (value: number) => `¥${value.toLocaleString('ja-JP')}`;
+const sum = (values: number[]) => values.reduce((total, value) => total + value, 0);
 
 // Deterministic pseudo-random numbers (mulberry32) so the chart is the same on every render.
 function seededRandom(seed: number) {
@@ -133,17 +87,33 @@ function seededRandom(seed: number) {
 // Orders dip on weekends (Sunday first), rise slowly over the quarter and vary a little from day to day.
 const WEEKDAY_FACTOR = [0.66, 0.96, 1.06, 1.12, 1.0, 1.16, 0.78];
 
-// 90 days from August 3 to October 31.
+interface SalesPoint {
+  month: number;
+  day: number;
+  date: string;
+  amount: number;
+}
+
+// 90 days from August 3 to October 31, 2026. The screen shows the state on October 31.
 const SALES: SalesPoint[] = (() => {
   const random = seededRandom(20261031);
   return Array.from({ length: 90 }, (_, index) => {
-    const day = new Date(2026, 7, 3 + index);
+    const date = new Date(2026, 7, 3 + index);
     const trend = 150_000 + index * 650;
     const noise = 1 + (random() - 0.5) * 0.24;
-    const amount = Math.round((trend * (WEEKDAY_FACTOR[day.getDay()] ?? 1) * noise) / 100) * 100;
-    return { date: `${day.getMonth() + 1}/${day.getDate()}`, amount };
+    const amount = Math.round((trend * (WEEKDAY_FACTOR[date.getDay()] ?? 1) * noise) / 100) * 100;
+    const month = date.getMonth() + 1;
+    return { month, day: date.getDate(), date: `${month}/${date.getDate()}`, amount };
   });
 })();
+
+const salesOfMonth = (month: number) =>
+  SALES.filter((point) => point.month === month).map((point) => point.amount);
+const OCTOBER = salesOfMonth(10);
+const SEPTEMBER = salesOfMonth(9);
+// Months have different lengths, so the comparison uses the daily average.
+const OCTOBER_GROWTH =
+  (sum(OCTOBER) / OCTOBER.length / (sum(SEPTEMBER) / SEPTEMBER.length) - 1) * 100;
 
 const PERIODS = [
   { value: '7', label: '7 日' },
@@ -151,31 +121,84 @@ const PERIODS = [
   { value: '90', label: '90 日' },
 ];
 
-const yen = (value: number) => `¥${value.toLocaleString('ja-JP')}`;
-
 interface StockItem {
   name: string;
-  remaining: number;
+  unit: string;
+  quantity: number;
+  reorderPoint: number;
+  target: number;
 }
 
 const STOCK: StockItem[] = [
-  { name: 'A4 コピー用紙（500 枚）', remaining: 12 },
-  { name: 'ボールペン 黒（10 本）', remaining: 28 },
-  { name: 'クリアファイル（20 枚）', remaining: 46 },
-  { name: '付箋 75mm 角', remaining: 63 },
-  { name: 'ホチキス針 No.10', remaining: 81 },
+  { name: 'A4 コピー用紙（500 枚）', unit: '箱', quantity: 18, reorderPoint: 40, target: 200 },
+  { name: 'ボールペン 黒（10 本）', unit: '箱', quantity: 35, reorderPoint: 50, target: 300 },
+  { name: 'クリアファイル（20 枚）', unit: '袋', quantity: 120, reorderPoint: 60, target: 250 },
+  { name: '付箋 75mm 角', unit: '冊', quantity: 160, reorderPoint: 80, target: 240 },
+  { name: 'ホチキス針 No.10', unit: '箱', quantity: 210, reorderPoint: 50, target: 260 },
 ];
 
-const stockColor = (remaining: number) =>
-  remaining < 20 ? 'red' : remaining < 40 ? 'yellow' : undefined;
+const needsReorder = (item: StockItem) => item.quantity < item.reorderPoint;
+const REORDER_COUNT = STOCK.filter(needsReorder).length;
+
+const INQUIRIES = { total: 100, done: 62, inProgress: 24, open: 14, overdue: 3 };
+
+interface Stat {
+  label: string;
+  value: string;
+  note: string;
+  badge: { label: string; attention: boolean; trend?: boolean };
+}
+
+const STATS: Stat[] = [
+  {
+    label: '10 月の受注額',
+    value: yen(sum(OCTOBER)),
+    note: '10/1〜10/31 の合計。増減は 1 日平均の 9 月比',
+    badge: { label: `+${OCTOBER_GROWTH.toFixed(1)}%`, attention: false, trend: true },
+  },
+  {
+    label: '10 月の新規顧客',
+    value: '128 社',
+    note: '9 月より 12 社多い',
+    badge: { label: '+12', attention: false, trend: true },
+  },
+  {
+    label: '発注が必要な品目',
+    value: `${REORDER_COUNT} 品目`,
+    note: '在庫数が発注点を下回っています',
+    badge: { label: '要発注', attention: true },
+  },
+  {
+    label: '未対応の問い合わせ',
+    value: `${INQUIRIES.open} 件`,
+    note: `うち ${INQUIRIES.overdue} 件は受付から 2 日以上`,
+    badge: { label: '要対応', attention: true },
+  },
+];
+
+interface NavItem {
+  label: string;
+  icon: Icon;
+  count?: number;
+}
+
+const NAV_ITEMS: NavItem[] = [
+  { label: 'ダッシュボード', icon: IconDashboard },
+  { label: '受注', icon: IconReceipt },
+  { label: '顧客', icon: IconUsers },
+  { label: '在庫', icon: IconBox },
+  { label: '問い合わせ', icon: IconMessage, count: INQUIRIES.open },
+  { label: 'レポート', icon: IconChartBar },
+];
 
 type OrderStatus = 'paymentPending' | 'notShipped' | 'shipped' | 'cancelled';
 
-const STATUS: Record<OrderStatus, { label: string; color: string }> = {
-  paymentPending: { label: '入金待ち', color: 'gray' },
-  notShipped: { label: '未発送', color: 'yellow' },
-  shipped: { label: '発送済み', color: 'green' },
-  cancelled: { label: 'キャンセル', color: 'red' },
+// Only "not shipped" asks the user to act; the other states are shown without color.
+const STATUS: Record<OrderStatus, { label: string; attention: boolean }> = {
+  notShipped: { label: '未発送', attention: true },
+  paymentPending: { label: '入金待ち', attention: false },
+  shipped: { label: '発送済み', attention: false },
+  cancelled: { label: 'キャンセル', attention: false },
 };
 
 const STATUS_ORDER: OrderStatus[] = [
@@ -221,19 +244,23 @@ const ORDERS: Order[] = Array.from({ length: 36 }, (_, index) => ({
 const ORDER_TABS: { value: 'all' | OrderStatus; label: string }[] = [
   { value: 'all', label: 'すべて' },
   { value: 'notShipped', label: '未発送' },
-  { value: 'paymentPending', label: '入金待ち' },
   { value: 'shipped', label: '発送済み' },
 ];
 
 const PAGE_SIZE = 8;
 
-const INQUIRIES = [
-  { label: '対応済み', value: 62, color: 'green' },
-  { label: '対応中', value: 24, color: 'yellow' },
-  { label: '未対応', value: 14, color: 'red' },
-];
+function StatusBadge({ status }: { status: OrderStatus }) {
+  const { label, attention } = STATUS[status];
+  return attention ? (
+    <Badge color={ATTENTION_COLOR} variant="light">
+      {label}
+    </Badge>
+  ) : (
+    <Badge variant="outline">{label}</Badge>
+  );
+}
 
-function Navbar() {
+function Navbar({ onNavigate }: { onNavigate: () => void }) {
   return (
     <>
       <AppShell.Section grow component={ScrollArea}>
@@ -245,10 +272,12 @@ function Navbar() {
               type="button"
               label={label}
               active={index === 0}
+              aria-current={index === 0 ? 'page' : undefined}
+              onClick={onNavigate}
               leftSection={<ItemIcon size={ICON_SIZE} />}
               rightSection={
                 count ? (
-                  <Badge color="red" variant="light">
+                  <Badge color={ATTENTION_COLOR} variant="light" aria-label={`未対応 ${count} 件`}>
                     {count}
                   </Badge>
                 ) : undefined
@@ -262,6 +291,7 @@ function Navbar() {
           component="button"
           type="button"
           label="設定"
+          onClick={onNavigate}
           leftSection={<IconSettings size={ICON_SIZE} />}
         />
       </AppShell.Section>
@@ -295,11 +325,17 @@ function StatCard({ stat }: { stat: Stat }) {
           <Text size="sm" c="dimmed">
             {stat.label}
           </Text>
-          <Badge color={stat.badge.color} variant="light">
-            {stat.badge.label}
-          </Badge>
+          {stat.badge.attention ? (
+            <Badge color={ATTENTION_COLOR} variant="light">
+              {stat.badge.label}
+            </Badge>
+          ) : (
+            <Badge variant="outline" leftSection={stat.badge.trend && <IconTrendingUp size={12} />}>
+              {stat.badge.label}
+            </Badge>
+          )}
         </Group>
-        <Title order={3} component="p">
+        <Title order={2} size="h2">
           {stat.value}
         </Title>
         <Text size="sm" c="dimmed">
@@ -313,17 +349,18 @@ function StatCard({ stat }: { stat: Stat }) {
 function SalesCard() {
   const [period, setPeriod] = useState('30');
   const data = SALES.slice(-Number(period));
-  const total = data.reduce((sum, point) => sum + point.amount, 0);
+  const first = data[0]?.date ?? '';
+  const last = data[data.length - 1]?.date ?? '';
 
   return (
     <Card h="100%">
       <Group justify="space-between" align="flex-start" mb="md">
         <Stack gap={4}>
-          <Title order={4} component="h2">
+          <Title order={2} size="h5">
             受注の推移
           </Title>
           <Text size="sm" c="dimmed">
-            過去 {period} 日の合計 {yen(total)}
+            {first}〜{last} の合計 {yen(sum(data.map((point) => point.amount)))}
           </Text>
         </Stack>
         <SegmentedControl
@@ -338,9 +375,6 @@ function SalesCard() {
         data={data}
         dataKey="date"
         series={[{ name: 'amount', label: '受注額', color: 'var(--efoo-chart-1)' }]}
-        curveType="monotone"
-        withDots={false}
-        withGradient
         valueFormatter={yen}
         yAxisProps={{ width: 80 }}
         xAxisProps={{ minTickGap: 24 }}
@@ -353,77 +387,60 @@ function StockCard() {
   return (
     <Card h="100%">
       <Stack gap={4} mb="md">
-        <Title order={4} component="h2">
+        <Title order={2} size="h5">
           在庫の残り
         </Title>
         <Text size="sm" c="dimmed">
-          発注点に対する現在の在庫
+          在庫数 / 適正在庫
         </Text>
       </Stack>
       <Stack gap="md">
-        {STOCK.map((item) => (
-          <Stack key={item.name} gap={6}>
-            <Group justify="space-between" wrap="nowrap">
-              <Text size="sm">{item.name}</Text>
-              <Text size="sm" c="dimmed">
-                {item.remaining}%
-              </Text>
-            </Group>
-            <Progress
-              value={item.remaining}
-              color={stockColor(item.remaining)}
-              aria-label={`${item.name}の在庫`}
-            />
-          </Stack>
-        ))}
+        {STOCK.map((item) => {
+          const reorder = needsReorder(item);
+          return (
+            <Stack key={item.name} gap={6}>
+              <Group justify="space-between" wrap="nowrap" gap="xs">
+                <Group gap="xs" wrap="nowrap">
+                  <Text size="sm">{item.name}</Text>
+                  {reorder && (
+                    <Badge color={ATTENTION_COLOR} variant="light">
+                      要発注
+                    </Badge>
+                  )}
+                </Group>
+                <Text size="sm" c="dimmed">
+                  {item.quantity} / {item.target} {item.unit}
+                </Text>
+              </Group>
+              <Progress
+                value={Math.min(100, (item.quantity / item.target) * 100)}
+                color={reorder ? ATTENTION_COLOR : undefined}
+                aria-label={`${item.name}の在庫 ${item.quantity} ${item.unit}（適正在庫 ${item.target} ${item.unit}、発注点 ${item.reorderPoint} ${item.unit}）`}
+              />
+            </Stack>
+          );
+        })}
       </Stack>
     </Card>
   );
 }
 
-function OrdersCard() {
-  const [tab, setTab] = useState<string>('all');
+function OrdersTable({ status }: { status: 'all' | OrderStatus }) {
   const [query, setQuery] = useState('');
   const [staff, setStaff] = useState<string | null>(null);
   const [page, setPage] = useState(1);
 
   const filtered = ORDERS.filter(
     (order) =>
-      (tab === 'all' || order.status === tab) &&
+      (status === 'all' || order.status === status) &&
       (!staff || order.staff === staff) &&
       (query === '' || order.id.includes(query) || order.customer.includes(query)),
   );
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const rows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const resetPage = () => setPage(1);
 
   return (
-    <Card>
-      <Group justify="space-between" mb="md">
-        <Title order={4} component="h2">
-          最近の受注
-        </Title>
-        <Button variant="outline" leftSection={<IconPlus size={16} />}>
-          受注を登録
-        </Button>
-      </Group>
-      <Tabs
-        value={tab}
-        onChange={(value) => {
-          setTab(value ?? 'all');
-          resetPage();
-        }}
-      >
-        <ScrollArea type="never">
-          <Tabs.List>
-            {ORDER_TABS.map((item) => (
-              <Tabs.Tab key={item.value} value={item.value}>
-                {item.label}
-              </Tabs.Tab>
-            ))}
-          </Tabs.List>
-        </ScrollArea>
-      </Tabs>
+    <>
       <Group my="md" gap="sm" wrap="wrap">
         <TextInput
           flex="1 1 240px"
@@ -433,7 +450,7 @@ function OrdersCard() {
           value={query}
           onChange={(event) => {
             setQuery(event.currentTarget.value);
-            resetPage();
+            setPage(1);
           }}
         />
         <Select
@@ -444,12 +461,12 @@ function OrdersCard() {
           value={staff}
           onChange={(value) => {
             setStaff(value);
-            resetPage();
+            setPage(1);
           }}
           clearable
         />
       </Group>
-      <Table.ScrollContainer minWidth={760}>
+      <Table.ScrollContainer minWidth={760} scrollAreaProps={{ type: 'always' }}>
         <Table highlightOnHover>
           <Table.Thead>
             <Table.Tr>
@@ -459,7 +476,9 @@ function OrdersCard() {
               <Table.Th>状態</Table.Th>
               <Table.Th>担当者</Table.Th>
               <Table.Th>受注日</Table.Th>
-              <Table.Th w={48} />
+              <Table.Th w={48}>
+                <VisuallyHidden>操作</VisuallyHidden>
+              </Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
@@ -469,13 +488,13 @@ function OrdersCard() {
                 <Table.Td>{order.customer}</Table.Td>
                 <Table.Td ta="right">{yen(order.amount)}</Table.Td>
                 <Table.Td>
-                  <Badge color={STATUS[order.status].color} variant="light">
-                    {STATUS[order.status].label}
-                  </Badge>
+                  <StatusBadge status={order.status} />
                 </Table.Td>
                 <Table.Td>
                   <Group gap="xs" wrap="nowrap">
-                    <Avatar size="sm">{order.staff.charAt(0)}</Avatar>
+                    <Avatar size="sm" aria-hidden>
+                      {order.staff.charAt(0)}
+                    </Avatar>
                     <Text size="sm">{order.staff}</Text>
                   </Group>
                 </Table.Td>
@@ -515,41 +534,71 @@ function OrdersCard() {
         </Text>
         <Pagination total={totalPages} value={page} onChange={setPage} />
       </Group>
+    </>
+  );
+}
+
+function OrdersCard() {
+  return (
+    <Card>
+      <Group justify="space-between" mb="md">
+        <Title order={2} size="h5">
+          最近の受注
+        </Title>
+        <Button variant="outline" leftSection={<IconPlus size={16} />}>
+          受注を登録
+        </Button>
+      </Group>
+      <Tabs defaultValue="all" keepMounted={false}>
+        <Tabs.List>
+          {ORDER_TABS.map((item) => (
+            <Tabs.Tab key={item.value} value={item.value}>
+              {item.label}
+            </Tabs.Tab>
+          ))}
+        </Tabs.List>
+        {ORDER_TABS.map((item) => (
+          <Tabs.Panel key={item.value} value={item.value}>
+            <OrdersTable status={item.value} />
+          </Tabs.Panel>
+        ))}
+      </Tabs>
     </Card>
   );
 }
 
 function InquiriesCard() {
+  const rows = [
+    { label: '対応済み', value: INQUIRIES.done },
+    { label: '対応中', value: INQUIRIES.inProgress },
+    { label: '未対応', value: INQUIRIES.open },
+  ];
+
   return (
     <Card h="100%">
       <Stack gap={4} mb="md">
-        <Title order={4} component="h2">
+        <Title order={2} size="h5">
           問い合わせの対応状況
         </Title>
         <Text size="sm" c="dimmed">
-          今月受け付けた 100 件の内訳
+          10 月に受け付けた {INQUIRIES.total} 件のうち、対応済みは {INQUIRIES.done} 件です
         </Text>
       </Stack>
-      <Progress.Root size="lg" mb="md">
-        {INQUIRIES.map((item) => (
-          <Progress.Section
-            key={item.label}
-            value={item.value}
-            color={item.color}
-            aria-label={item.label}
-          />
+      <Progress
+        value={(INQUIRIES.done / INQUIRIES.total) * 100}
+        mb="md"
+        aria-label={`対応済み ${INQUIRIES.done} 件 / ${INQUIRIES.total} 件`}
+      />
+      <SimpleGrid cols={3}>
+        {rows.map((row) => (
+          <Stack key={row.label} gap={4}>
+            <Text size="sm" c="dimmed">
+              {row.label}
+            </Text>
+            <Text size="lg">{row.value} 件</Text>
+          </Stack>
         ))}
-      </Progress.Root>
-      <Group gap="lg">
-        {INQUIRIES.map((item) => (
-          <Group key={item.label} gap={6}>
-            <Badge color={item.color} variant="dot">
-              {item.label}
-            </Badge>
-            <Text size="sm">{item.value} 件</Text>
-          </Group>
-        ))}
-      </Group>
+      </SimpleGrid>
     </Card>
   );
 }
@@ -558,7 +607,7 @@ function BestSellersCard() {
   return (
     <Card h="100%" aria-busy="true">
       <Stack gap={4} mb="md">
-        <Title order={4} component="h2">
+        <Title order={2} size="h5">
           今週の売れ筋
         </Title>
         <Text size="sm" c="dimmed">
@@ -581,7 +630,9 @@ function BestSellersCard() {
 }
 
 function DashboardPage() {
-  const [opened, { toggle }] = useDisclosure(false);
+  const [opened, { toggle, close }] = useDisclosure(false);
+  const navbarId = useId();
+  useHotkeys([['Escape', close]]);
 
   return (
     <AppShell
@@ -597,7 +648,9 @@ function DashboardPage() {
               onClick={toggle}
               hiddenFrom="sm"
               size="sm"
-              aria-label="メニューを開閉"
+              aria-label="ナビゲーション"
+              aria-expanded={opened}
+              aria-controls={navbarId}
             />
             <Title order={5} component="p">
               サンプル販売管理
@@ -615,16 +668,18 @@ function DashboardPage() {
           </Group>
         </Group>
       </AppShell.Header>
-      <AppShell.Navbar p="sm">
-        <Navbar />
+      <AppShell.Navbar p="sm" id={navbarId} aria-label="メインナビゲーション">
+        <Navbar onNavigate={close} />
       </AppShell.Navbar>
       <AppShell.Main>
         <Stack gap="lg">
           <Stack gap={4}>
-            <Title order={1} size="h2">
+            <Title order={1} size="h3">
               ダッシュボード
             </Title>
-            <Text c="dimmed">2026 年 10 月 31 日時点の状況</Text>
+            <Text size="sm" c="dimmed">
+              2026 年 10 月 31 日時点の状況
+            </Text>
           </Stack>
           <SimpleGrid cols={{ base: 1, xs: 2, lg: 4 }}>
             {STATS.map((stat) => (
