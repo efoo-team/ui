@@ -221,7 +221,19 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     AppShell: AppShell.extend({ classNames: { navbar: appShellClasses.navbar } }),
     Autocomplete: Autocomplete.extend({ classNames: comboboxClassNames }),
-    Avatar: Avatar.extend({ classNames: { root: avatarClasses.root } }),
+    // Without a color the fallback is shadcn/ui's muted surface and text; Mantine's dark gray light variant is nearly black.
+    Avatar: Avatar.extend({
+      classNames: { root: avatarClasses.root, placeholder: avatarClasses.placeholder },
+      vars: (_theme, props) =>
+        props.color === undefined && (props.variant === undefined || props.variant === 'light')
+          ? {
+              root: {
+                '--avatar-bg': 'var(--mantine-color-default-hover)',
+                '--avatar-color': 'var(--mantine-color-dimmed)',
+              },
+            }
+          : { root: {} },
+    }),
     // Without a variant Mantine leaves the text color to its CSS default (white), which is unreadable on the dark-scheme neutral fill.
     Badge: Badge.extend({
       classNames: { root: badgeClasses.root },

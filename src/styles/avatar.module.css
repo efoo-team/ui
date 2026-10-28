@@ -3,4 +3,10 @@
   .root {
     --avatar-size-md: calc(2rem * var(--mantine-scale));
   }
+
+  /* shadcn/ui's fallback initials are 14px regular in a 32px avatar; the ratio keeps other sizes in step. */
+  .placeholder {
+    font-size: calc(var(--avatar-size) * 0.4375);
+    font-weight: var(--mantine-font-weight-regular);
+  }
 }
