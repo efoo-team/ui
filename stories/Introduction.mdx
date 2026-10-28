@@ -171,6 +171,8 @@ Popover の中で操作させる場合は、Escape で閉じられるように `
 
 状態を表す色は `red`・`yellow`・`green`・`blue` です（Tailwind CSS v4 の値）。
 
+グラフの系列の色は、CSS 変数 `--efoo-chart-1`〜`--efoo-chart-5`（shadcn/ui の chart と同じ青の濃淡）を使います。`@mantine/charts` では `series` の `color` に `var(--efoo-chart-1)` のように渡します。
+
 ## 表示例を探す
 
 部品ごとの表示例は、サイドバーの「日本語名（Mantine の部品名）」から探せます。サイドバーの検索欄に Mantine の部品名（例: `Radio`）を入れても見つかります。上部ツールバーの「ライト」「ダーク」のボタンで、表示を切り替えられます。

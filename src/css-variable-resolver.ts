@@ -92,11 +92,20 @@ const darkStatusColors = (theme: MantineTheme) =>
 const neutralAnchor = (theme: MantineTheme): Record<string, string> =>
   theme.primaryColor === z ? { '--mantine-color-anchor': 'var(--mantine-color-text)' } : {};
 
+// shadcn/ui's --chart-1..5: shades of blue, the same in both schemes. Each scheme sets them so a service can split them.
+const chartColors = Object.fromEntries(
+  [3, 5, 6, 7, 8].map((shade, index) => [
+    `--efoo-chart-${index + 1}`,
+    `var(--mantine-color-blue-${shade})`,
+  ]),
+);
+
 // Returns only the differences from Mantine's default resolver, which Mantine deep-merges with this result.
 export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
   variables: { ...motionCssVariables },
   light: {
     ...neutralAnchor(theme),
+    ...chartColors,
     [`--mantine-color-${z}-filled`]: `var(--mantine-color-${z}-9)`,
     [`--mantine-color-${z}-contrast`]: `var(--mantine-color-${z}-0)`,
     ...lightStatusColors(theme),
@@ -109,6 +118,7 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
   },
   dark: {
     ...neutralAnchor(theme),
+    ...chartColors,
     [`--mantine-color-${z}-filled`]: `var(--mantine-color-${z}-2)`,
     [`--mantine-color-${z}-filled-hover`]: `var(--mantine-color-${z}-3)`,
     [`--mantine-color-${z}-light`]: `var(--mantine-color-${z}-8)`,
