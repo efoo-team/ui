@@ -59,8 +59,13 @@
     min-height: calc(1.75rem * var(--mantine-scale));
   }
 
-  /* Labels stay on one line and end in an ellipsis like shadcn/ui's menu buttons, so a narrowing navbar never
-     wraps them into tall rows. */
+  /* Labels stay on one line and are cut at the edge like shadcn/ui's menu buttons, so a narrowing navbar never wraps
+     them into tall rows nor swaps letters for an ellipsis on every frame. The link clips its own content, so the
+     chevron and badges never spill past a narrow navbar; its focus ring is its own box-shadow and stays whole. */
+  .root {
+    overflow: hidden;
+  }
+
   .body {
     white-space: nowrap;
   }
@@ -69,7 +74,6 @@
   .description {
     display: block;
     overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .description {
@@ -82,12 +86,13 @@
     min-width: calc(2rem * var(--mantine-scale));
   }
 
-  /* A NavLink that leads with an Avatar is a switcher row, like shadcn/ui's size="lg" menu button: 48px high with an
-     8px inset around a 32px avatar, a medium name and a 12/16 second line. Mantine's static Avatar class marks it, so
-     a service's own Avatar classNames do not switch it off. */
+  /* A NavLink that leads with an Avatar is a switcher row, like shadcn/ui's size="lg" menu button: 48px high with a
+     32px avatar, a medium name and a 12/16 second line. The avatar starts at the row's edge, on the icon column, so
+     it keeps its x when the navbar folds into a rail. Mantine's static Avatar class marks the row, so a service's
+     own Avatar classNames do not switch it off. */
   .root:has(> .section > :global(.mantine-Avatar-root)) {
     min-height: calc(3rem * var(--mantine-scale));
-    padding: 0.375rem 0.5rem;
+    padding: 0.375rem 0.5rem 0.375rem 0;
   }
 
   .root:has(> .section > :global(.mantine-Avatar-root)) .label {
@@ -100,16 +105,11 @@
     background-color: var(--mantine-color-default-hover);
   }
 
-  /* Inside <AppShell.Navbar mod={{ rail }}> (data-rail) the navbar padding (app-shell.module.css) leaves 32px, so
+  /* Inside <AppShell.Navbar mod={{ rail }}> (data-rail) the navbar inset (app-shell.module.css) leaves 32px, so
      each link becomes an icon square while the navbar narrows: the label is cut at the right edge as the rail closes,
      like shadcn/ui, and is hidden from assistive technology only when the AppShell transition ends. */
   [data-rail] .root {
     --efoo-rail-delay: calc(var(--app-shell-transition-duration, 0ms) * var(--efoo-motion-scale));
-    overflow: hidden;
-  }
-
-  [data-rail] .root:has(> .section > :global(.mantine-Avatar-root)) {
-    padding: 0;
   }
 
   [data-rail] .body {
