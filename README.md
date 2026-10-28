@@ -183,11 +183,16 @@ Badge の既定は `variant="light"` です。`color` を指定しない Badge �
 | AppShell・NavLink                                | 構造 / 画面の枠組みとナビゲーション（AppShell, NavLink）                      |
 | Button                                           | 操作 / ボタン（Button）                                                       |
 | Tabs                                             | 操作 / タブ（Tabs）                                                           |
+| ActionIcon                                       | 操作 / アイコンボタン（ActionIcon）                                           |
+| SegmentedControl                                 | 操作 / 切り替え（SegmentedControl）                                           |
+| Pagination                                       | 操作 / ページ送り（Pagination）                                               |
 | TextInput・Textarea・NumberInput・PasswordInput  | 入力 / テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）      |
 | Select・MultiSelect                              | 入力 / 選択欄（Select, MultiSelect）                                          |
 | Checkbox・Radio・Switch                          | 入力 / チェック・選択・切り替え（Checkbox, Radio, Switch）                    |
 | Button・TextInput・Checkbox・Radio・Switch・Tabs | 入力 / フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs） |
 | Table・Card・Badge                               | 表示 / 表・カード・バッジ（Table, Card, Badge）                               |
+| Avatar                                           | 表示 / アバター（Avatar）                                                     |
+| Progress                                         | 表示 / 進捗バー（Progress）                                                   |
 | Skeleton・Tooltip                                | 表示 / 読み込み表示とツールチップ（Skeleton, Tooltip）                        |
 | Menu・Popover・Modal・Drawer                     | 重ねて表示 / メニュー・モーダルほか（Menu, Popover, Modal, Drawer）           |
 | Notification                                     | フィードバック / 通知（Notification）                                         |
