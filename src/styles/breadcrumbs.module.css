@@ -1,0 +1,24 @@
+@layer efoo {
+  /* shadcn/ui's breadcrumb: 14/20 text, earlier pages muted without underline and the text color on hover, the
+     current (last) page in the text color, muted separators 10px from each item. The selectors go through the root
+     so they win over the Anchor underline and weight of the theme. */
+  .root > .breadcrumb {
+    color: var(--mantine-color-dimmed);
+    font-size: var(--mantine-font-size-sm);
+    font-weight: var(--mantine-font-weight-regular);
+    line-height: var(--mantine-line-height-sm);
+    text-decoration: none;
+    transition: color calc(var(--efoo-motion-duration-fast) * var(--efoo-motion-scale))
+      var(--efoo-motion-easing);
+  }
+
+  .root > .breadcrumb:where(a, button):hover,
+  .root > .breadcrumb:last-child {
+    color: var(--mantine-color-text);
+  }
+
+  .separator {
+    margin-inline: 0.625rem;
+    color: var(--mantine-color-dimmed);
+  }
+}

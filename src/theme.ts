@@ -13,6 +13,7 @@ import {
   Avatar,
   AvatarGroup,
   Badge,
+  Breadcrumbs,
   Button,
   Card,
   Cascader,
@@ -86,6 +87,7 @@ import anchorClasses from './styles/anchor.module.css';
 import appShellClasses from './styles/app-shell.module.css';
 import avatarClasses from './styles/avatar.module.css';
 import badgeClasses from './styles/badge.module.css';
+import breadcrumbsClasses from './styles/breadcrumbs.module.css';
 import buttonClasses from './styles/button.module.css';
 import cardClasses from './styles/card.module.css';
 import chartClasses from './styles/chart.module.css';
@@ -340,6 +342,13 @@ export const efooTheme: MantineThemeOverride = createTheme({
         },
       }),
       defaultProps: { variant: 'light' },
+    }),
+    Breadcrumbs: Breadcrumbs.extend({
+      classNames: {
+        root: breadcrumbsClasses.root,
+        breadcrumb: breadcrumbsClasses.breadcrumb,
+        separator: breadcrumbsClasses.separator,
+      },
     }),
     Button: Button.extend({
       classNames: { root: buttonClasses.root, section: buttonClasses.section },
