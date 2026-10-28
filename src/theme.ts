@@ -89,6 +89,7 @@ import navLinkClasses from './styles/nav-link.module.css';
 import notificationClasses from './styles/notification.module.css';
 import notificationsClasses from './styles/notifications.module.css';
 import paginationClasses from './styles/pagination.module.css';
+import popoverClasses from './styles/popover.module.css';
 import pillClasses from './styles/pill.module.css';
 import radioClasses from './styles/radio.module.css';
 import segmentedControlClasses from './styles/segmented-control.module.css';
@@ -353,7 +354,9 @@ export const efooTheme: MantineThemeOverride = createTheme({
               : props.position === 'bottom'
                 ? drawerClasses.contentBottom
                 : drawerClasses.contentLeft,
+        header: drawerClasses.header,
         title: drawerClasses.title,
+        body: drawerClasses.body,
         close: drawerClasses.close,
       }),
       defaultProps: { transitionProps: drawerTransitionProps, overlayProps, shadow: 'lg' },
@@ -439,6 +442,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     },
     Pill: Pill.extend({ classNames: { root: pillClasses.root }, defaultProps: { radius: 'sm' } }),
     Popover: Popover.extend({
+      classNames: { dropdown: popoverClasses.dropdown },
       defaultProps: { transitionProps: overlayTransitionProps, shadow: 'md' },
     }),
     Radio: Radio.extend({

@@ -1,0 +1,11 @@
+@layer efoo {
+  /* Like the dialog: 16px padding and 14/20 text, which Text without a size inside also follows.
+     Combobox and Menu reuse this dropdown with their own roles and keep their list padding. */
+  .dropdown[role='dialog'] {
+    --text-fz: var(--mantine-font-size-sm);
+    --text-lh: var(--mantine-line-height-sm);
+    padding: var(--mantine-spacing-md);
+    font-size: var(--mantine-font-size-sm);
+    line-height: var(--mantine-line-height-sm);
+  }
+}
