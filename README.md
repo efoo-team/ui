@@ -1,4 +1,4 @@
-# @efoo-team/ui
+# @efoo/ui
 
 efoo のサービスで共有する Mantine theme と、その theme を使った部品の表示例（Storybook）をまとめるリポジトリです。画面の部品は Mantine を使い、shadcn/ui の見た目に合わせた色、CSS 変数、部品ごとのスタイルを theme で提供します。
 
@@ -8,12 +8,12 @@ efoo のサービスで共有する Mantine theme と、その theme を使っ�
 
 React 19 と Mantine 9.7 系を使います。各 Mantine パッケージは同じバージョンにしてください。
 
-新しい版を公開するときは、`package.json` の `version` を未公開の値に更新して main に push すると、CI が GitHub Release を作成します。
+`fix:` や `feat:` などのコミットを main に push すると、CI が変更内容に応じた版を決めて npm に公開します。
 
 ### pnpm
 
 ```sh
-pnpm add https://github.com/efoo-team/ui/releases/download/v0.1.0/efoo-team-ui-0.1.0.tgz @mantine/core@9.7.4 @mantine/hooks@9.7.4 react@19 react-dom@19
+pnpm add @efoo/ui @mantine/core@9.7.4 @mantine/hooks@9.7.4 react@19 react-dom@19
 pnpm add @mantine/notifications@9.7.4 # 通知を使う場合
 pnpm add @mantine/dates@9.7.4 dayjs # 日付・時刻を使う場合
 pnpm add @mantine/dropzone@9.7.4 # ファイルの選択を使う場合
@@ -22,7 +22,7 @@ pnpm add @mantine/dropzone@9.7.4 # ファイルの選択を使う場合
 ### npm
 
 ```sh
-npm i https://github.com/efoo-team/ui/releases/download/v0.1.0/efoo-team-ui-0.1.0.tgz @mantine/core@9.7.4 @mantine/hooks@9.7.4 react@19 react-dom@19
+npm i @efoo/ui @mantine/core@9.7.4 @mantine/hooks@9.7.4 react@19 react-dom@19
 npm i @mantine/notifications@9.7.4 # 通知を使う場合
 npm i @mantine/dates@9.7.4 dayjs # 日付・時刻を使う場合
 npm i @mantine/dropzone@9.7.4 # ファイルの選択を使う場合
@@ -43,7 +43,7 @@ import '@mantine/core/styles.layer.css'; // Mantine の CSS は layer 版
 import '@mantine/notifications/styles.layer.css'; // 通知を使う場合だけ
 import '@mantine/dates/styles.layer.css'; // 日付・時刻を使う場合だけ
 import '@mantine/dropzone/styles.layer.css'; // ファイルの選択を使う場合だけ
-import '@efoo-team/ui/styles.css';
+import '@efoo/ui/styles.css';
 ```
 
 Mantine の CSS は `styles.css` ではなく `styles.layer.css` を読み込みます。パッケージの CSS は `@layer efoo` に入っており、`@layer mantine` の後に宣言されるため、層なしの `@mantine/core/styles.css` と一緒に使うと、パッケージの規則がすべて Mantine に負けて効きません。`styles.css` と `styles.layer.css` を両方読み込むこともしないでください。
@@ -61,7 +61,7 @@ Mantine の CSS は `styles.css` ではなく `styles.layer.css` を読み込み
 
 ```tsx
 import { MantineProvider } from '@mantine/core';
-import { efooTheme, efooCssVariablesResolver } from '@efoo-team/ui';
+import { efooTheme, efooCssVariablesResolver } from '@efoo/ui';
 
 export function App() {
   return (
@@ -109,7 +109,7 @@ theme の差分は `createTheme` で書き、`mergeThemeOverrides` で `efooThem
 
 ```tsx
 import { createTheme, mergeThemeOverrides } from '@mantine/core';
-import { efooTheme } from '@efoo-team/ui';
+import { efooTheme } from '@efoo/ui';
 
 // サービスで変えたい項目だけを書く（以下は一例）
 const serviceOverrides = createTheme({
@@ -126,7 +126,7 @@ export const serviceTheme = mergeThemeOverrides(efooTheme, serviceOverrides);
 
 ```tsx
 import { deepMerge, type CSSVariablesResolver } from '@mantine/core';
-import { efooCssVariablesResolver } from '@efoo-team/ui';
+import { efooCssVariablesResolver } from '@efoo/ui';
 
 const serviceCssVariablesResolver: CSSVariablesResolver = () => ({
   variables: { '--service-header-height': '3rem' },
