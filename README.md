@@ -8,8 +8,6 @@ efoo のサービスで共有する Mantine theme と、その theme を使っ�
 
 React 19 と Mantine 9.7 系を使います。各 Mantine パッケージは同じバージョンにしてください。
 
-`fix:` や `feat:` などのコミットを main に push すると、CI が変更内容に応じた版を決めて npm に公開します。
-
 ### pnpm
 
 ```sh
@@ -292,6 +290,8 @@ Badge の既定は `variant="light"` です。`color` を指定しない Badge �
 ## 開発
 
 Node.js 22 と pnpm を使います。`pnpm install` で依存関係を入れた後、`pnpm storybook` で開発サーバーを起動します。変更を入れる前に、`pnpm typecheck`・`pnpm lint`・`pnpm format:check`・`pnpm build-storybook` が通ることを確認してください。Mantine を更新したときは、Storybook でライトとダークの表示を確認します。
+
+`fix:` や `feat:` などのコミットを main に push すると、CI が変更内容に応じた版を決めて npm に公開します。
 
 ## ライセンス
 
