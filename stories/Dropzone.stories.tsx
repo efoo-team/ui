@@ -7,16 +7,17 @@ import '@mantine/dropzone/styles.layer.css';
 
 const meta = {
   title: '入力 / ファイルの選択（Dropzone）',
-  component: Dropzone,
   tags: ['autodocs'],
-} satisfies Meta<typeof Dropzone>;
+} satisfies Meta;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const FileSelection: Story = {
   name: '画像を選択',
-  args: { onDrop: () => {} },
+  parameters: {
+    docs: { description: { story: '画像をドラッグまたは選択して追加できます。' } },
+  },
   render: () => {
     const [message, setMessage] = useState('');
 
@@ -26,10 +27,20 @@ export const FileSelection: Story = {
           accept={IMAGE_MIME_TYPE}
           maxSize={5 * 1024 ** 2}
           inputProps={{ 'aria-label': '画像を選択' }}
-          onDrop={(files) => setMessage(`${files.length} 件の画像を選択しました。`)}
-          onReject={() => setMessage('画像形式とファイルサイズを確認してください。')}
+          onDrop={() => {}}
+          onDropAny={(files, rejections) => {
+            const codes = new Set(
+              rejections.flatMap(({ errors }) => errors.map(({ code }) => code)),
+            );
+            const messages = [
+              files.length > 0 ? `${files.length} 件の画像を選択しました。` : '',
+              codes.has('file-invalid-type') ? '画像ファイルを選択してください。' : '',
+              codes.has('file-too-large') ? '画像は 1 件につき 5 MB までです。' : '',
+            ].filter(Boolean);
+            setMessage(messages.join(' '));
+          }}
         >
-          <Group justify="center" gap="lg" mih={140}>
+          <Group justify="center" gap="lg" mih={140} wrap="nowrap">
             <Dropzone.Accept>
               <IconUpload size={36} aria-hidden />
             </Dropzone.Accept>
@@ -44,14 +55,16 @@ export const FileSelection: Story = {
                 <Text>画像をドロップ</Text>
               </Dropzone.Accept>
               <Dropzone.Reject>
-                <Text>画像ファイルを選択してください</Text>
+                <Text>画像ファイル以外は選べません</Text>
               </Dropzone.Reject>
               <Dropzone.Idle>
-                <Text>画像をドロップ、またはクリックして選択</Text>
+                <Text>
+                  画像をドロップ
+                  <br />
+                  またはクリックして選択
+                </Text>
               </Dropzone.Idle>
-              <Text size="sm" c="dimmed">
-                画像 1 件につき 5 MB まで
-              </Text>
+              <Text size="sm">画像 1 件につき 5 MB まで</Text>
             </div>
           </Group>
         </Dropzone>
