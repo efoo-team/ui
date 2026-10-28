@@ -1,13 +1,17 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { useId, useRef, useState, type ReactNode } from 'react';
 import {
   ActionIcon,
+  Anchor,
   AppShell,
   Avatar,
   Badge,
+  Breadcrumbs,
   Burger,
   Button,
   Card,
+  CloseButton,
+  Divider,
   Grid,
   Group,
   Menu,
@@ -15,6 +19,7 @@ import {
   NavLink,
   Pagination,
   Progress,
+  RemoveScroll,
   ScrollArea,
   SegmentedControl,
   Select,
@@ -30,7 +35,7 @@ import {
   useMantineTheme,
   VisuallyHidden,
 } from '@mantine/core';
-import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { useDisclosure, useHotkeys, useMediaQuery } from '@mantine/hooks';
 import { AreaChart } from '@mantine/charts';
 import '@mantine/charts/styles.layer.css';
 import {
@@ -70,6 +75,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const ICON_SIZE = 16;
+
+// Container breakpoints for the Grids in the main area; Mantine needs exact widths for container queries.
+const CONTENT_BREAKPOINTS = { xs: '36rem', sm: '48rem', md: '48rem', lg: '64rem', xl: '80rem' };
 
 // Every name and number below is fictional. Figures that appear twice on the screen are computed from one source.
 
@@ -169,20 +177,20 @@ const STATS: Stat[] = [
     badge: { label: `+${OCTOBER_GROWTH.toFixed(1)}%`, attention: false, trend: true },
   },
   {
-    label: '10 月の新規顧客',
-    value: '128 社',
+    label: '10 月の新規顧客（社）',
+    value: '128',
     note: '9 月より 12 社多い',
     badge: { label: '+12', attention: false, trend: true },
   },
   {
-    label: '発注が必要な品目',
-    value: `${REORDER_COUNT} 品目`,
+    label: '発注が必要な品目数',
+    value: String(REORDER_COUNT),
     note: '在庫数が発注点を下回っています',
     badge: { label: '要発注', attention: true },
   },
   {
-    label: '未対応の問い合わせ',
-    value: `${INQUIRIES.open} 件`,
+    label: '未対応の問い合わせ（件）',
+    value: String(INQUIRIES.open),
     note: `うち ${INQUIRIES.overdue} 件は受付から 2 日以上`,
     badge: { label: '要対応', attention: true },
   },
@@ -195,15 +203,17 @@ interface NavItem {
   children?: string[];
 }
 
+// The current page is a child link, so the example shows an open parent with an active child.
 const NAV_ITEMS: NavItem[] = [
-  { label: 'ダッシュボード', icon: IconDashboard },
+  { label: 'ホーム', icon: IconDashboard, children: ['ダッシュボード', 'お知らせ'] },
   { label: '受注', icon: IconReceipt, children: ['受注一覧', '出荷', '返品'] },
   { label: '顧客', icon: IconUsers },
   { label: '在庫', icon: IconBox },
   { label: '問い合わせ', icon: IconMessage, count: INQUIRIES.open },
-  { label: 'レポート', icon: IconChartBar, children: ['売上', '在庫'] },
+  { label: 'レポート', icon: IconChartBar, children: ['売上', '在庫推移'] },
 ];
 
+const CURRENT_PARENT = 'ホーム';
 const CURRENT_PAGE = 'ダッシュボード';
 
 interface Organization {
@@ -213,9 +223,9 @@ interface Organization {
 }
 
 const ORGANIZATIONS: Organization[] = [
-  { name: 'サンプル販売 本店', initial: '本', note: '標準プラン' },
-  { name: 'サンプル販売 北支店', initial: '北', note: '標準プラン' },
-  { name: 'サンプル販売 通信販売部', initial: '通', note: 'お試し中' },
+  { name: '青葉商店', initial: '青', note: '標準プラン' },
+  { name: '北町センター', initial: '北', note: '標準プラン' },
+  { name: 'みなと通販', initial: 'み', note: 'お試し中' },
 ];
 
 type OrderStatus = 'paymentPending' | 'notShipped' | 'shipped' | 'cancelled';
@@ -300,40 +310,46 @@ function OrganizationMenu({
   organization,
   onOrganizationChange,
 }: Pick<NavbarProps, 'rail' | 'organization' | 'onOrganizationChange'>) {
+  const ref = useRef<HTMLButtonElement>(null);
   return (
-    <Menu position={rail ? 'right-start' : 'bottom-start'} width={240}>
-      <Menu.Target>
-        <NavLink
-          component="button"
-          type="button"
-          label={organization.name}
-          description={organization.note}
-          leftSection={<Avatar aria-hidden>{organization.initial}</Avatar>}
-          rightSection={<IconSelector size={16} />}
-          aria-label={`組織を切り替える（現在：${organization.name}）`}
-        />
-      </Menu.Target>
-      <Menu.Dropdown>
-        <Menu.Label>組織</Menu.Label>
-        {ORGANIZATIONS.map((item) => (
-          <Menu.Item
-            key={item.name}
-            leftSection={
-              <Avatar size="sm" aria-hidden>
-                {item.initial}
-              </Avatar>
-            }
-            rightSection={item.name === organization.name ? <IconCheck size={16} /> : undefined}
-            aria-current={item.name === organization.name ? 'true' : undefined}
-            onClick={() => onOrganizationChange(item)}
-          >
-            {item.name}
-          </Menu.Item>
-        ))}
-        <Menu.Divider />
-        <Menu.Item leftSection={<IconPlus size={16} />}>組織を追加</Menu.Item>
-      </Menu.Dropdown>
-    </Menu>
+    <>
+      <Menu position={rail ? 'right-start' : 'bottom-start'} width={240}>
+        <Menu.Target>
+          <NavLink
+            ref={ref}
+            component="button"
+            type="button"
+            label={organization.name}
+            description={organization.note}
+            leftSection={<Avatar aria-hidden>{organization.initial}</Avatar>}
+            rightSection={<IconSelector size={16} />}
+            aria-label={`組織を切り替える（現在：${organization.name}）`}
+          />
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Label>組織</Menu.Label>
+          {ORGANIZATIONS.map((item) => (
+            <Menu.Item
+              key={item.name}
+              leftSection={
+                <Avatar size="sm" aria-hidden>
+                  {item.initial}
+                </Avatar>
+              }
+              rightSection={item.name === organization.name ? <IconCheck size={16} /> : undefined}
+              aria-current={item.name === organization.name ? 'true' : undefined}
+              onClick={() => onOrganizationChange(item)}
+            >
+              {item.name}
+            </Menu.Item>
+          ))}
+          <Menu.Divider />
+          <Menu.Item leftSection={<IconPlus size={16} />}>組織を追加</Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+      {/* In the rail only the avatar shows, so the name comes from a Tooltip pointed at the Menu.Target link. */}
+      <Tooltip label={organization.name} position="right" target={ref} disabled={!rail} />
+    </>
   );
 }
 
@@ -353,6 +369,7 @@ function RailParent({
   icon: ReactNode;
   items: string[];
 }) {
+  const current = label === CURRENT_PARENT;
   const ref = useRef<HTMLButtonElement>(null);
   return (
     <>
@@ -364,13 +381,16 @@ function RailParent({
             type="button"
             label={label}
             aria-label={name}
+            active={current}
             leftSection={icon}
           />
         </Menu.Target>
         <Menu.Dropdown>
           <Menu.Label>{label}</Menu.Label>
           {items.map((child) => (
-            <Menu.Item key={child}>{child}</Menu.Item>
+            <Menu.Item key={child} aria-current={child === CURRENT_PAGE ? 'page' : undefined}>
+              {child}
+            </Menu.Item>
           ))}
         </Menu.Dropdown>
       </Menu>
@@ -395,11 +415,17 @@ function Navbar({
   return (
     <>
       <AppShell.Section mb="xs">
-        <OrganizationMenu
-          rail={rail}
-          organization={organization}
-          onOrganizationChange={onOrganizationChange}
-        />
+        <Group gap="xs" wrap="nowrap">
+          <Stack flex={1} miw={0}>
+            <OrganizationMenu
+              rail={rail}
+              organization={organization}
+              onOrganizationChange={onOrganizationChange}
+            />
+          </Stack>
+          {/* With layout="alt" the open navbar covers the header on narrow screens, so it carries its own close button. */}
+          <CloseButton hiddenFrom="sm" onClick={onNavigate} aria-label="ナビゲーションを閉じる" />
+        </Group>
       </AppShell.Section>
       <AppShell.Section grow component={ScrollArea} scrollbars="y">
         <Stack gap={4}>
@@ -428,6 +454,8 @@ function Navbar({
                       component="button"
                       type="button"
                       label={child}
+                      active={child === CURRENT_PAGE}
+                      aria-current={child === CURRENT_PAGE ? 'page' : undefined}
                       onClick={onNavigate}
                     />
                   ))}
@@ -496,20 +524,25 @@ function AccountMenu() {
 function StatCard({ stat }: { stat: Stat }) {
   return (
     <Card>
-      <Stack gap="xs">
-        <Group justify="space-between" wrap="nowrap">
-          <Text size="sm" c="dimmed">
-            {stat.label}
-          </Text>
-          {stat.badge.attention ? (
-            <Badge color={ATTENTION_COLOR}>{stat.badge.label}</Badge>
-          ) : (
-            <Badge variant="outline" leftSection={stat.badge.trend && <IconTrendingUp size={12} />}>
-              {stat.badge.label}
-            </Badge>
-          )}
-        </Group>
-        <Text variant="metric">{stat.value}</Text>
+      <Stack gap="lg">
+        <Stack gap="xs">
+          <Group justify="space-between" wrap="nowrap">
+            <Text size="sm" c="dimmed">
+              {stat.label}
+            </Text>
+            {stat.badge.attention ? (
+              <Badge color={ATTENTION_COLOR}>{stat.badge.label}</Badge>
+            ) : (
+              <Badge
+                variant="outline"
+                leftSection={stat.badge.trend && <IconTrendingUp size={12} />}
+              >
+                {stat.badge.label}
+              </Badge>
+            )}
+          </Group>
+          <Text variant="metric">{stat.value}</Text>
+        </Stack>
         <Text size="sm" c="dimmed">
           {stat.note}
         </Text>
@@ -755,9 +788,9 @@ function OrdersCard() {
 
 function InquiriesCard() {
   const rows = [
-    { label: '対応済み', value: INQUIRIES.done },
-    { label: '対応中', value: INQUIRIES.inProgress },
-    { label: '未対応', value: INQUIRIES.open },
+    { label: '対応済み（件）', value: INQUIRIES.done },
+    { label: '対応中（件）', value: INQUIRIES.inProgress },
+    { label: '未対応（件）', value: INQUIRIES.open },
   ];
 
   return (
@@ -781,7 +814,7 @@ function InquiriesCard() {
             <Text size="sm" c="dimmed">
               {row.label}
             </Text>
-            <Text variant="metric">{row.value} 件</Text>
+            <Text variant="metric">{row.value}</Text>
           </Stack>
         ))}
       </SimpleGrid>
@@ -820,23 +853,24 @@ function DashboardPage() {
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [searchOpened, { open: openSearch, close: closeSearch }] = useDisclosure(false);
   const [organization, setOrganization] = useState<Organization>(ORGANIZATIONS[0]!);
-  const [openedParents, setOpenedParents] = useState<string[]>(['受注']);
+  const [openedParents, setOpenedParents] = useState<string[]>([CURRENT_PARENT]);
   const navbarId = useId();
   const theme = useMantineTheme();
   const wide = useMediaQuery(`(min-width: ${theme.breakpoints.sm})`);
   // On narrow screens the navbar always opens in full; the icon rail exists only on wide screens.
   const rail = wide === true && !desktopOpened;
-  // Escape closes the narrow-screen navbar from the Burger or from inside the navbar. A menu opened from the navbar
-  // renders in a portal, but React still bubbles its keydown here, so events from outside the navbar's DOM and
-  // from an open menu button are left to the menu.
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    const target = event.target;
-    if (!(target instanceof HTMLElement)) return;
-    const fromPortal = !event.currentTarget.contains(target);
-    const closesMenu =
-      target.hasAttribute('aria-haspopup') && target.getAttribute('aria-expanded') === 'true';
-    if (event.key === 'Escape' && opened && !fromPortal && !closesMenu) close();
-  };
+  // Escape anywhere closes the narrow-screen navbar, except while a menu or dialog is open: their own Escape closes
+  // them first, and the navbar stays.
+  useHotkeys([
+    [
+      'Escape',
+      () => {
+        if (!opened || document.querySelector('[role="menu"], [role="dialog"]')) return;
+        close();
+      },
+    ],
+  ]);
+  const narrowOpen = wide === false && opened;
   const toggleParent = (label: string) =>
     setOpenedParents((current) =>
       current.includes(label) ? current.filter((value) => value !== label) : [...current, label],
@@ -844,22 +878,22 @@ function DashboardPage() {
 
   return (
     <AppShell
+      layout="alt"
       header={{ height: 56 }}
       navbar={{ width: rail ? 48 : 256, breakpoint: 'sm', collapsed: { mobile: !opened } }}
       padding="md"
     >
       <AppShell.Header px="md">
         <Group h="100%" justify="space-between" wrap="nowrap">
-          <Group gap="sm" wrap="nowrap">
+          <Group gap="xs" wrap="nowrap">
             <Burger
               opened={opened}
               onClick={toggle}
               hiddenFrom="sm"
-              size="sm"
+              size="lg"
               aria-label="ナビゲーション"
               aria-expanded={opened}
               aria-controls={navbarId}
-              onKeyDown={closeOnEscape}
             />
             <ActionIcon
               variant="subtle"
@@ -871,7 +905,15 @@ function DashboardPage() {
             >
               <IconLayoutSidebar size={ICON_SIZE} />
             </ActionIcon>
-            <Text variant="emphasis">サンプル販売管理</Text>
+            <Divider orientation="vertical" my="md" />
+            <Breadcrumbs>
+              <Anchor href="#" size="sm">
+                {CURRENT_PARENT}
+              </Anchor>
+              <Text size="sm" aria-current="page">
+                {CURRENT_PAGE}
+              </Text>
+            </Breadcrumbs>
           </Group>
           <Group gap="sm" wrap="nowrap">
             <TextInput
@@ -901,22 +943,25 @@ function DashboardPage() {
           aria-label="検索する言葉"
         />
       </Modal>
-      <AppShell.Navbar
-        p="xs"
-        mod={{ rail }}
-        id={navbarId}
-        aria-label="メインナビゲーション"
-        onKeyDown={closeOnEscape}
-      >
-        <Navbar
-          rail={rail}
-          organization={organization}
-          onOrganizationChange={setOrganization}
-          openedParents={openedParents}
-          onToggleParent={toggleParent}
-          onNavigate={close}
-        />
-      </AppShell.Navbar>
+      {/* While the narrow-screen navbar is open the page behind it does not scroll; while it is closed it is inert. */}
+      <RemoveScroll enabled={narrowOpen} forwardProps>
+        <AppShell.Navbar
+          p="xs"
+          mod={{ rail }}
+          id={navbarId}
+          aria-label="メインナビゲーション"
+          inert={wide === false && !opened ? true : undefined}
+        >
+          <Navbar
+            rail={rail}
+            organization={organization}
+            onOrganizationChange={setOrganization}
+            openedParents={openedParents}
+            onToggleParent={toggleParent}
+            onNavigate={close}
+          />
+        </AppShell.Navbar>
+      </RemoveScroll>
       <AppShell.Main>
         <Stack gap="lg">
           <Stack gap={4}>
@@ -927,12 +972,13 @@ function DashboardPage() {
               2026 年 10 月 31 日時点の状況
             </Text>
           </Stack>
-          <SimpleGrid cols={{ base: 1, xs: 2, lg: 4 }}>
+          {/* Columns follow the width of the main area, not the viewport, so an open sidebar is taken into account. */}
+          <SimpleGrid type="container" cols={{ base: 1, '36rem': 2, '72rem': 4 }}>
             {STATS.map((stat) => (
               <StatCard key={stat.label} stat={stat} />
             ))}
           </SimpleGrid>
-          <Grid>
+          <Grid type="container" breakpoints={CONTENT_BREAKPOINTS}>
             <Grid.Col span={{ base: 12, lg: 8 }}>
               <SalesCard />
             </Grid.Col>
@@ -941,7 +987,7 @@ function DashboardPage() {
             </Grid.Col>
           </Grid>
           <OrdersCard />
-          <Grid>
+          <Grid type="container" breakpoints={CONTENT_BREAKPOINTS}>
             <Grid.Col span={{ base: 12, md: 6 }}>
               <InquiriesCard />
             </Grid.Col>
