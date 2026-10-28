@@ -1,6 +1,7 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
   .root {
+    --efoo-inline-control: var(--checkbox-size);
     /* shadcn/ui's box is 16px; the other sizes step by 2-4px instead of Mantine's 30 and 36px, which outgrow
        the 40 and 44px inputs they sit beside. */
     --checkbox-size-xs: calc(0.875rem * var(--mantine-scale));
@@ -15,10 +16,8 @@
     border-color: var(--efoo-input-border);
   }
 
-  /* Mantine aligns the box with the top of the label line; centered on the first line, it stays level with the
-     text at every size. */
-  .root:has(label) .inner {
-    margin-top: calc((var(--label-lh) - var(--checkbox-size)) / 2);
+  .inner {
+    margin-top: var(--efoo-inline-offset, 0px);
   }
 
   .input:disabled {

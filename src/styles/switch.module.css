@@ -1,6 +1,7 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
   .root {
+    --efoo-inline-control: var(--switch-height);
     /* shadcn/ui's switch is 32x18 with a 16px thumb; each size adds 4x2px and keeps the 1px inset. */
     --switch-height-xs: calc(1rem * var(--mantine-scale));
     --switch-height-sm: calc(1.125rem * var(--mantine-scale));
@@ -40,8 +41,8 @@
     --switch-text-color: var(--efoo-switch-checked-contrast, var(--mantine-color-white));
   }
 
-  .root:has(label) .track {
-    margin-top: calc((var(--label-lh) - var(--switch-height)) / 2);
+  .track {
+    margin-top: var(--efoo-inline-offset, 0px);
   }
 
   .input:focus-visible + .track {

@@ -9,6 +9,13 @@
     --label-offset-end: var(--mantine-spacing-xs);
   }
 
+  /* Mantine aligns the control with the top of the label line; with label text it is centered on the first line
+     instead. Each component sets --efoo-inline-control to its control height. Switch always renders its body as a
+     <label>, so the label text element is what tells a labelled control. */
+  .root:has(.label) {
+    --efoo-inline-offset: calc((var(--label-lh) - var(--efoo-inline-control)) / 2);
+  }
+
   .label {
     font-weight: var(--mantine-font-weight-medium);
   }

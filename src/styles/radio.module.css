@@ -1,6 +1,7 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
   .root {
+    --efoo-inline-control: var(--radio-size);
     /* The same steps as Checkbox. */
     --radio-size-xs: calc(0.875rem * var(--mantine-scale));
     --radio-size-sm: calc(1rem * var(--mantine-scale));
@@ -19,8 +20,8 @@
     border-color: var(--efoo-input-border);
   }
 
-  .root:has(label) .inner {
-    margin-top: calc((var(--label-lh) - var(--radio-size)) / 2);
+  .inner {
+    margin-top: var(--efoo-inline-offset, 0px);
   }
 
   .radio:disabled {
