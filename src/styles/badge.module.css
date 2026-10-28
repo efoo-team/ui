@@ -1,6 +1,10 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
+  /* shadcn/ui's badge is 22px in dashboard-01 and 20px in the current docs, both with 12px text and 8px sides. */
   .root {
+    --badge-height-sm: calc(1.25rem * var(--mantine-scale));
+    --badge-height-md: calc(1.375rem * var(--mantine-scale));
+    --badge-fz-sm: var(--mantine-font-size-xs);
     --badge-fz-md: var(--mantine-font-size-xs);
     --badge-fz-lg: var(--mantine-font-size-sm);
     --badge-padding-x-md: calc(0.5rem * var(--mantine-scale));
