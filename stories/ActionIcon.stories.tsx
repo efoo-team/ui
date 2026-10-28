@@ -24,7 +24,9 @@ export const VariantsAndSizes: Story = {
   render: () => (
     <Stack gap="xl">
       <Stack gap="xs">
-        <Title order={5}>見た目</Title>
+        <Title order={4} size="h5">
+          見た目
+        </Title>
         <Group>
           <ActionIcon aria-label="追加">
             <IconPlus size={16} />
@@ -47,7 +49,9 @@ export const VariantsAndSizes: Story = {
         </Group>
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>サイズ</Title>
+        <Title order={4} size="h5">
+          サイズ
+        </Title>
         <Group align="center">
           <ActionIcon variant="outline" size="xs" aria-label="検索（極小）">
             <IconSearch size={12} />
@@ -67,7 +71,9 @@ export const VariantsAndSizes: Story = {
         </Group>
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>状態</Title>
+        <Title order={4} size="h5">
+          状態
+        </Title>
         <Group align="center">
           <ActionIcon variant="outline" loading aria-label="保存中">
             <IconSettings size={16} />

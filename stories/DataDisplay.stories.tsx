@@ -109,7 +109,9 @@ export const CardAndBadgeExamples: Story = {
         <Card w={300}>
           <Stack gap="sm">
             <Group justify="space-between">
-              <Title order={5}>サンプルカード</Title>
+              <Title order={4} size="h5">
+                サンプルカード
+              </Title>
               <Badge>標準</Badge>
             </Group>
             <Text size="sm" c="dimmed">
@@ -122,7 +124,9 @@ export const CardAndBadgeExamples: Story = {
         </Card>
         <Card w={300}>
           <Stack gap="sm">
-            <Title order={5}>状態を伝える</Title>
+            <Title order={4} size="h5">
+              状態を伝える
+            </Title>
             <Text size="sm">タイトル、説明、状態ラベルを組み合わせます。</Text>
             <Badge variant="outline">利用可能</Badge>
           </Stack>

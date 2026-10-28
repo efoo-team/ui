@@ -22,7 +22,9 @@ export const States: Story = {
   render: () => (
     <Stack gap="xl">
       <Stack gap="sm">
-        <Title order={5}>Checkbox</Title>
+        <Title order={4} size="h5">
+          Checkbox
+        </Title>
         <Group align="flex-start">
           <Checkbox label="未選択" />
           <Checkbox label="選択済み" defaultChecked />
@@ -57,7 +59,9 @@ export const States: Story = {
         </Group>
       </Radio.Group>
       <Stack gap="sm">
-        <Title order={5}>Switch</Title>
+        <Title order={4} size="h5">
+          Switch
+        </Title>
         <Group>
           <Switch label="オフ" />
           <Switch label="オン" defaultChecked />

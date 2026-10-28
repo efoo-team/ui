@@ -42,9 +42,7 @@ export const AppShellExample: Story = {
                 size="sm"
                 aria-label="メニューを開閉"
               />
-              <Title order={5} component="p">
-                サンプル管理画面
-              </Title>
+              <Text>サンプル管理画面</Text>
             </Group>
             <Button size="xs" variant="outline">
               ヘルプ
@@ -58,7 +56,9 @@ export const AppShellExample: Story = {
         </AppShell.Navbar>
         <AppShell.Main>
           <Stack>
-            <Title order={2}>ページの見出し</Title>
+            <Title order={1} size="h3">
+              ページの見出し
+            </Title>
             <Text c="dimmed">本文やページ固有の部品をここに配置します。</Text>
           </Stack>
         </AppShell.Main>

@@ -24,7 +24,9 @@ export const AvatarStates: Story = {
   render: () => (
     <Stack gap="xl">
       <Stack gap="xs">
-        <Title order={5}>サイズ</Title>
+        <Title order={4} size="h5">
+          サイズ
+        </Title>
         <Group align="center">
           <Avatar size="xs">青</Avatar>
           <Avatar size="sm">青</Avatar>
@@ -34,7 +36,9 @@ export const AvatarStates: Story = {
         </Group>
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>見た目</Title>
+        <Title order={4} size="h5">
+          見た目
+        </Title>
         <Group align="center">
           <Avatar>青</Avatar>
           <Avatar variant="filled">青</Avatar>
@@ -44,7 +48,9 @@ export const AvatarStates: Story = {
         </Group>
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>頭文字とアイコン</Title>
+        <Title order={4} size="h5">
+          頭文字とアイコン
+        </Title>
         <Group align="center">
           <Avatar name="Sample User" />
           <Avatar>
@@ -54,7 +60,9 @@ export const AvatarStates: Story = {
         </Group>
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>グループ</Title>
+        <Title order={4} size="h5">
+          グループ
+        </Title>
         <Avatar.Group>
           <Avatar>青</Avatar>
           <Avatar>赤</Avatar>

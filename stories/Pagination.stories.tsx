@@ -23,19 +23,27 @@ export const PaginationStates: Story = {
   render: () => (
     <Stack gap="xl">
       <Stack gap="xs">
-        <Title order={5}>標準</Title>
+        <Title order={4} size="h5">
+          標準
+        </Title>
         <Pagination total={5} defaultValue={2} />
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>ページ数が多い場合</Title>
+        <Title order={4} size="h5">
+          ページ数が多い場合
+        </Title>
         <Pagination total={24} defaultValue={10} />
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>先頭・末尾へ移動するボタン付き</Title>
+        <Title order={4} size="h5">
+          先頭・末尾へ移動するボタン付き
+        </Title>
         <Pagination total={24} defaultValue={10} withEdges />
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>サイズ</Title>
+        <Title order={4} size="h5">
+          サイズ
+        </Title>
         <Pagination total={5} defaultValue={1} size="xs" />
         <Pagination total={5} defaultValue={1} size="sm" />
         <Pagination total={5} defaultValue={1} size="md" />
@@ -43,7 +51,9 @@ export const PaginationStates: Story = {
         <Pagination total={5} defaultValue={1} size="xl" />
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>操作できない状態</Title>
+        <Title order={4} size="h5">
+          操作できない状態
+        </Title>
         <Pagination total={5} defaultValue={2} disabled />
       </Stack>
     </Stack>

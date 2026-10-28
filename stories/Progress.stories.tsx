@@ -23,13 +23,17 @@ export const ProgressStates: Story = {
   render: () => (
     <Stack gap="xl" maw={440}>
       <Stack gap="xs">
-        <Title order={5}>標準</Title>
+        <Title order={4} size="h5">
+          標準
+        </Title>
         <Progress value={0} aria-label="進捗 0%" />
         <Progress value={40} aria-label="進捗 40%" />
         <Progress value={100} aria-label="進捗 100%" />
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>サイズ</Title>
+        <Title order={4} size="h5">
+          サイズ
+        </Title>
         <Progress value={60} size="xs" aria-label="進捗 60%（極小）" />
         <Progress value={60} size="sm" aria-label="進捗 60%（小）" />
         <Progress value={60} size="md" aria-label="進捗 60%（中）" />
@@ -37,11 +41,15 @@ export const ProgressStates: Story = {
         <Progress value={60} size="xl" aria-label="進捗 60%（極大）" />
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>意味のある色</Title>
+        <Title order={4} size="h5">
+          意味のある色
+        </Title>
         <Progress value={12} color="red" aria-label="在庫の残り 12%" />
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>複数区間</Title>
+        <Title order={4} size="h5">
+          複数区間
+        </Title>
         <Progress.Root size="lg">
           <Progress.Section value={60} aria-label="完了 60%" />
           <Progress.Section value={15} color="red" aria-label="要対応 15%" />

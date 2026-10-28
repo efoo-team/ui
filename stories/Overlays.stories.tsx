@@ -74,7 +74,9 @@ export const PopoverExample: Story = {
       </Popover.Target>
       <Popover.Dropdown>
         <Stack gap="xs">
-          <Title order={5}>確認内容</Title>
+          <Title order={4} size="h5">
+            確認内容
+          </Title>
           <Text size="sm">この領域に補足情報や操作を表示します。</Text>
         </Stack>
       </Popover.Dropdown>
@@ -213,7 +215,9 @@ export const PopoverOpenedPreview: Story = {
         </Popover.Target>
         <Popover.Dropdown>
           <Stack gap="xs">
-            <Title order={5}>確認内容</Title>
+            <Title order={4} size="h5">
+              確認内容
+            </Title>
             <Text size="sm">この領域に補足情報や操作を表示します。</Text>
           </Stack>
         </Popover.Dropdown>

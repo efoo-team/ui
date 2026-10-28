@@ -29,15 +29,21 @@ export const SegmentedControlStates: Story = {
   render: () => (
     <Stack gap="xl" maw={440} align="flex-start">
       <Stack gap="xs">
-        <Title order={5}>標準</Title>
+        <Title order={4} size="h5">
+          標準
+        </Title>
         <SegmentedControl data={periods} defaultValue="month" aria-label="表示する期間" />
       </Stack>
       <Stack gap="xs" w="100%">
-        <Title order={5}>幅いっぱい</Title>
+        <Title order={4} size="h5">
+          幅いっぱい
+        </Title>
         <SegmentedControl data={periods} defaultValue="week" fullWidth aria-label="表示する期間" />
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>サイズ</Title>
+        <Title order={4} size="h5">
+          サイズ
+        </Title>
         <SegmentedControl data={periods} defaultValue="month" size="xs" aria-label="期間（極小）" />
         <SegmentedControl data={periods} defaultValue="month" size="sm" aria-label="期間（小）" />
         <SegmentedControl data={periods} defaultValue="month" size="md" aria-label="期間（中）" />
@@ -45,7 +51,9 @@ export const SegmentedControlStates: Story = {
         <SegmentedControl data={periods} defaultValue="month" size="xl" aria-label="期間（極大）" />
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>縦向き</Title>
+        <Title order={4} size="h5">
+          縦向き
+        </Title>
         <SegmentedControl
           data={periods}
           defaultValue="month"
@@ -54,7 +62,9 @@ export const SegmentedControlStates: Story = {
         />
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>操作できない状態</Title>
+        <Title order={4} size="h5">
+          操作できない状態
+        </Title>
         <SegmentedControl data={periods} defaultValue="month" disabled aria-label="表示する期間" />
         <SegmentedControl
           data={[

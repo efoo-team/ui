@@ -22,7 +22,9 @@ export const VariantsAndSizes: Story = {
   render: () => (
     <Stack gap="xl">
       <Stack gap="xs">
-        <Title order={5}>見た目</Title>
+        <Title order={4} size="h5">
+          見た目
+        </Title>
         <Group>
           <Button>塗りつぶし</Button>
           <Button variant="light">薄い背景</Button>
@@ -38,7 +40,9 @@ export const VariantsAndSizes: Story = {
         </Paper>
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>サイズ</Title>
+        <Title order={4} size="h5">
+          サイズ
+        </Title>
         <Group align="center">
           <Button size="xs">極小</Button>
           <Button size="sm">小（既定）</Button>
@@ -48,7 +52,9 @@ export const VariantsAndSizes: Story = {
         </Group>
       </Stack>
       <Stack gap="xs">
-        <Title order={5}>状態</Title>
+        <Title order={4} size="h5">
+          状態
+        </Title>
         <Group align="center">
           <Button loading aria-label="保存中">
             保存
