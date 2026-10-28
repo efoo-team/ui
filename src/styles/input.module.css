@@ -59,16 +59,27 @@
     box-shadow: 0 0 0 3px var(--efoo-error-ring-color);
   }
 
-  /* The unstyled text has no padding, so a ring drawn on the box would touch it. The ring moves 2px outward
-     instead of adding padding, which would shift the text when it sits aligned inside another component. */
-  .wrapper[data-variant='unstyled'] .input:where(:focus, :focus-within) {
-    outline: 3px solid var(--efoo-focus-ring-color);
-    outline-offset: 2px;
-    box-shadow: none;
+  /* The unstyled text has no padding, so the box grows 4px on each side with a matching negative margin: the text
+     stays where it is, and the usual focus halo keeps a gap from it. Under a label the input moves down 4px, the
+     same offset Mantine leaves under a description, so the halo does not touch the label either. */
+  .wrapper[data-variant='unstyled'] .input {
+    width: calc(100% + var(--efoo-unstyled-start, 0px) + var(--efoo-unstyled-end, 0px));
   }
 
-  .wrapper[data-variant='unstyled'][data-error] .input:where(:focus, :focus-within) {
-    outline-color: var(--efoo-error-ring-color);
+  .wrapper[data-variant='unstyled']:not([data-with-left-section]) .input {
+    --efoo-unstyled-start: 0.25rem;
+    margin-inline-start: -0.25rem;
+    padding-inline-start: 0.25rem;
+  }
+
+  .wrapper[data-variant='unstyled']:not([data-with-right-section]) .input {
+    --efoo-unstyled-end: 0.25rem;
+    margin-inline-end: -0.25rem;
+    padding-inline-end: 0.25rem;
+  }
+
+  .label + .wrapper[data-variant='unstyled'] {
+    --input-margin-top: calc(var(--mantine-spacing-xs) / 2);
   }
 
   .input:where(:disabled, [data-disabled], :has(input:disabled)) {
