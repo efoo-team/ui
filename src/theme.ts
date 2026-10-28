@@ -590,6 +590,8 @@ export const efooTheme: MantineThemeOverride = createTheme({
       defaultProps: {
         transitionProps: overlayTransitionProps,
         radius: 'md',
+        // shadcn/ui's tooltip without an arrow sits 4px from its target (Mantine: 5px).
+        offset: 4,
         arrowSize: 8,
         events: { hover: true, focus: true, touch: false },
       },
