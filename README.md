@@ -93,6 +93,7 @@ export function App() {
 - ダークで状態色の塗りつぶしの hover が暗くなる向きに変わる。
 - ダークの Tabs の pills で、選択中のタブの面が帯より暗くなる。
 - ライトの Skeleton が `gray-3` になり、shadcn/ui より濃くなる。
+- ダークの Skeleton が白 10% になり、Card の上ではほとんど見えない。
 - 通知（`@mantine/notifications`）の出入りの緩急が `ease` になる。
 
 ### サービスごとに調整する

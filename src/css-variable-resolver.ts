@@ -115,6 +115,8 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
     '--mantine-color-error': 'var(--mantine-color-red-4)',
     '--efoo-color-ring': `var(--mantine-color-${z}-5)`,
     '--efoo-color-sidebar': `var(--mantine-color-${z}-9)`,
+    // shadcn/ui's skeleton is the accent surface, #404040 in dashboard-01; white 10% vanishes on a Card.
+    '--efoo-color-skeleton': `var(--mantine-color-${z}-7)`,
     // shadcn/ui's dark input line is white 15%; other surfaces keep white 10%.
     '--efoo-color-input-border': 'rgba(255, 255, 255, 0.15)',
     // shadcn/ui's dark outline surface: input (white 15%) at 30%, and at 50% on hover.
