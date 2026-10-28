@@ -164,40 +164,28 @@ Popover の中で操作させる場合は、Escape で閉じられるように `
 
 AppShell の navbar に NavLink を並べると、shadcn/ui の sidebar と同じ見た目になります。入れ子は NavLink の `children` に子の NavLink を渡すと、左の線と字下げつきで開閉します。`leftSection` に Avatar を置いた NavLink は組織の切り替えの起点（高さ 48px）になるので、`Menu.Target` で包みます。
 
-アイコンだけの帯（rail）にするときは、`navbar.width` に 48 を渡し、`AppShell.Navbar` に `mod={{ rail }}`（`data-rail` が付く）を渡します。navbar の余白は theme が持つので、`p` は渡しません（渡すと theme の余白より優先され、開閉でアイコンの位置がずれます）。navbar の中は、上から組織の切り替え・リンク・設定を `AppShell.Section` に分け、リンクの Section を `grow component={ScrollArea}` にします。theme は余白をスクロールする領域の内側（各 Section と ScrollArea の中身）に置くので、focus の輪郭が切れません。theme は navbar の幅に合わせて NavLink を帯の中央の 32px のアイコンに畳み、名前は右端で切れていき、畳み終わると名前・説明・chevron・子の項目を隠します。rail ではアイコンしか見えないので、NavLink には `aria-label` で名前を渡し、Tooltip で名前を示します（Mantine の Tooltip は名前を付けません）。子を持つ項目は、rail では子が見えないので、`Menu` で子を開きます。Menu を開く項目（組織の切り替えと、rail の子を持つ項目）は、`Menu` の中に `Tooltip`、その中に `Menu.Target` と NavLink を置きます。Tooltip が hover と focus の受け口を Menu.Target に渡し、Menu.Target がそれと `aria-haspopup`・`aria-expanded`・`aria-controls` を NavLink に付けます（Tooltip を Menu.Target の内側に置くと aria 属性が Tooltip に付き、`target` で別に置くと focus で出ません）。Menu の開閉を `opened` で持ち、開いている間は Tooltip を `disabled` にします。子を持つ項目は、開いた帯と rail で同じ要素を使い（作り直すと畳む最初のフレームで子の行が消えます）、開いた帯では Menu を `disabled` にして `withRoles` を外します（Menu の型には無いので、`PopoverProps` の `withRoles` として渡します。外さないと、子の開閉の `aria-expanded` が Menu の値で上書きされます）。見出しなど NavLink 以外の文字は、rail のときに描かないようにしてください。
+アイコンだけの帯（rail）にするときは、`navbar.width` に 48 を渡し、`AppShell.Navbar` に `mod={{ rail }}`（`data-rail` が付く）を渡します。navbar の余白は theme が持つので、`p` は渡しません（渡すと theme の余白より優先され、開閉でアイコンの位置がずれます）。navbar の中は、上から組織の切り替え・リンク・設定を `AppShell.Section` に分け、リンクの Section を `grow component={ScrollArea}` にします。theme は余白をスクロールする領域の内側（各 Section と ScrollArea の中身）に置くので、focus の輪郭が切れません。theme は navbar の幅に合わせて NavLink を帯の中央の 32px のアイコンに畳み、名前は右端で切れていき、畳み終わると名前・説明・chevron・子の項目を隠します。rail ではアイコンしか見えないので、NavLink には `aria-label` で名前を渡し、Tooltip で名前を示します（Mantine の Tooltip は名前を付けません）。子を持つ項目は、rail では子が見えないので、押すとサイドバーを広げてその項目の子を開きます（shadcn/ui の sidebar-07 と同じ）。子を持つ NavLink は押すと自分で子の開閉を反転させるので、`opened` と `onChange` で開閉を持ち、rail のときの `onChange` を「広げて、その項目を開く」に置き換えます（クリック・Enter・Space のどれも `onChange` に届きます）。rail では子が見えないので、`aria-expanded` は rail のとき false にします。開いた帯と rail で同じ NavLink を使い続けます（作り直すと畳む最初のフレームで子の行が消えます）。Menu を開く項目（組織の切り替え）は、`Menu` の中に `Tooltip`、その中に `Menu.Target` と NavLink を置きます。Tooltip が hover と focus の受け口を Menu.Target に渡し、Menu.Target がそれと `aria-haspopup`・`aria-expanded`・`aria-controls` を NavLink に付けます（Tooltip を Menu.Target の内側に置くと aria 属性が Tooltip に付き、`target` で別に置くと focus で出ません）。Menu の開閉を `opened` で持ち、開いている間は Tooltip を `disabled` にします。子を持つ NavLink は Menu.Target にしません（子の開閉と Menu の開閉が 1 つのボタンで干渉します）。見出しなど NavLink 以外の文字は、rail のときに描かないようにしてください。
 
 ```tsx
 const [rail, setRail] = useState(false);
-
-// A link that opens a Menu, with its name in a Tooltip while the navbar is a rail.
-function MenuLink({ rail, name, menuEnabled, link, dropdown }) {
-  const [menuOpened, setMenuOpened] = useState(false);
-  const opened = menuEnabled && menuOpened;
-  const popoverRoles: Pick<PopoverProps, 'withRoles'> = { withRoles: menuEnabled };
-  return (
-    <Menu
-      {...popoverRoles}
-      opened={opened}
-      onChange={setMenuOpened}
-      disabled={!menuEnabled}
-      position="right-start"
-    >
-      <Tooltip label={name} position="right" disabled={!rail || opened}>
-        <Menu.Target>{link}</Menu.Target>
-      </Tooltip>
-      {dropdown}
-    </Menu>
+const [openedParents, setOpenedParents] = useState<string[]>(['設定']);
+const toggleParent = (label: string) =>
+  setOpenedParents((current) =>
+    current.includes(label) ? current.filter((value) => value !== label) : [...current, label],
   );
-}
+// In the rail a parent widens the sidebar and opens itself.
+const expandParent = (label: string) => {
+  setRail(false);
+  setOpenedParents((current) => (current.includes(label) ? current : [...current, label]));
+};
 
-<AppShell navbar={{ width: rail ? 48 : 256, breakpoint: 'sm' }}>
-  <AppShell.Navbar mod={{ rail }}>
-    <AppShell.Section>
-      <MenuLink
-        rail={rail}
-        name="組織名"
-        menuEnabled
-        link={
+// The organization switcher: a Menu, with its name in a Tooltip while the navbar is a rail.
+function OrganizationMenu({ rail }) {
+  const [opened, setOpened] = useState(false);
+  return (
+    <Menu opened={opened} onChange={setOpened} position={rail ? 'right-start' : 'bottom-start'}>
+      <Tooltip label="組織名" position="right" disabled={!rail || opened}>
+        <Menu.Target>
           <NavLink
             component="button"
             label="組織名"
@@ -206,9 +194,17 @@ function MenuLink({ rail, name, menuEnabled, link, dropdown }) {
             leftSection={<Avatar aria-hidden>A</Avatar>}
             rightSection={<IconSelector size={16} />}
           />
-        }
-        dropdown={<Menu.Dropdown>{/* 組織の一覧 */}</Menu.Dropdown>}
-      />
+        </Menu.Target>
+      </Tooltip>
+      <Menu.Dropdown>{/* 組織の一覧 */}</Menu.Dropdown>
+    </Menu>
+  );
+}
+
+<AppShell navbar={{ width: rail ? 48 : 256, breakpoint: 'sm' }}>
+  <AppShell.Navbar mod={{ rail }}>
+    <AppShell.Section>
+      <OrganizationMenu rail={rail} />
     </AppShell.Section>
     <AppShell.Section grow component={ScrollArea}>
       <Tooltip label="ダッシュボード" position="right" disabled={!rail}>
@@ -218,29 +214,20 @@ function MenuLink({ rail, name, menuEnabled, link, dropdown }) {
           leftSection={<IconHome size={16} />}
         />
       </Tooltip>
-      <MenuLink
-        rail={rail}
-        name="設定"
-        menuEnabled={rail}
-        link={
-          <NavLink
-            component="button"
-            label="設定"
-            aria-label="設定"
-            leftSection={<IconSettings size={16} />}
-            defaultOpened
-          >
-            <NavLink label="全般" active aria-current="page" />
-            <NavLink label="通知" />
-          </NavLink>
-        }
-        dropdown={
-          <Menu.Dropdown>
-            <Menu.Item aria-current="page">全般</Menu.Item>
-            <Menu.Item>通知</Menu.Item>
-          </Menu.Dropdown>
-        }
-      />
+      <Tooltip label="設定" position="right" disabled={!rail}>
+        <NavLink
+          component="button"
+          label="設定"
+          aria-label="設定"
+          leftSection={<IconSettings size={16} />}
+          opened={openedParents.includes('設定')}
+          onChange={() => (rail ? expandParent('設定') : toggleParent('設定'))}
+          aria-expanded={rail ? false : openedParents.includes('設定')}
+        >
+          <NavLink label="全般" active aria-current="page" />
+          <NavLink label="通知" />
+        </NavLink>
+      </Tooltip>
     </AppShell.Section>
   </AppShell.Navbar>
 </AppShell>;
