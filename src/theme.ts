@@ -7,6 +7,7 @@ import {
   Accordion,
   ActionIcon,
   Alert,
+  AppShell,
   Autocomplete,
   Avatar,
   Badge,
@@ -58,6 +59,7 @@ import baseClasses from './styles/base.module.css';
 import accordionClasses from './styles/accordion.module.css';
 import actionIconClasses from './styles/action-icon.module.css';
 import alertClasses from './styles/alert.module.css';
+import appShellClasses from './styles/app-shell.module.css';
 import avatarClasses from './styles/avatar.module.css';
 import badgeClasses from './styles/badge.module.css';
 import buttonClasses from './styles/button.module.css';
@@ -199,6 +201,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     Alert: Alert.extend({
       classNames: { root: alertClasses.root, body: alertClasses.body, title: alertClasses.title },
     }),
+    AppShell: AppShell.extend({ classNames: { navbar: appShellClasses.navbar } }),
     Autocomplete: Autocomplete.extend({ classNames: comboboxClassNames }),
     Avatar: Avatar.extend({ classNames: { root: avatarClasses.root } }),
     // Without a variant Mantine leaves the text color to its CSS default (white), which is unreadable on the dark-scheme neutral fill.

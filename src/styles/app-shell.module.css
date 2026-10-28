@@ -1,0 +1,7 @@
+@layer efoo {
+  /* shadcn/ui's sidebar sits on its own surface (--sidebar), one step off the page; the header stays on the page color.
+     Mantine already draws the 1px border between them. */
+  .navbar {
+    background-color: var(--efoo-color-sidebar, var(--mantine-color-body));
+  }
+}

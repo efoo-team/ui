@@ -28,6 +28,7 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
     '--efoo-color-ring': `var(--mantine-color-${z}-4)`,
     '--efoo-color-tab-pills-text': 'var(--mantine-color-gray-7)',
     '--efoo-color-skeleton': 'var(--mantine-color-default-hover)',
+    '--efoo-color-sidebar': `var(--mantine-color-${z}-0)`,
   },
   dark: {
     [`--mantine-color-${z}-filled`]: `var(--mantine-color-${z}-2)`,
@@ -41,6 +42,7 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
     ...darkStatusColors,
     '--mantine-color-error': 'var(--mantine-color-red-4)',
     '--efoo-color-ring': `var(--mantine-color-${z}-5)`,
+    '--efoo-color-sidebar': `var(--mantine-color-${z}-9)`,
     // shadcn/ui's dark outline surface: input (white 15%) at 30%, and at 50% on hover.
     '--efoo-color-outline-bg': 'color-mix(in srgb, white 4.5%, transparent)',
     '--efoo-color-outline-hover': 'color-mix(in srgb, white 7.5%, transparent)',
