@@ -77,6 +77,7 @@ import avatarClasses from './styles/avatar.module.css';
 import badgeClasses from './styles/badge.module.css';
 import buttonClasses from './styles/button.module.css';
 import cardClasses from './styles/card.module.css';
+import chartClasses from './styles/chart.module.css';
 import checkboxClasses from './styles/checkbox.module.css';
 import chipClasses from './styles/chip.module.css';
 import drawerClasses from './styles/drawer.module.css';
@@ -137,6 +138,38 @@ const PAGINATION_CONTROL_LABELS = {
   next: '次のページ',
   last: '最後のページ',
 } as const;
+
+/*
+ * @mantine/charts is optional for services, so the theme refers to its components by name instead of importing
+ * them. shadcn/ui's charts draw solid grid lines and smooth ("natural") curves without dots.
+ */
+const chartClassNames = {
+  root: chartClasses.root,
+  tooltip: chartClasses.tooltip,
+  tooltipLabel: chartClasses.tooltipLabel,
+  tooltipItem: chartClasses.tooltipItem,
+};
+const gridChart = { classNames: chartClassNames, defaultProps: { strokeDasharray: 0 } };
+const curveChart = {
+  classNames: chartClassNames,
+  defaultProps: { strokeDasharray: 0, curveType: 'natural', withDots: false },
+};
+const chartComponents = {
+  AreaChart: curveChart,
+  LineChart: curveChart,
+  CompositeChart: { ...curveChart, defaultProps: { strokeDasharray: 0, curveType: 'natural' } },
+  BarChart: gridChart,
+  ScatterChart: gridChart,
+  BubbleChart: { classNames: chartClassNames },
+  DonutChart: { classNames: chartClassNames },
+  PieChart: { classNames: chartClassNames },
+  RadarChart: { classNames: chartClassNames },
+  RadialBarChart: { classNames: chartClassNames },
+  FunnelChart: { classNames: chartClassNames },
+  Sparkline: { defaultProps: { curveType: 'natural' } },
+  // The tooltip resolves its Styles API under its own name, not the chart's.
+  ChartTooltip: { classNames: chartClassNames },
+};
 
 const comboboxClassNames = { options: selectClasses.options, option: selectClasses.option };
 
@@ -217,6 +250,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
   },
   variantColorResolver: efooVariantColorResolver,
   components: {
+    ...chartComponents,
     Accordion: Accordion.extend({
       classNames: {
         root: accordionClasses.root,

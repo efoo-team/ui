@@ -172,7 +172,7 @@ Popover の中で操作させる場合は、Escape で閉じられるように `
 
 Badge の既定は `variant="light"` です。`color` を指定しない Badge は shadcn/ui の secondary（muted の面に本文の色の文字）、状態色の Badge は色の 10% の面に色の文字になります。塗りつぶしにする場合は `variant="filled"` を指定します。
 
-グラフの系列の色は、CSS 変数 `--efoo-chart-1`〜`--efoo-chart-5`（shadcn/ui の chart と同じ青の濃淡）を使います。`@mantine/charts` では `series` の `color` に `var(--efoo-chart-1)` のように渡します。
+グラフの系列の色は、CSS 変数 `--efoo-chart-1`〜`--efoo-chart-5` を使います。`--efoo-chart-1` は primary の無彩色（shadcn/ui の dashboard-01 の chart と同じ）で、2〜5 は青の濃淡です（ライトは 500〜800 番台、ダークは 300〜600 番台。どれも背景に対して 3:1 以上）。`@mantine/charts` では `series` の `color` に `var(--efoo-chart-1)` のように渡します。grid・tooltip・曲線の形は theme が既定を持つので、chart 側で指定する必要はありません。
 
 ## 表示例
 

@@ -112,20 +112,27 @@ const darkStatusColors = (theme: MantineTheme) =>
 const neutralAnchor = (theme: MantineTheme): Record<string, string> =>
   theme.primaryColor === z ? { '--mantine-color-anchor': 'var(--mantine-color-text)' } : {};
 
-// shadcn/ui's --chart-1..5: shades of blue, the same in both schemes. Each scheme sets them so a service can split them.
-const chartColors = Object.fromEntries(
-  [3, 5, 6, 7, 8].map((shade, index) => [
-    `--efoo-chart-${index + 1}`,
-    `var(--mantine-color-blue-${shade})`,
-  ]),
-);
+/*
+ * shadcn/ui's dashboard-01 draws its chart in the primary color, and the docs charts use a blue ramp
+ * (300, 500, 600, 700, 800). chart-1 is the neutral primary; chart-2..5 are the blues that keep 3:1 against the page
+ * and the card in each scheme (300 and 400 are too pale on white, 700 and 800 too dark on black).
+ */
+const chartColors = (scheme: 'light' | 'dark') =>
+  Object.fromEntries(
+    [
+      'var(--mantine-primary-color-filled)',
+      ...(scheme === 'light' ? [5, 6, 7, 8] : [3, 4, 5, 6]).map(
+        (shade) => `var(--mantine-color-blue-${shade})`,
+      ),
+    ].map((value, index) => [`--efoo-chart-${index + 1}`, value]),
+  );
 
 // Returns only the differences from Mantine's default resolver, which Mantine deep-merges with this result.
 export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
   variables: { ...motionCssVariables },
   light: {
     ...neutralAnchor(theme),
-    ...chartColors,
+    ...chartColors('light'),
     [`--mantine-color-${z}-filled`]: `var(--mantine-color-${z}-9)`,
     [`--mantine-color-${z}-contrast`]: `var(--mantine-color-${z}-0)`,
     ...lightStatusColors(theme),
@@ -140,7 +147,7 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
   },
   dark: {
     ...neutralAnchor(theme),
-    ...chartColors,
+    ...chartColors('dark'),
     [`--mantine-color-${z}-filled`]: `var(--mantine-color-${z}-2)`,
     [`--mantine-color-${z}-filled-hover`]: `var(--mantine-color-${z}-3)`,
     [`--mantine-color-${z}-light`]: `var(--mantine-color-${z}-8)`,

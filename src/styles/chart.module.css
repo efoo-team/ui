@@ -1,0 +1,31 @@
+@layer efoo {
+  /* @mantine/charts is optional for services; the theme names its components and these classes reach them by
+     Styles API name. shadcn/ui's grid is a solid line at half the border color (white 5% in dark). */
+  .root {
+    --chart-grid-color: color-mix(in srgb, var(--mantine-color-default-border) 50%, transparent);
+    --chart-cursor-fill: color-mix(in srgb, var(--mantine-color-default-hover) 60%, transparent);
+    --chart-text-color: var(--mantine-color-dimmed);
+  }
+
+  /* The same halo as the other controls instead of Mantine's 2px line with square corners. */
+  .root svg:focus-visible {
+    outline: none;
+    border-radius: var(--mantine-radius-default);
+    box-shadow: var(--efoo-focus-ring);
+  }
+
+  /* The tooltip is an overlay like Menu and Popover: their surface, line and 14/20 text. */
+  .tooltip {
+    border-color: var(--mantine-color-default-border);
+    background-color: var(--mantine-color-default);
+  }
+
+  .tooltipLabel {
+    font-size: var(--mantine-font-size-sm);
+    line-height: var(--mantine-line-height-sm);
+  }
+
+  .tooltipItem {
+    line-height: var(--mantine-line-height-sm);
+  }
+}
