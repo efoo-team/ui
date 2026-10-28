@@ -87,6 +87,7 @@ import modalClasses from './styles/modal.module.css';
 import navLinkClasses from './styles/nav-link.module.css';
 import notificationClasses from './styles/notification.module.css';
 import notificationsClasses from './styles/notifications.module.css';
+import paginationClasses from './styles/pagination.module.css';
 import pillClasses from './styles/pill.module.css';
 import radioClasses from './styles/radio.module.css';
 import segmentedControlClasses from './styles/segmented-control.module.css';
@@ -365,6 +366,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
       defaultProps: { withBorder: true },
     }),
     Pagination: Pagination.extend({
+      classNames: { control: paginationClasses.control },
       vars: (theme, props) => ({
         root: { '--pagination-active-color': getFilledContrast(theme, props.color) },
       }),
