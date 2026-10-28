@@ -76,6 +76,7 @@ import avatarClasses from './styles/avatar.module.css';
 import badgeClasses from './styles/badge.module.css';
 import buttonClasses from './styles/button.module.css';
 import checkboxClasses from './styles/checkbox.module.css';
+import chipClasses from './styles/chip.module.css';
 import drawerClasses from './styles/drawer.module.css';
 import inlineInputClasses from './styles/inline-input.module.css';
 import inputClasses from './styles/input.module.css';
@@ -269,6 +270,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
       }),
     }),
     CheckboxIndicator: CheckboxIndicator.extend({
+      classNames: { indicator: checkboxClasses.indicator },
       defaultProps: { radius: 'xs' },
       vars: (theme, props) => ({
         indicator: { '--checkbox-icon-color': getCheckboxIconColor(theme, props) },
@@ -276,6 +278,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     // Mantine sets the checked text only when color or variant is given, and white otherwise.
     Chip: Chip.extend({
+      classNames: { root: chipClasses.root, label: chipClasses.label },
       vars: (theme, props) => ({
         root: {
           '--chip-color':
@@ -398,6 +401,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     RadioGroup: RadioGroup.extend({ classNames: { root: radioClasses.group } }),
     RadioIndicator: RadioIndicator.extend({
+      classNames: { indicator: radioClasses.indicator },
       vars: (theme, props) => ({
         indicator: { '--radio-icon-color': getRadioIconColor(theme, props) },
       }),

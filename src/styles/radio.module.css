@@ -10,8 +10,12 @@
     border-color: var(--mantine-color-error);
   }
 
+  .radio:not(:checked, [data-error]),
+  .indicator:not([data-checked], [data-error]) {
+    border-color: var(--efoo-input-border);
+  }
+
   .radio:disabled {
-    border-color: var(--mantine-color-default-border);
     background-color: var(--mantine-color-default);
   }
 

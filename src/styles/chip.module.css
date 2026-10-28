@@ -1,0 +1,6 @@
+@layer efoo {
+  /* An unchecked outline chip is a control waiting for input, so it takes the input line. */
+  .root[data-variant='outline'] .label:not([data-checked], [data-disabled]) {
+    border-color: var(--efoo-input-border);
+  }
+}

@@ -13,7 +13,7 @@
   }
 
   .wrapper[data-variant='default']:not([data-error]) {
-    --input-bd: var(--efoo-color-input-border, var(--mantine-color-default-border));
+    --input-bd: var(--efoo-input-border);
   }
 
   /* Mantine keeps the unstyled border transparent on focus; the ring alone marks focus because the text has no padding. */

@@ -2,6 +2,9 @@
 
 @layer efoo {
   :root {
+    /* The line of controls that take input. The resolver raises it to shadcn/ui's white 15% in dark;
+       surface lines (Card, Table, Divider) keep --mantine-color-default-border. */
+    --efoo-input-border: var(--efoo-color-input-border, var(--mantine-color-default-border));
     --efoo-motion-scale: 1;
     --efoo-focus-ring: 0 0 0 3px
       color-mix(

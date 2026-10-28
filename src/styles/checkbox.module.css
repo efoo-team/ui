@@ -5,8 +5,12 @@
     --checkbox-size-sm: calc(1rem * var(--mantine-scale));
   }
 
+  .input:not(:checked, [data-indeterminate], [data-error]),
+  .indicator:not([data-checked], [data-indeterminate], [data-error]) {
+    border-color: var(--efoo-input-border);
+  }
+
   .input:disabled {
-    border-color: var(--mantine-color-default-border);
     background-color: var(--mantine-color-default);
   }
 

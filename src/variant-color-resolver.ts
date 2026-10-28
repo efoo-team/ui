@@ -60,7 +60,7 @@ export const efooVariantColorResolver: VariantColorsResolver = (input) => {
       ...resolved,
       background: 'var(--efoo-color-outline-bg, var(--mantine-color-default))',
       hover: 'var(--efoo-color-outline-hover, var(--mantine-color-default-hover))',
-      border: '1px solid var(--efoo-color-input-border, var(--mantine-color-default-border))',
+      border: '1px solid var(--efoo-input-border)',
     };
   }
 
@@ -83,7 +83,7 @@ export const efooVariantColorResolver: VariantColorsResolver = (input) => {
     return {
       ...resolved,
       background: 'var(--efoo-color-outline-bg, transparent)',
-      border: '1px solid var(--efoo-color-input-border, var(--mantine-color-default-border))',
+      border: '1px solid var(--efoo-input-border)',
       color: 'var(--mantine-color-text)',
       hover: 'var(--efoo-color-outline-hover, var(--mantine-color-default-hover))',
     };
