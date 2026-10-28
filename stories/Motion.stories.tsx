@@ -136,7 +136,7 @@ export const OpenAndClose: Story = {
           data={['サンプル項目 A', 'サンプル項目 B', 'サンプル項目 C']}
           w={240}
         />
-        <Modal opened={modal} onClose={modalHandlers.close} title="内容を確認" centered>
+        <Modal opened={modal} onClose={modalHandlers.close} title="内容を確認">
           <Text>保存前に入力内容を確認してください。</Text>
         </Modal>
         <Drawer opened={drawer} onClose={drawerHandlers.close} title="項目の詳細" position="right">

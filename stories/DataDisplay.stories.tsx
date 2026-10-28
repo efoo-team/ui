@@ -33,23 +33,21 @@ export const TableExample: Story = {
           <Table.Tr>
             <Table.Td>サンプル項目 A</Table.Td>
             <Table.Td>
-              <Badge variant="light">進行中</Badge>
+              <Badge>進行中</Badge>
             </Table.Td>
             <Table.Td>担当者 1</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Td>サンプル項目 B</Table.Td>
             <Table.Td>
-              <Badge variant="light">完了</Badge>
+              <Badge>完了</Badge>
             </Table.Td>
             <Table.Td>担当者 2</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Td>サンプル項目 C</Table.Td>
             <Table.Td>
-              <Badge color="yellow" variant="light">
-                要確認
-              </Badge>
+              <Badge color="yellow">要確認</Badge>
             </Table.Td>
             <Table.Td>担当者 3</Table.Td>
           </Table.Tr>
@@ -101,7 +99,7 @@ export const CardAndBadgeExamples: Story = {
   render: () => (
     <Stack>
       <Group>
-        <Badge>塗りつぶし</Badge>
+        <Badge variant="filled">塗りつぶし</Badge>
         <Badge variant="light">薄い背景</Badge>
         <Badge variant="outline">枠線</Badge>
         <Badge variant="dot">Dot</Badge>
@@ -112,7 +110,7 @@ export const CardAndBadgeExamples: Story = {
           <Stack gap="sm">
             <Group justify="space-between">
               <Title order={5}>サンプルカード</Title>
-              <Badge variant="light">標準</Badge>
+              <Badge>標準</Badge>
             </Group>
             <Text size="sm" c="dimmed">
               カードは関連する情報と操作をひとまとまりに表示します。
@@ -147,15 +145,17 @@ export const BadgeStatusColors: Story = {
     docs: {
       description: {
         story:
-          '状態を表す 4 色を、薄い背景と枠線で並べます。塗りつぶしは既定の色と、削除などの取り消せない操作を表す赤だけに使います。ツールバーでライトとダークを切り替えて、文字が読めることを確認できます。',
+          'Badge の既定は薄い背景です。状態を表す 4 色を、薄い背景と枠線で並べます。塗りつぶし（variant="filled"）は、色を指定しない場合と、削除などの取り消せない操作を表す赤だけに使います。ツールバーでライトとダークを切り替えて、文字が読めることを確認できます。',
       },
     },
   },
   render: () => (
     <Stack>
       <Group>
-        <Badge>既定</Badge>
-        <Badge color="red">要対応</Badge>
+        <Badge variant="filled">既定</Badge>
+        <Badge color="red" variant="filled">
+          要対応
+        </Badge>
       </Group>
       {(['light', 'outline'] as const).map((variant) => (
         <Group key={variant}>

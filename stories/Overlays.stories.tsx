@@ -103,7 +103,7 @@ export const ModalExample: Story = {
             全画面のモーダルを開く
           </Button>
         </Group>
-        <Modal opened={opened} onClose={close} title="内容を確認" centered>
+        <Modal opened={opened} onClose={close} title="内容を確認">
           <Stack>
             <Text>保存前に入力内容を確認してください。</Text>
             <Group justify="flex-end">
@@ -238,7 +238,6 @@ export const ModalOpenedPreview: Story = {
         opened
         onClose={() => undefined}
         title="内容を確認"
-        centered
         withinPortal={false}
         withOverlay={false}
         trapFocus={false}

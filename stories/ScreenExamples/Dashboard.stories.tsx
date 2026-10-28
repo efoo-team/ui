@@ -252,9 +252,7 @@ const PAGE_SIZE = 8;
 function StatusBadge({ status }: { status: OrderStatus }) {
   const { label, attention } = STATUS[status];
   return attention ? (
-    <Badge color={ATTENTION_COLOR} variant="light">
-      {label}
-    </Badge>
+    <Badge color={ATTENTION_COLOR}>{label}</Badge>
   ) : (
     <Badge variant="outline">{label}</Badge>
   );
@@ -277,7 +275,7 @@ function Navbar({ onNavigate }: { onNavigate: () => void }) {
               leftSection={<ItemIcon size={ICON_SIZE} />}
               rightSection={
                 count ? (
-                  <Badge color={ATTENTION_COLOR} variant="light" aria-label={`未対応 ${count} 件`}>
+                  <Badge color={ATTENTION_COLOR} aria-label={`未対応 ${count} 件`}>
                     {count}
                   </Badge>
                 ) : undefined
@@ -326,9 +324,7 @@ function StatCard({ stat }: { stat: Stat }) {
             {stat.label}
           </Text>
           {stat.badge.attention ? (
-            <Badge color={ATTENTION_COLOR} variant="light">
-              {stat.badge.label}
-            </Badge>
+            <Badge color={ATTENTION_COLOR}>{stat.badge.label}</Badge>
           ) : (
             <Badge variant="outline" leftSection={stat.badge.trend && <IconTrendingUp size={12} />}>
               {stat.badge.label}
@@ -402,11 +398,7 @@ function StockCard() {
               <Group justify="space-between" wrap="nowrap" gap="xs">
                 <Group gap="xs" wrap="nowrap">
                   <Text size="sm">{item.name}</Text>
-                  {reorder && (
-                    <Badge color={ATTENTION_COLOR} variant="light">
-                      要発注
-                    </Badge>
-                  )}
+                  {reorder && <Badge color={ATTENTION_COLOR}>要発注</Badge>}
                 </Group>
                 <Text size="sm" c="dimmed">
                   {item.quantity} / {item.target} {item.unit}
