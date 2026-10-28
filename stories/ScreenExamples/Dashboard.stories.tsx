@@ -946,7 +946,6 @@ function DashboardPage() {
       {/* While the narrow-screen navbar is open the page behind it does not scroll; while it is closed it is inert. */}
       <RemoveScroll enabled={narrowOpen} forwardProps>
         <AppShell.Navbar
-          p="xs"
           mod={{ rail }}
           id={navbarId}
           aria-label="メインナビゲーション"
