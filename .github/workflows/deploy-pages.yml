@@ -74,33 +74,11 @@ jobs:
         shell: bash
         run: |
           version=$(node -p "require('./package.json').version")
-          tag="v${version}"
-          asset="efoo-team-ui-${version}.tgz"
-          gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/releases?per_page=100" > "$RUNNER_TEMP/releases.json"
-          release=$(jq -c --arg tag "$tag" '[.[][] | select(.tag_name == $tag)] | first // null' "$RUNNER_TEMP/releases.json")
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          echo "asset=$asset" >> "$GITHUB_OUTPUT"
-          if [[ "$release" != null ]]; then
-            if [[ $(jq -r '.draft' <<< "$release") == true ]]; then
-              echo "A draft release already exists for $tag" >&2
-              exit 1
-            fi
-            if jq -e --arg asset "$asset" '.assets[] | select(.name == $asset and .state == "uploaded")' <<< "$release" > /dev/null; then
-              echo "published=true" >> "$GITHUB_OUTPUT"
-              exit 0
-            fi
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          fi
-          gh api "repos/${GITHUB_REPOSITORY}/git/matching-refs/tags/${tag}" > "$RUNNER_TEMP/tags.json"
-          if jq -e --arg ref "refs/tags/$tag" '.[] | select(.ref == $ref)' "$RUNNER_TEMP/tags.json" > /dev/null; then
-            tag_commit=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${tag}" --jq .sha)
-            if [[ "$tag_commit" != "$GITHUB_SHA" ]]; then
-              echo "Tag $tag points to $tag_commit, not $GITHUB_SHA; rerun the original workflow." >&2
-              exit 1
-            fi
-          elif [[ "$release" != null ]]; then
-            echo "Release $tag exists but its tag is missing." >&2
-            exit 1
+          if gh release view "v$version" > /dev/null 2>&1; then
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=v$version" >> "$GITHUB_OUTPUT"
+            echo "asset=efoo-team-ui-$version.tgz" >> "$GITHUB_OUTPUT"
           fi
       - name: Set up pnpm
         if: steps.release.outputs.published != 'true'
@@ -124,10 +102,5 @@ jobs:
         env:
           TAG: ${{ steps.release.outputs.tag }}
           ASSET: ${{ steps.release.outputs.asset }}
-          RELEASE_EXISTS: ${{ steps.release.outputs.exists }}
         run: |
-          if [[ "$RELEASE_EXISTS" == true ]]; then
-            gh release upload "$TAG" "$RUNNER_TEMP/$ASSET"
-          else
-            gh release create "$TAG" "$RUNNER_TEMP/$ASSET" --target "$GITHUB_SHA" --title "$TAG" --notes ""
-          fi
+          gh release create "$TAG" "$RUNNER_TEMP/$ASSET" --target "$GITHUB_SHA" --title "$TAG" --notes ""
