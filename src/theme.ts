@@ -128,6 +128,16 @@ function getNotificationBarColor(theme: MantineTheme, color: string | undefined)
     : undefined;
 }
 
+// Mantine's clear buttons and page arrows have no accessible name; screen readers would announce only "button".
+const clearSelectionProps = { 'aria-label': '選択を解除' };
+const clearInputProps = { 'aria-label': '入力を消去' };
+const PAGINATION_CONTROL_LABELS = {
+  first: '最初のページ',
+  previous: '前のページ',
+  next: '次のページ',
+  last: '最後のページ',
+} as const;
+
 const comboboxClassNames = { options: selectClasses.options, option: selectClasses.option };
 
 const overlayProps = { backgroundOpacity: 0.15, blur: 4 };
@@ -225,7 +235,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
       defaultProps: { underline: 'always' },
     }),
     AppShell: AppShell.extend({ classNames: { navbar: appShellClasses.navbar } }),
-    Autocomplete: Autocomplete.extend({ classNames: comboboxClassNames }),
+    Autocomplete: Autocomplete.extend({
+      classNames: comboboxClassNames,
+      defaultProps: { clearButtonProps: clearInputProps },
+    }),
     // Without a color the fallback is shadcn/ui's muted surface and text; Mantine's dark gray light variant is nearly black.
     Avatar: Avatar.extend({
       classNames: { root: avatarClasses.root, placeholder: avatarClasses.placeholder },
@@ -348,6 +361,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     MultiSelect: MultiSelect.extend({
       classNames: { ...comboboxClassNames, inputField: inputClasses.pillsField },
+      defaultProps: { clearButtonProps: clearSelectionProps },
     }),
     NavLink: NavLink.extend({
       classNames: { root: navLinkClasses.root, children: navLinkClasses.children },
@@ -368,6 +382,9 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     Pagination: Pagination.extend({
       classNames: { control: paginationClasses.control },
+      defaultProps: {
+        getControlProps: (control) => ({ 'aria-label': PAGINATION_CONTROL_LABELS[control] }),
+      },
       vars: (theme, props) => ({
         root: { '--pagination-active-color': getFilledContrast(theme, props.color) },
       }),
@@ -418,7 +435,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     Select: Select.extend({
       classNames: comboboxClassNames,
-      defaultProps: { checkIconPosition: 'right' },
+      defaultProps: { checkIconPosition: 'right', clearButtonProps: clearSelectionProps },
     }),
     Skeleton: Skeleton.extend({
       classNames: { root: skeletonClasses.root },
@@ -452,6 +469,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     TagsInput: TagsInput.extend({
       classNames: { ...comboboxClassNames, inputField: inputClasses.pillsField },
+      defaultProps: { clearButtonProps: clearInputProps },
     }),
     ThemeIcon: ThemeIcon.extend({ defaultProps: { variant: 'filled' } }),
     Timeline: Timeline.extend({
