@@ -120,8 +120,11 @@
 
   /* Inside <AppShell.Navbar mod={{ rail }}> (data-rail) the navbar inset (app-shell.module.css) leaves 32px, so
      each link becomes an icon square while the navbar narrows: the label is cut at the right edge as the rail closes,
-     like shadcn/ui, and is hidden from assistive technology only when the AppShell transition ends. */
-  [data-rail] .root {
+     like shadcn/ui, and is hidden from assistive technology only when the AppShell transition ends. The right section
+     (chevron, badge) and the child links cannot be cut into whole pieces, so they hide as the navbar starts to fold
+     and come back once it has opened. */
+  .root,
+  .collapse {
     --efoo-rail-delay: calc(var(--app-shell-transition-duration, 0ms) * var(--efoo-motion-scale));
   }
 
@@ -130,17 +133,29 @@
     transition: visibility 0s linear var(--efoo-rail-delay);
   }
 
-  [data-rail] .section[data-position='right'] {
-    visibility: hidden;
+  .section[data-position='right'] {
     transition:
       transform calc(var(--efoo-motion-duration-standard) * var(--efoo-motion-scale))
         var(--efoo-motion-easing),
       visibility 0s linear var(--efoo-rail-delay);
   }
 
-  /* Child links fold away with the navbar and leave the layout at the end, so the rail keeps one row per link. */
+  [data-rail] .section[data-position='right'] {
+    visibility: hidden;
+    transition-delay: 0s;
+  }
+
+  /* The children come back into the layout as the navbar starts to open (they were display: none, so no transition
+     can delay them); --efoo-rail-fold keeps them transparent until it reaches 0. */
+  .children {
+    opacity: max(0, 1 - var(--efoo-rail-fold, 0) * 1000);
+  }
+
+  /* Child links leave the layout only when the navbar has folded, so the links below keep their place during the
+     fold and the rail keeps one row per link. Mantine's Collapse writes its own transition inline, which only an
+     !important declaration can replace; it applies in the rail alone, where the children are not shown. */
   [data-rail] .collapse {
     display: none;
-    transition: display 0s allow-discrete var(--efoo-rail-delay);
+    transition: display 0s allow-discrete var(--efoo-rail-delay) !important;
   }
 }

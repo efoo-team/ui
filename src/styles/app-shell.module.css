@@ -1,3 +1,11 @@
+/* 0 in the open navbar and 1 in the rail, moving with the navbar width, so links can tell that the navbar is
+   folding or opening (nav-link.module.css). */
+@property --efoo-rail-fold {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
 @layer efoo {
   /* shadcn/ui's sidebar sits on its own surface (--sidebar), one step off the page; the header stays on the page color.
      Mantine already draws the 1px border between them. */
@@ -8,10 +16,11 @@
     --efoo-navbar-inset-inline: var(--mantine-spacing-xs);
     background-color: var(--efoo-color-sidebar, var(--mantine-color-body));
     /* Mantine animates the main padding but not the navbar width, so a narrowing navbar jumped. */
-    transition-property: transform, top, height, width;
+    transition-property: transform, top, height, width, --efoo-rail-fold;
   }
 
   .navbar[data-rail] {
+    --efoo-rail-fold: 1;
     --efoo-navbar-inset-inline: max(
       0px,
       calc((var(--app-shell-navbar-width) - 2rem * var(--mantine-scale) - 1px) / 2)
