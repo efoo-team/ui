@@ -11,6 +11,7 @@ import {
   AppShell,
   Autocomplete,
   Avatar,
+  AvatarGroup,
   Badge,
   Button,
   Card,
@@ -289,6 +290,8 @@ export const efooTheme: MantineThemeOverride = createTheme({
             }
           : { root: {} },
     }),
+    // shadcn/ui overlaps avatars by 8px (-space-x-2); Mantine's 12px hid the initials of the avatar behind.
+    AvatarGroup: AvatarGroup.extend({ defaultProps: { spacing: 'xs' } }),
     // shadcn/ui's badges are mostly secondary (a muted surface with the text color); status colors default to a tint.
     // A variant is always set, so Mantine never falls back to its white text on the light dark-scheme fill.
     Badge: Badge.extend({

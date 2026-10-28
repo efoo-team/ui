@@ -4,6 +4,13 @@
     --avatar-size-md: calc(2rem * var(--mantine-scale));
   }
 
+  /* In a group shadcn/ui separates avatars with a 2px ring of the page outside the avatar; Mantine's 2px border
+     inside it shrank the face and crowded the initials. */
+  .root[data-within-group] {
+    border: 0;
+    box-shadow: 0 0 0 2px var(--mantine-color-body);
+  }
+
   /* shadcn/ui's fallback initials are 14px regular in a 32px avatar; the ratio keeps other sizes in step. */
   .placeholder {
     font-size: calc(var(--avatar-size) * 0.4375);
