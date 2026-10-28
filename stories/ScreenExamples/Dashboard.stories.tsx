@@ -19,7 +19,6 @@ import {
   Modal,
   NavLink,
   Pagination,
-  type PopoverProps,
   Progress,
   RemoveScroll,
   ScrollArea,
@@ -79,7 +78,7 @@ type Story = StoryObj<typeof meta>;
 const ICON_SIZE = 16;
 
 // Container breakpoints for the Grids in the main area; Mantine needs exact widths for container queries.
-// lg (66rem = 1056px) is where the four stat cards and the 8/4 chart row start; it stays clear of the main width at
+// lg (66rem = 1056px) is where the four stat cards and the side-by-side chart row start; it stays clear of the main width at
 // common viewports (1440: 1152 open / 1360 rail, 1280: 992 / 1200, 1200: 912 / 1120, 1024: 736 / 944).
 const CONTENT_BREAKPOINTS = { xs: '36rem', sm: '48rem', md: '48rem', lg: '66rem', xl: '80rem' };
 
@@ -193,7 +192,7 @@ const STATS: Stat[] = [
     badge: { label: '要発注', attention: true },
   },
   {
-    label: '未対応の問い合わせ（件）',
+    label: '未対応の問合せ（件）',
     value: String(INQUIRIES.open),
     note: `うち ${INQUIRIES.overdue} 件は受付から 2 日以上`,
     badge: { label: '要対応', attention: true },
@@ -305,19 +304,20 @@ interface NavbarProps {
   onOrganizationChange: (organization: Organization) => void;
   openedParents: string[];
   onToggleParent: (label: string) => void;
+  onExpandParent: (label: string) => void;
   onNavigate: () => void;
 }
 
 /*
- * A link that opens a Menu, with its name in a Tooltip for the rail. The Tooltip sits between Menu and Menu.Target:
- * Tooltip hands its hover and focus handlers and ref to Menu.Target, Menu.Target passes them on through
- * Popover.Target, and Popover.Target puts them and aria-haspopup / aria-expanded / aria-controls on the NavLink.
- * The Menu is controlled so the Tooltip stays hidden while the Menu is open.
+ * A link that opens a Menu (the organization switcher), with its name in a Tooltip for the rail. The Tooltip sits
+ * between Menu and Menu.Target: Tooltip hands its hover and focus handlers and ref to Menu.Target, Menu.Target passes
+ * them on through Popover.Target, and Popover.Target puts them and aria-haspopup / aria-expanded / aria-controls on
+ * the NavLink. The Menu is controlled so the Tooltip stays hidden while the Menu is open. Only links without child
+ * links use it: a NavLink with children already opens and closes them itself.
  */
 function MenuLink({
   rail,
   name,
-  menuEnabled,
   position,
   width,
   dropdown,
@@ -325,26 +325,14 @@ function MenuLink({
 }: {
   rail: boolean;
   name: string;
-  menuEnabled: boolean;
   position: 'right-start' | 'bottom-start';
   width: number;
   dropdown: ReactNode;
   link: ReactElement;
 }) {
-  const [menuOpened, setMenuOpened] = useState(false);
-  const opened = menuEnabled && menuOpened;
-  // Menu's type leaves out Popover's withRoles, but Menu passes it on to Popover. Without it, Popover.Target would
-  // put the Menu's aria-expanded on a parent link that is opening its own children instead.
-  const popoverRoles: Pick<PopoverProps, 'withRoles'> = { withRoles: menuEnabled };
+  const [opened, setOpened] = useState(false);
   return (
-    <Menu
-      {...popoverRoles}
-      opened={opened}
-      onChange={setMenuOpened}
-      disabled={!menuEnabled}
-      position={position}
-      width={width}
-    >
+    <Menu opened={opened} onChange={setOpened} position={position} width={width}>
       <Tooltip label={name} position="right" disabled={!rail || opened}>
         <Menu.Target>{link}</Menu.Target>
       </Tooltip>
@@ -363,7 +351,6 @@ function OrganizationMenu({
     <MenuLink
       rail={rail}
       name={organization.name}
-      menuEnabled
       position={rail ? 'right-start' : 'bottom-start'}
       width={240}
       link={
@@ -415,11 +402,12 @@ function Navbar({
   onOrganizationChange,
   openedParents,
   onToggleParent,
+  onExpandParent,
   onNavigate,
 }: NavbarProps) {
   return (
     <>
-      <AppShell.Section mb="xs">
+      <AppShell.Section>
         <Group gap="xs" wrap="nowrap">
           <Stack flex={1} miw={0}>
             <OrganizationMenu
@@ -438,53 +426,38 @@ function Navbar({
             const name = count ? `${label}（未対応 ${count} 件）` : label;
             const icon = <ItemIcon size={ICON_SIZE} />;
             if (children) {
+              const opened = openedParents.includes(label);
               return (
-                <MenuLink
-                  key={label}
-                  rail={rail}
-                  name={label}
-                  menuEnabled={rail}
-                  position="right-start"
-                  width={180}
-                  link={
-                    <NavLink
-                      component="button"
-                      type="button"
-                      label={label}
-                      aria-label={label}
-                      leftSection={icon}
-                      // In the rail the open child is not visible, so its parent shows the current place.
-                      active={rail && label === CURRENT_PARENT}
-                      opened={openedParents.includes(label)}
-                      onChange={() => onToggleParent(label)}
-                    >
-                      {children.map((child) => (
-                        <NavLink
-                          key={child}
-                          component="button"
-                          type="button"
-                          label={child}
-                          active={child === CURRENT_PAGE}
-                          aria-current={child === CURRENT_PAGE ? 'page' : undefined}
-                          onClick={onNavigate}
-                        />
-                      ))}
-                    </NavLink>
-                  }
-                  dropdown={
-                    <Menu.Dropdown>
-                      <Menu.Label>{label}</Menu.Label>
-                      {children.map((child) => (
-                        <Menu.Item
-                          key={child}
-                          aria-current={child === CURRENT_PAGE ? 'page' : undefined}
-                        >
-                          {child}
-                        </Menu.Item>
-                      ))}
-                    </Menu.Dropdown>
-                  }
-                />
+                // A parent keeps one NavLink at both widths. Its opened state is controlled, so every way of pressing
+                // it (click, Enter, Space) reaches onChange: in the rail it widens the sidebar and opens this parent,
+                // in the full sidebar it opens or closes the children. The rail hides the children, so aria-expanded
+                // follows what is shown there.
+                <Tooltip key={label} label={label} position="right" disabled={!rail}>
+                  <NavLink
+                    component="button"
+                    type="button"
+                    label={label}
+                    aria-label={label}
+                    leftSection={icon}
+                    // In the rail the open child is not visible, so its parent shows the current place.
+                    active={rail && label === CURRENT_PARENT}
+                    opened={opened}
+                    onChange={() => (rail ? onExpandParent(label) : onToggleParent(label))}
+                    aria-expanded={rail ? false : opened}
+                  >
+                    {children.map((child) => (
+                      <NavLink
+                        key={child}
+                        component="button"
+                        type="button"
+                        label={child}
+                        active={child === CURRENT_PAGE}
+                        aria-current={child === CURRENT_PAGE ? 'page' : undefined}
+                        onClick={onNavigate}
+                      />
+                    ))}
+                  </NavLink>
+                </Tooltip>
               );
             }
             return (
@@ -874,7 +847,7 @@ function BestSellersCard() {
 function DashboardPage() {
   const [opened, { toggle, close }] = useDisclosure(false);
   const burgerRef = useRef<HTMLButtonElement>(null);
-  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+  const [desktopOpened, { toggle: toggleDesktop, open: openDesktop }] = useDisclosure(true);
   const [searchOpened, { open: openSearch, close: closeSearch }] = useDisclosure(false);
   const [organization, setOrganization] = useState<Organization>(ORGANIZATIONS[0]!);
   const [openedParents, setOpenedParents] = useState<string[]>([CURRENT_PARENT]);
@@ -905,6 +878,11 @@ function DashboardPage() {
     else if (wasOpen.current) burgerRef.current?.focus();
     wasOpen.current = opened;
   }, [opened, wide, navbarId]);
+  // Pressing a parent in the rail widens the sidebar with that parent open, like shadcn/ui's sidebar-07.
+  const expandParent = (label: string) => {
+    openDesktop();
+    setOpenedParents((current) => (current.includes(label) ? current : [...current, label]));
+  };
   const toggleParent = (label: string) =>
     setOpenedParents((current) =>
       current.includes(label) ? current.filter((value) => value !== label) : [...current, label],
@@ -926,6 +904,8 @@ function DashboardPage() {
           id={navbarId}
           aria-label="サイドバー"
           inert={wide === false && !opened ? true : undefined}
+          // The full-width navbar on narrow screens has nothing beside it to separate from.
+          withBorder={wide !== false}
         >
           <Navbar
             rail={rail}
@@ -933,13 +913,15 @@ function DashboardPage() {
             onOrganizationChange={setOrganization}
             openedParents={openedParents}
             onToggleParent={toggleParent}
+            onExpandParent={expandParent}
             onNavigate={close}
           />
         </AppShell.Navbar>
       </RemoveScroll>
-      <AppShell.Header px="md">
+      {/* The open narrow-screen navbar covers the header and main, so they leave the Tab order meanwhile. */}
+      <AppShell.Header px="md" inert={narrowOpen ? true : undefined}>
         <Group h="100%" justify="space-between" wrap="nowrap">
-          <Group gap="xs" wrap="nowrap" miw={0}>
+          <Group gap="md" wrap="nowrap" miw={0}>
             <Burger
               ref={burgerRef}
               opened={opened}
@@ -1005,7 +987,7 @@ function DashboardPage() {
           aria-label="検索する言葉"
         />
       </Modal>
-      <AppShell.Main>
+      <AppShell.Main inert={narrowOpen ? true : undefined}>
         <Stack gap="lg">
           <Stack gap={4}>
             <Title order={1} size="h3">
@@ -1022,10 +1004,11 @@ function DashboardPage() {
             ))}
           </SimpleGrid>
           <Grid type="container" breakpoints={CONTENT_BREAKPOINTS}>
-            <Grid.Col span={{ base: 12, lg: 8 }}>
+            {/* 6/6 puts the gap between the chart and stock cards on the gap between the 2nd and 3rd stat card. */}
+            <Grid.Col span={{ base: 12, lg: 6 }}>
               <SalesCard />
             </Grid.Col>
-            <Grid.Col span={{ base: 12, lg: 4 }}>
+            <Grid.Col span={{ base: 12, lg: 6 }}>
               <StockCard />
             </Grid.Col>
           </Grid>
