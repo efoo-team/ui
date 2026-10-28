@@ -320,7 +320,9 @@ export const efooTheme: MantineThemeOverride = createTheme({
         shadow: 'xs',
       },
     }),
-    MultiSelect: MultiSelect.extend({ classNames: comboboxClassNames }),
+    MultiSelect: MultiSelect.extend({
+      classNames: { ...comboboxClassNames, inputField: inputClasses.pillsField },
+    }),
     NavLink: NavLink.extend({
       classNames: { root: navLinkClasses.root, children: navLinkClasses.children },
     }),

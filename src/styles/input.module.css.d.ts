@@ -3,6 +3,7 @@ declare const classNames: {
   readonly error: string;
   readonly input: string;
   readonly label: string;
+  readonly pillsField: string;
   readonly visibilityToggle: string;
   readonly wrapper: string;
 };
