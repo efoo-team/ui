@@ -136,14 +136,15 @@ export const efooTheme: MantineThemeOverride = createTheme({
     medium: '500',
     bold: '600',
   },
+  // shadcn/ui's radius scale (--radius 10px): 4, 6, 8, 10 and 14px. Controls and dropdowns use lg.
   radius: {
     xs: '0.25rem',
     sm: '0.375rem',
     md: '0.5rem',
-    lg: '0.75rem',
-    xl: '1rem',
+    lg: '0.625rem',
+    xl: '0.875rem',
   },
-  defaultRadius: 'sm',
+  defaultRadius: 'lg',
   spacing: {
     xs: '0.5rem',
     sm: '0.75rem',
@@ -176,12 +177,13 @@ export const efooTheme: MantineThemeOverride = createTheme({
       h4: { fontSize: '1.25rem', lineHeight: '1.75rem' },
     },
   },
+  // Tailwind v4 shadows. The negative spread keeps the shadow under the element instead of around it.
   shadows: {
-    xs: '0 1px 2px rgb(0 0 0 / 0.05)',
-    sm: '0 1px 3px rgb(0 0 0 / 0.1), 0 1px 2px rgb(0 0 0 / 0.06)',
-    md: '0 4px 6px rgb(0 0 0 / 0.1), 0 2px 4px rgb(0 0 0 / 0.06)',
-    lg: '0 10px 15px rgb(0 0 0 / 0.1), 0 4px 6px rgb(0 0 0 / 0.05)',
-    xl: '0 20px 25px rgb(0 0 0 / 0.1), 0 10px 10px rgb(0 0 0 / 0.04)',
+    xs: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+    sm: '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+    md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+    lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+    xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
   },
   variantColorResolver: efooVariantColorResolver,
   components: {
@@ -207,7 +209,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     Button: Button.extend({
       classNames: { root: buttonClasses.root, section: buttonClasses.section },
     }),
-    Card: Card.extend({ defaultProps: { withBorder: true } }),
+    Card: Card.extend({ defaultProps: { withBorder: true, radius: 'xl' } }),
     Checkbox: Checkbox.extend({
       classNames: {
         root: `${checkboxClasses.root} ${inlineInputClasses.root}`,
@@ -270,7 +272,13 @@ export const efooTheme: MantineThemeOverride = createTheme({
         body: modalClasses.body,
         close: modalClasses.close,
       },
-      defaultProps: { transitionProps: modalTransitionProps, overlayProps },
+      // shadcn/ui's dialog is a 14px box drawn by its 1px line, with no large shadow.
+      defaultProps: {
+        transitionProps: modalTransitionProps,
+        overlayProps,
+        radius: 'xl',
+        shadow: 'xs',
+      },
     }),
     MultiSelect: MultiSelect.extend({ classNames: comboboxClassNames }),
     NavLink: NavLink.extend({
@@ -323,7 +331,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: comboboxClassNames,
       defaultProps: { checkIconPosition: 'right' },
     }),
-    Skeleton: Skeleton.extend({ classNames: { root: skeletonClasses.root } }),
+    Skeleton: Skeleton.extend({
+      classNames: { root: skeletonClasses.root },
+      defaultProps: { radius: 'md' },
+    }),
     Switch: Switch.extend({
       classNames: {
         root: `${switchClasses.root} ${inlineInputClasses.root}`,

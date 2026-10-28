@@ -5,7 +5,9 @@
       calc(0.5rem * var(--mantine-scale));
   }
 
+  /* Like shadcn/ui, an option is 2px less round than its dropdown. */
   .option {
+    border-radius: calc(var(--popover-radius, var(--mantine-radius-default)) - 2px);
     line-height: var(--mantine-line-height-sm);
     font-size: min(
       var(--combobox-option-fz, var(--mantine-font-size-sm)),

@@ -32,6 +32,10 @@
     line-height: var(--mantine-line-height-sm);
   }
 
+  .close {
+    border-radius: var(--mantine-radius-md);
+  }
+
   .close:hover {
     background-color: var(--mantine-color-default-hover);
   }

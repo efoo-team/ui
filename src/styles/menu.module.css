@@ -6,6 +6,7 @@
   /* shadcn/ui's items are 28px high with 8px sides. */
   .item {
     padding: calc(0.25rem * var(--mantine-scale)) calc(0.5rem * var(--mantine-scale));
+    border-radius: calc(var(--popover-radius, var(--mantine-radius-default)) - 2px);
     line-height: var(--mantine-line-height-sm);
     --mantine-color-red-6: var(--mantine-color-red-text);
     /* Mantine writes --menu-item-hover inline as the red light-hover (red-2 in light). shadcn/ui tints with 10% of the red. */

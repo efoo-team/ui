@@ -4,6 +4,7 @@
   .root {
     padding-block: var(--mantine-spacing-md);
     padding-inline-end: var(--mantine-spacing-md);
+    box-shadow: var(--mantine-shadow-md);
   }
 
   /* The bar keeps the icon and loader on --notification-color and only takes the line color of the status. */
