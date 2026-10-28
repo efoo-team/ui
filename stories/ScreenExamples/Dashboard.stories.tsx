@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useId, useState } from 'react';
+import { useId, useState, type KeyboardEvent } from 'react';
 import {
   ActionIcon,
   AppShell,
@@ -26,21 +26,26 @@ import {
   Text,
   TextInput,
   Title,
+  Tooltip,
+  useMantineTheme,
   VisuallyHidden,
 } from '@mantine/core';
-import { useDisclosure, useHotkeys } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { AreaChart } from '@mantine/charts';
 import '@mantine/charts/styles.layer.css';
 import {
   IconBox,
+  IconCheck,
   IconChartBar,
   IconDashboard,
   IconDotsVertical,
+  IconLayoutSidebar,
   IconLogout,
   IconMessage,
   IconPlus,
   IconReceipt,
   IconSearch,
+  IconSelector,
   IconSettings,
   IconTrendingUp,
   IconUserCircle,
@@ -64,7 +69,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const ICON_SIZE = 18;
+const ICON_SIZE = 16;
 
 // Every name and number below is fictional. Figures that appear twice on the screen are computed from one source.
 
@@ -187,15 +192,30 @@ interface NavItem {
   label: string;
   icon: Icon;
   count?: number;
+  children?: string[];
 }
 
 const NAV_ITEMS: NavItem[] = [
   { label: 'ダッシュボード', icon: IconDashboard },
-  { label: '受注', icon: IconReceipt },
+  { label: '受注', icon: IconReceipt, children: ['受注一覧', '出荷', '返品'] },
   { label: '顧客', icon: IconUsers },
   { label: '在庫', icon: IconBox },
   { label: '問い合わせ', icon: IconMessage, count: INQUIRIES.open },
-  { label: 'レポート', icon: IconChartBar },
+  { label: 'レポート', icon: IconChartBar, children: ['売上', '在庫'] },
+];
+
+const CURRENT_PAGE = 'ダッシュボード';
+
+interface Organization {
+  name: string;
+  initial: string;
+  note: string;
+}
+
+const ORGANIZATIONS: Organization[] = [
+  { name: 'サンプル販売 本店', initial: '本', note: '標準プラン' },
+  { name: 'サンプル販売 北支店', initial: '北', note: '標準プラン' },
+  { name: 'サンプル販売 通信販売部', initial: '通', note: 'お試し中' },
 ];
 
 type OrderStatus = 'paymentPending' | 'notShipped' | 'shipped' | 'cancelled';
@@ -265,40 +285,163 @@ function StatusBadge({ status }: { status: OrderStatus }) {
   );
 }
 
-function Navbar({ onNavigate }: { onNavigate: () => void }) {
+interface NavbarProps {
+  rail: boolean;
+  organization: Organization;
+  onOrganizationChange: (organization: Organization) => void;
+  openedParents: string[];
+  onToggleParent: (label: string) => void;
+  onNavigate: () => void;
+}
+
+// The organization switcher is a NavLink that leads with an Avatar; in the rail the theme shows only the avatar.
+function OrganizationMenu({
+  rail,
+  organization,
+  onOrganizationChange,
+}: Pick<NavbarProps, 'rail' | 'organization' | 'onOrganizationChange'>) {
   return (
-    <>
-      <AppShell.Section grow component={ScrollArea}>
-        <Stack gap={4}>
-          {NAV_ITEMS.map(({ label, icon: ItemIcon, count }, index) => (
-            <NavLink
-              key={label}
-              component="button"
-              type="button"
-              label={label}
-              active={index === 0}
-              aria-current={index === 0 ? 'page' : undefined}
-              onClick={onNavigate}
-              leftSection={<ItemIcon size={ICON_SIZE} />}
-              rightSection={
-                count ? (
-                  <Badge color={ATTENTION_COLOR} aria-label={`未対応 ${count} 件`}>
-                    {count}
-                  </Badge>
-                ) : undefined
-              }
-            />
-          ))}
-        </Stack>
-      </AppShell.Section>
-      <AppShell.Section>
+    <Menu position={rail ? 'right-start' : 'bottom-start'} width={240}>
+      <Menu.Target>
         <NavLink
           component="button"
           type="button"
-          label="設定"
-          onClick={onNavigate}
-          leftSection={<IconSettings size={ICON_SIZE} />}
+          label={organization.name}
+          description={organization.note}
+          leftSection={<Avatar size="sm">{organization.initial}</Avatar>}
+          rightSection={<IconSelector size={16} />}
+          aria-label={`組織を切り替える（現在：${organization.name}）`}
         />
+      </Menu.Target>
+      <Menu.Dropdown>
+        <Menu.Label>組織</Menu.Label>
+        {ORGANIZATIONS.map((item) => (
+          <Menu.Item
+            key={item.name}
+            leftSection={<Avatar size="sm">{item.initial}</Avatar>}
+            rightSection={item.name === organization.name ? <IconCheck size={16} /> : undefined}
+            aria-current={item.name === organization.name ? 'true' : undefined}
+            onClick={() => onOrganizationChange(item)}
+          >
+            {item.name}
+          </Menu.Item>
+        ))}
+        <Menu.Divider />
+        <Menu.Item leftSection={<IconPlus size={16} />}>組織を追加</Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
+  );
+}
+
+/*
+ * One set of NavLinks serves both widths. With <AppShell.Navbar mod={{ collapsed }}> the theme folds them into
+ * icons and hides labels, badges and child links, so each link carries its name in aria-label and a Tooltip, and a
+ * parent opens its child links from a Menu instead.
+ */
+function Navbar({
+  rail,
+  organization,
+  onOrganizationChange,
+  openedParents,
+  onToggleParent,
+  onNavigate,
+}: NavbarProps) {
+  return (
+    <>
+      <AppShell.Section mb="xs">
+        <OrganizationMenu
+          rail={rail}
+          organization={organization}
+          onOrganizationChange={onOrganizationChange}
+        />
+      </AppShell.Section>
+      <AppShell.Section grow component={ScrollArea} scrollbars="y">
+        <Stack gap={4}>
+          {NAV_ITEMS.map(({ label, icon: ItemIcon, count, children }) => {
+            const name = count ? `${label}（未対応 ${count} 件）` : label;
+            const icon = <ItemIcon size={ICON_SIZE} />;
+            if (children && rail) {
+              return (
+                <Menu key={label} position="right-start" width={180}>
+                  <Menu.Target>
+                    <Tooltip label={label} position="right">
+                      <NavLink
+                        component="button"
+                        type="button"
+                        label={label}
+                        aria-label={name}
+                        leftSection={icon}
+                      />
+                    </Tooltip>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Label>{label}</Menu.Label>
+                    {children.map((child) => (
+                      <Menu.Item key={child}>{child}</Menu.Item>
+                    ))}
+                  </Menu.Dropdown>
+                </Menu>
+              );
+            }
+            if (children) {
+              return (
+                <NavLink
+                  key={label}
+                  component="button"
+                  type="button"
+                  label={label}
+                  leftSection={icon}
+                  opened={openedParents.includes(label)}
+                  onChange={() => onToggleParent(label)}
+                >
+                  {children.map((child) => (
+                    <NavLink
+                      key={child}
+                      component="button"
+                      type="button"
+                      label={child}
+                      onClick={onNavigate}
+                    />
+                  ))}
+                </NavLink>
+              );
+            }
+            return (
+              // In the rail the theme hides the count badge, so the Tooltip carries the count.
+              <Tooltip key={label} label={name} position="right" disabled={!rail}>
+                <NavLink
+                  component="button"
+                  type="button"
+                  label={label}
+                  aria-label={name}
+                  active={label === CURRENT_PAGE}
+                  aria-current={label === CURRENT_PAGE ? 'page' : undefined}
+                  onClick={onNavigate}
+                  leftSection={icon}
+                  rightSection={
+                    count ? (
+                      <Badge color={ATTENTION_COLOR} aria-hidden>
+                        {count}
+                      </Badge>
+                    ) : undefined
+                  }
+                />
+              </Tooltip>
+            );
+          })}
+        </Stack>
+      </AppShell.Section>
+      <AppShell.Section>
+        <Tooltip label="設定" position="right" disabled={!rail}>
+          <NavLink
+            component="button"
+            type="button"
+            label="設定"
+            aria-label="設定"
+            onClick={onNavigate}
+            leftSection={<IconSettings size={ICON_SIZE} />}
+          />
+        </Tooltip>
       </AppShell.Section>
     </>
   );
@@ -646,14 +789,34 @@ function BestSellersCard() {
 
 function DashboardPage() {
   const [opened, { toggle, close }] = useDisclosure(false);
+  const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
   const [searchOpened, { open: openSearch, close: closeSearch }] = useDisclosure(false);
+  const [organization, setOrganization] = useState<Organization>(ORGANIZATIONS[0]!);
+  const [openedParents, setOpenedParents] = useState<string[]>(['受注']);
   const navbarId = useId();
-  useHotkeys([['Escape', close]]);
+  const theme = useMantineTheme();
+  const wide = useMediaQuery(`(min-width: ${theme.breakpoints.sm})`);
+  // On narrow screens the navbar always opens in full; the icon rail exists only on wide screens.
+  const rail = wide === true && !desktopOpened;
+  // Escape closes the narrow-screen navbar from the Burger or from inside the navbar. A menu opened from the navbar
+  // renders in a portal, but React still bubbles its keydown here, so events from outside the navbar's DOM and
+  // from an open menu button are left to the menu.
+  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement;
+    const fromPortal = !event.currentTarget.contains(target);
+    const closesMenu =
+      target.hasAttribute('aria-haspopup') && target.getAttribute('aria-expanded') === 'true';
+    if (event.key === 'Escape' && opened && !fromPortal && !closesMenu) close();
+  };
+  const toggleParent = (label: string) =>
+    setOpenedParents((current) =>
+      current.includes(label) ? current.filter((value) => value !== label) : [...current, label],
+    );
 
   return (
     <AppShell
       header={{ height: 56 }}
-      navbar={{ width: 240, breakpoint: 'sm', collapsed: { mobile: !opened } }}
+      navbar={{ width: rail ? 48 : 256, breakpoint: 'sm', collapsed: { mobile: !opened } }}
       padding="md"
     >
       <AppShell.Header px="md">
@@ -667,7 +830,18 @@ function DashboardPage() {
               aria-label="ナビゲーション"
               aria-expanded={opened}
               aria-controls={navbarId}
+              onKeyDown={closeOnEscape}
             />
+            <ActionIcon
+              variant="subtle"
+              visibleFrom="sm"
+              onClick={toggleDesktop}
+              aria-label={desktopOpened ? 'サイドバーを折りたたむ' : 'サイドバーを広げる'}
+              aria-expanded={desktopOpened}
+              aria-controls={navbarId}
+            >
+              <IconLayoutSidebar size={ICON_SIZE} />
+            </ActionIcon>
             <Text variant="emphasis">サンプル販売管理</Text>
           </Group>
           <Group gap="sm" wrap="nowrap">
@@ -698,8 +872,21 @@ function DashboardPage() {
           aria-label="検索する言葉"
         />
       </Modal>
-      <AppShell.Navbar p="sm" id={navbarId} aria-label="メインナビゲーション">
-        <Navbar onNavigate={close} />
+      <AppShell.Navbar
+        p={rail ? 'xs' : 'sm'}
+        mod={{ collapsed: rail }}
+        id={navbarId}
+        aria-label="メインナビゲーション"
+        onKeyDown={closeOnEscape}
+      >
+        <Navbar
+          rail={rail}
+          organization={organization}
+          onOrganizationChange={setOrganization}
+          openedParents={openedParents}
+          onToggleParent={toggleParent}
+          onNavigate={close}
+        />
       </AppShell.Navbar>
       <AppShell.Main>
         <Stack gap="lg">
