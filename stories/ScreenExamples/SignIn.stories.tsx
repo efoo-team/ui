@@ -27,6 +27,8 @@ interface SignInValues {
   password: string;
 }
 
+const FIELD_ORDER = ['email', 'password'] as const;
+
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function validateEmail(value: string) {
@@ -66,7 +68,17 @@ function SignInPage({
             </Text>
           </Stack>
           {/* noValidate replaces the browser's English bubbles with the Japanese messages below each field. */}
-          <form noValidate onSubmit={form.onSubmit(() => undefined)}>
+          <form
+            noValidate
+            onSubmit={form.onSubmit(
+              () => undefined,
+              // Move focus to the first field with an error so keyboard users land on it.
+              (errors) => {
+                const first = FIELD_ORDER.find((field) => errors[field]);
+                if (first) form.getInputNode(first)?.focus();
+              },
+            )}
+          >
             <Stack gap="md">
               <TextInput
                 type="email"
@@ -84,6 +96,8 @@ function SignInPage({
                   required
                   key={form.key('password')}
                   {...form.getInputProps('password')}
+                  // Mantine 9 sets aria-invalid on TextInput but not on the inner field of PasswordInput.
+                  aria-invalid={form.errors.password ? true : undefined}
                 />
                 <Anchor href="#" size="sm" ta="right">
                   パスワードを忘れた場合
