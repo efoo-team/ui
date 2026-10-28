@@ -103,7 +103,7 @@ export const OpenAndClose: Story = {
     return (
       <Stack align="flex-start" gap="lg">
         <Group>
-          <Menu shadow="md" width={200}>
+          <Menu width={200}>
             <Menu.Target>
               <Button>メニュー</Button>
             </Menu.Target>
@@ -112,7 +112,7 @@ export const OpenAndClose: Story = {
               <Menu.Item>名前を変更</Menu.Item>
             </Menu.Dropdown>
           </Menu>
-          <Popover width={240} withArrow shadow="md" trapFocus returnFocus>
+          <Popover width={240} withArrow trapFocus returnFocus>
             <Popover.Target>
               <Button variant="outline">補足表示</Button>
             </Popover.Target>

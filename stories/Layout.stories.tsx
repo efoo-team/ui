@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { AppShell, Button, Group, NavLink, Stack, Text, Title } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { AppShell, Burger, Button, Group, NavLink, Stack, Text, Title } from '@mantine/core';
 
 const meta = {
   title: '構造 / 画面の枠組みとナビゲーション（AppShell, NavLink）',
@@ -15,40 +16,55 @@ export const AppShellExample: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'ヘッダー、ナビゲーション、ページ本文を枠内に配置した例です。',
+        story:
+          'ヘッダー、ナビゲーション、ページ本文を枠内に配置した例です。狭い画面ではナビゲーションを畳み、ヘッダーのボタンで開閉します。',
       },
     },
   },
-  render: () => (
-    <AppShell
-      mode="static"
-      header={{ height: 60 }}
-      navbar={{ width: 220, breakpoint: 'sm' }}
-      padding="md"
-      h={520}
-      withBorder
-    >
-      <AppShell.Header px="md">
-        <Group h="100%" justify="space-between">
-          <Text fw={600}>サンプル管理画面</Text>
-          <Button size="xs" variant="outline">
-            ヘルプ
-          </Button>
-        </Group>
-      </AppShell.Header>
-      <AppShell.Navbar p="sm">
-        <NavLink component="button" type="button" label="ダッシュボード" active />
-        <NavLink component="button" type="button" label="項目一覧" description="登録済みの項目" />
-        <NavLink component="button" type="button" label="設定" disabled />
-      </AppShell.Navbar>
-      <AppShell.Main>
-        <Stack>
-          <Title order={2}>ページの見出し</Title>
-          <Text c="dimmed">本文やページ固有の部品をここに配置します。</Text>
-        </Stack>
-      </AppShell.Main>
-    </AppShell>
-  ),
+  render: function AppShellDemo() {
+    const [opened, { toggle }] = useDisclosure(false);
+
+    return (
+      <AppShell
+        mode="static"
+        header={{ height: 56 }}
+        navbar={{ width: 240, breakpoint: 'sm', collapsed: { mobile: !opened } }}
+        padding="md"
+        h={520}
+      >
+        <AppShell.Header px="md">
+          <Group h="100%" justify="space-between" wrap="nowrap">
+            <Group gap="sm" wrap="nowrap">
+              <Burger
+                opened={opened}
+                onClick={toggle}
+                hiddenFrom="sm"
+                size="sm"
+                aria-label="メニューを開閉"
+              />
+              <Title order={5} component="p">
+                サンプル管理画面
+              </Title>
+            </Group>
+            <Button size="xs" variant="outline">
+              ヘルプ
+            </Button>
+          </Group>
+        </AppShell.Header>
+        <AppShell.Navbar p="sm">
+          <NavLink component="button" type="button" label="ダッシュボード" active />
+          <NavLink component="button" type="button" label="項目一覧" description="登録済みの項目" />
+          <NavLink component="button" type="button" label="設定" disabled />
+        </AppShell.Navbar>
+        <AppShell.Main>
+          <Stack>
+            <Title order={2}>ページの見出し</Title>
+            <Text c="dimmed">本文やページ固有の部品をここに配置します。</Text>
+          </Stack>
+        </AppShell.Main>
+      </AppShell>
+    );
+  },
 };
 
 export const NavLinkStates: Story = {

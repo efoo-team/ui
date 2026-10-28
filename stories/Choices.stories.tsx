@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Checkbox, Group, Radio, Stack, Switch, Text } from '@mantine/core';
+import { Checkbox, Group, Radio, Stack, Switch, Title } from '@mantine/core';
 
 const meta = {
   title: '入力 / チェック・選択・切り替え（Checkbox, Radio, Switch）',
@@ -22,7 +22,7 @@ export const States: Story = {
   render: () => (
     <Stack gap="xl">
       <Stack gap="sm">
-        <Text fw={600}>Checkbox</Text>
+        <Title order={5}>Checkbox</Title>
         <Group align="flex-start">
           <Checkbox label="未選択" />
           <Checkbox label="選択済み" defaultChecked />
@@ -57,7 +57,7 @@ export const States: Story = {
         </Group>
       </Radio.Group>
       <Stack gap="sm">
-        <Text fw={600}>Switch</Text>
+        <Title order={5}>Switch</Title>
         <Group>
           <Switch label="オフ" />
           <Switch label="オン" defaultChecked />

@@ -21,17 +21,17 @@ export const SkeletonStates: Story = {
   },
   render: () => (
     <Stack maw={420}>
-      <Skeleton height={12} radius="xl" />
-      <Skeleton height={12} radius="xl" width="80%" />
+      <Skeleton height={12} />
+      <Skeleton height={12} width="80%" />
       <Group align="flex-start" wrap="nowrap">
         <Skeleton circle height={48} />
-        <Stack gap="xs" style={{ flex: 1 }}>
-          <Skeleton height={12} radius="xl" />
-          <Skeleton height={12} radius="xl" width="70%" />
+        <Stack gap="xs" flex={1}>
+          <Skeleton height={12} />
+          <Skeleton height={12} width="70%" />
         </Stack>
       </Group>
-      <Skeleton height={120} radius="md" />
-      <Skeleton height={72} radius="md" animate={false} />
+      <Skeleton height={120} />
+      <Skeleton height={72} animate={false} />
       <Text size="sm" c="dimmed">
         読み込み中に表示するプレースホルダーです。
       </Text>

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Button, Group, Paper, Stack, Text } from '@mantine/core';
+import { Button, Group, Paper, Stack, Text, Title } from '@mantine/core';
 
 const meta = {
   title: '操作 / ボタン（Button）',
@@ -22,7 +22,7 @@ export const VariantsAndSizes: Story = {
   render: () => (
     <Stack gap="xl">
       <Stack gap="xs">
-        <Text fw={600}>見た目</Text>
+        <Title order={5}>見た目</Title>
         <Group>
           <Button>塗りつぶし</Button>
           <Button variant="light">薄い背景</Button>
@@ -30,7 +30,7 @@ export const VariantsAndSizes: Story = {
           <Button variant="subtle">控えめ</Button>
           <Button variant="transparent">背景なし</Button>
         </Group>
-        <Paper bg="dark.9" c="white" p="sm" radius="sm">
+        <Paper bg="dark.9" c="white" p="sm">
           <Group>
             <Text size="sm">濃い背景に置いた白いボタン</Text>
             <Button variant="white">白い面</Button>
@@ -38,7 +38,7 @@ export const VariantsAndSizes: Story = {
         </Paper>
       </Stack>
       <Stack gap="xs">
-        <Text fw={600}>サイズ</Text>
+        <Title order={5}>サイズ</Title>
         <Group align="center">
           <Button size="xs">極小</Button>
           <Button size="sm">小（既定）</Button>
@@ -48,7 +48,7 @@ export const VariantsAndSizes: Story = {
         </Group>
       </Stack>
       <Stack gap="xs">
-        <Text fw={600}>状態</Text>
+        <Title order={5}>状態</Title>
         <Group align="center">
           <Button loading aria-label="保存中">
             保存

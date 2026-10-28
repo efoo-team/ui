@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { NumberInput, PasswordInput, Stack, Text, Textarea, TextInput } from '@mantine/core';
+import { NumberInput, PasswordInput, Stack, Textarea, TextInput, Title } from '@mantine/core';
 
 const meta = {
   title: '入力 / テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）',
@@ -22,7 +22,7 @@ export const VariantsAndStates: Story = {
   render: () => (
     <Stack maw={440} gap="xl">
       <Stack gap="sm">
-        <Text fw={600}>TextInput</Text>
+        <Title order={5}>TextInput</Title>
         <TextInput
           label="名前"
           placeholder="例：山田 太郎"
@@ -38,14 +38,14 @@ export const VariantsAndStates: Story = {
         <TextInput label="大きい入力欄" size="lg" placeholder="文字を入力" />
       </Stack>
       <Stack gap="sm">
-        <Text fw={600}>Textarea</Text>
+        <Title order={5}>Textarea</Title>
         <Textarea label="メモ" placeholder="内容を入力" minRows={3} autosize />
         <Textarea label="大きい入力欄" size="lg" placeholder="文字を入力" minRows={2} />
         <Textarea label="変更できません" defaultValue="閲覧のみ" disabled />
         <Textarea label="入力エラー" error="入力内容を確認してください" defaultValue="要修正" />
       </Stack>
       <Stack gap="sm">
-        <Text fw={600}>NumberInput</Text>
+        <Title order={5}>NumberInput</Title>
         <NumberInput label="数量" defaultValue={3} min={0} max={99} />
         <NumberInput label="塗りつぶし" defaultValue={12} variant="filled" />
         <NumberInput label="大きい入力欄" size="lg" defaultValue={24} />
@@ -53,7 +53,7 @@ export const VariantsAndStates: Story = {
         <NumberInput label="変更できません" defaultValue={12} disabled />
       </Stack>
       <Stack gap="sm">
-        <Text fw={600}>PasswordInput</Text>
+        <Title order={5}>PasswordInput</Title>
         <PasswordInput label="パスワード" placeholder="パスワードを入力" />
         <PasswordInput label="塗りつぶし" placeholder="入力してください" variant="filled" />
         <PasswordInput label="大きい入力欄" placeholder="入力してください" size="lg" />

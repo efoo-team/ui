@@ -1,6 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useDisclosure } from '@mantine/hooks';
-import { Box, Button, Drawer, Group, Menu, Modal, Popover, Stack, Text } from '@mantine/core';
+import {
+  Box,
+  Button,
+  Drawer,
+  Group,
+  Menu,
+  Modal,
+  Paper,
+  Popover,
+  Stack,
+  Text,
+  Title,
+} from '@mantine/core';
 
 const meta = {
   title: '重ねて表示 / メニュー・モーダルほか（Menu, Popover, Modal, Drawer）',
@@ -29,7 +41,7 @@ export const MenuExample: Story = {
     },
   },
   render: () => (
-    <Menu shadow="md" width={220}>
+    <Menu width={220}>
       <Menu.Target>
         <Button>メニューを開く</Button>
       </Menu.Target>
@@ -56,13 +68,13 @@ export const PopoverExample: Story = {
     },
   },
   render: () => (
-    <Popover width={280} position="bottom" withArrow shadow="md" trapFocus returnFocus>
+    <Popover width={280} position="bottom" withArrow trapFocus returnFocus>
       <Popover.Target>
         <Button variant="outline">補足表示を開く</Button>
       </Popover.Target>
       <Popover.Dropdown>
         <Stack gap="xs">
-          <Text fw={600}>確認内容</Text>
+          <Title order={5}>確認内容</Title>
           <Text size="sm">この領域に補足情報や操作を表示します。</Text>
         </Stack>
       </Popover.Dropdown>
@@ -130,7 +142,7 @@ export const DrawerExample: Story = {
         <Group>
           <Button onClick={open}>側面パネルを開く</Button>
         </Group>
-        <Drawer opened={opened} onClose={close} title="項目の詳細" position="right" size="md">
+        <Drawer opened={opened} onClose={close} title="項目の詳細" position="right">
           <Stack>
             <Text>補足情報や編集フォームを表示します。</Text>
             <Button onClick={close}>閉じる</Button>
@@ -158,7 +170,6 @@ export const MenuOpenedPreview: Story = {
         position="bottom-start"
         hideDetached={false}
         middlewares={{ flip: false, shift: false }}
-        shadow="md"
         width={220}
       >
         <Menu.Target>
@@ -196,14 +207,13 @@ export const PopoverOpenedPreview: Story = {
         hideDetached={false}
         middlewares={{ flip: false, shift: false }}
         withArrow
-        shadow="md"
       >
         <Popover.Target>
           <Button variant="outline">補足表示</Button>
         </Popover.Target>
         <Popover.Dropdown>
           <Stack gap="xs">
-            <Text fw={600}>確認内容</Text>
+            <Title order={5}>確認内容</Title>
             <Text size="sm">この領域に補足情報や操作を表示します。</Text>
           </Stack>
         </Popover.Dropdown>
@@ -218,16 +228,12 @@ export const ModalOpenedPreview: Story = {
     docs: {
       description: {
         story:
-          '破線の枠内に、モーダルを開いた状態の面・タイトル・余白を表示します（背景の overlay は出しません）。',
+          '枠内に、モーダルを開いた状態の面・タイトル・余白を表示します（背景の overlay は出しません）。',
       },
     },
   },
   render: () => (
-    <Box
-      pos="relative"
-      h={280}
-      style={{ border: '1px dashed var(--mantine-color-default-border)', overflow: 'hidden' }}
-    >
+    <Paper withBorder pos="relative" h={280} style={{ overflow: 'hidden' }}>
       <Modal
         opened
         onClose={() => undefined}
@@ -250,7 +256,7 @@ export const ModalOpenedPreview: Story = {
           </Group>
         </Stack>
       </Modal>
-    </Box>
+    </Paper>
   ),
 };
 
@@ -260,22 +266,17 @@ export const DrawerOpenedPreview: Story = {
     docs: {
       description: {
         story:
-          '破線の枠内に、右側の側面パネルを開いた状態の面・タイトル・境界線を表示します（背景の overlay は出しません）。',
+          '枠内に、右側の側面パネルを開いた状態の面・タイトル・境界線を表示します（背景の overlay は出しません）。',
       },
     },
   },
   render: () => (
-    <Box
-      pos="relative"
-      h={280}
-      style={{ border: '1px dashed var(--mantine-color-default-border)', overflow: 'hidden' }}
-    >
+    <Paper withBorder pos="relative" h={280} style={{ overflow: 'hidden' }}>
       <Drawer
         opened
         onClose={() => undefined}
         title="項目の詳細"
         position="right"
-        size="md"
         withinPortal={false}
         withOverlay={false}
         trapFocus={false}
@@ -290,6 +291,6 @@ export const DrawerOpenedPreview: Story = {
           <Button>閉じる</Button>
         </Stack>
       </Drawer>
-    </Box>
+    </Paper>
   ),
 };

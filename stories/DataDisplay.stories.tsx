@@ -21,7 +21,7 @@ export const TableExample: Story = {
   },
   render: () => (
     <Stack>
-      <Table striped highlightOnHover withTableBorder withColumnBorders>
+      <Table highlightOnHover>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>項目</Table.Th>
@@ -33,24 +33,22 @@ export const TableExample: Story = {
           <Table.Tr>
             <Table.Td>サンプル項目 A</Table.Td>
             <Table.Td>
-              <Badge>進行中</Badge>
+              <Badge variant="light">進行中</Badge>
             </Table.Td>
             <Table.Td>担当者 1</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Td>サンプル項目 B</Table.Td>
             <Table.Td>
-              <Badge color="green" variant="light">
-                完了
-              </Badge>
+              <Badge variant="light">完了</Badge>
             </Table.Td>
             <Table.Td>担当者 2</Table.Td>
           </Table.Tr>
           <Table.Tr>
             <Table.Td>サンプル項目 C</Table.Td>
             <Table.Td>
-              <Badge color="yellow" variant="outline">
-                確認中
+              <Badge color="yellow" variant="light">
+                要確認
               </Badge>
             </Table.Td>
             <Table.Td>担当者 3</Table.Td>
@@ -58,7 +56,7 @@ export const TableExample: Story = {
         </Table.Tbody>
       </Table>
       <Table.ScrollContainer minWidth={480}>
-        <Table highlightOnHover>
+        <Table>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>横幅がある表</Table.Th>
@@ -107,21 +105,13 @@ export const CardAndBadgeExamples: Story = {
         <Badge variant="light">薄い背景</Badge>
         <Badge variant="outline">枠線</Badge>
         <Badge variant="dot">Dot</Badge>
-        <Badge color="green" variant="light">
-          完了
-        </Badge>
-        <Badge color="red" variant="light">
-          要対応
-        </Badge>
         <Badge size="lg">大</Badge>
       </Group>
       <Group align="stretch">
-        <Card w={300} padding="lg" withBorder>
+        <Card w={300}>
           <Stack gap="sm">
             <Group justify="space-between">
-              <Title order={5} fw={500}>
-                サンプルカード
-              </Title>
+              <Title order={5}>サンプルカード</Title>
               <Badge variant="light">標準</Badge>
             </Group>
             <Text size="sm" c="dimmed">
@@ -132,15 +122,11 @@ export const CardAndBadgeExamples: Story = {
             </Group>
           </Stack>
         </Card>
-        <Card w={300} padding="lg" withBorder>
+        <Card w={300}>
           <Stack gap="sm">
-            <Title order={5} fw={500}>
-              状態を伝える
-            </Title>
+            <Title order={5}>状態を伝える</Title>
             <Text size="sm">タイトル、説明、状態ラベルを組み合わせます。</Text>
-            <Badge color="green" variant="light">
-              利用可能
-            </Badge>
+            <Badge variant="outline">利用可能</Badge>
           </Stack>
         </Card>
       </Group>
