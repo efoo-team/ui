@@ -1,0 +1,42 @@
+@layer efoo {
+  /* shadcn/ui calendar: 28px cells and 14px text. Preserve other Mantine sizes. */
+  .day {
+    --day-size-sm: calc(1.75rem * var(--mantine-scale));
+  }
+
+  .day[data-size='sm'] {
+    font-size: var(--mantine-font-size-sm);
+  }
+
+  .day:where([data-weekend]):not([data-outside], [data-disabled], [data-selected]) {
+    color: var(--mantine-color-text);
+  }
+
+  .day:where([data-in-range]):not([data-selected]) {
+    background: var(--mantine-color-default-hover);
+    color: var(--mantine-color-text);
+  }
+
+  .weekday {
+    font-size: calc(0.8rem * var(--mantine-scale));
+  }
+
+  .calendarHeader {
+    --dch-control-size-sm: calc(1.75rem * var(--mantine-scale));
+  }
+
+  .monthsListControl,
+  .yearsListControl {
+    --dpc-size-sm: calc(1.75rem * var(--mantine-scale));
+  }
+
+  @media (hover: hover) {
+    .day:hover:where(:not([data-static], [data-disabled], [data-selected], [data-in-range])),
+    .calendarHeaderControl:hover:where(:not([data-disabled], [data-static], :disabled)),
+    .calendarHeaderLevel:hover:where(:not([data-disabled], [data-static], :disabled)),
+    .monthsListControl:hover:where(:not([data-disabled], :disabled)),
+    .yearsListControl:hover:where(:not([data-disabled], :disabled)) {
+      background: var(--mantine-color-default-hover);
+    }
+  }
+}

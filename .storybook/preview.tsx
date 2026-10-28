@@ -7,10 +7,17 @@ import { GLOBALS_UPDATED } from 'storybook/internal/core-events';
 import { themes } from 'storybook/theming';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
+import { DatesProvider } from '@mantine/dates';
+import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import 'dayjs/locale/ja';
 import '@mantine/core/styles.layer.css';
 import '@mantine/notifications/styles.layer.css';
-import { efooTheme, efooCssVariablesResolver } from '../src';
+import '@mantine/dates/styles.layer.css';
+import { efooTheme, efooCssVariablesResolver, efooDatesSettings } from '../src';
 import './preview.css';
+
+dayjs.extend(customParseFormat);
 
 // The docs page is rendered outside the story decorators, so it follows the toolbar through the globals event.
 // Docs pages without a story (MDX only) are mounted again after every globals change, so the last value is kept
@@ -76,13 +83,15 @@ const preview: Preview = {
           cssVariablesResolver={efooCssVariablesResolver}
           forceColorScheme={colorScheme}
         >
-          <Notifications position="top-right" />
-          <div
-            className="storybook-canvas"
-            data-layout={context.parameters.layout === 'fullscreen' ? 'fullscreen' : undefined}
-          >
-            <Story />
-          </div>
+          <DatesProvider settings={efooDatesSettings}>
+            <Notifications position="top-right" />
+            <div
+              className="storybook-canvas"
+              data-layout={context.parameters.layout === 'fullscreen' ? 'fullscreen' : undefined}
+            >
+              <Story />
+            </div>
+          </DatesProvider>
         </MantineProvider>
       );
     },

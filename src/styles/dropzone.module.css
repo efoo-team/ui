@@ -1,0 +1,31 @@
+@layer efoo {
+  .root {
+    background: var(--mantine-color-body);
+    border-color: var(--efoo-input-border);
+    transition-duration: calc(var(--efoo-motion-duration-fast) * var(--efoo-motion-scale));
+    transition-timing-function: var(--efoo-motion-easing);
+  }
+
+  .root:where(:focus-visible) {
+    outline: none;
+    box-shadow: var(--efoo-focus-ring);
+  }
+
+  @media (hover: hover) {
+    .root:hover:where([data-activate-on-click]:not([data-loading], [data-accept], [data-reject])) {
+      background: var(--mantine-color-default-hover);
+    }
+  }
+
+  .root:where([data-accept]) {
+    background: var(--dropzone-accept-bg);
+    border-color: var(--dropzone-accept-color);
+    color: var(--dropzone-accept-color);
+  }
+
+  .root:where([data-reject]) {
+    background: var(--dropzone-reject-bg);
+    border-color: var(--dropzone-reject-color);
+    color: var(--dropzone-reject-color);
+  }
+}

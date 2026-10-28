@@ -25,10 +25,12 @@ import {
   Combobox,
   createTheme,
   Drawer,
+  EmptyState,
   Indicator,
   Input,
   InputWrapper,
   Menu,
+  Loader,
   Modal,
   MultiSelect,
   NavLink,
@@ -39,12 +41,17 @@ import {
   PasswordInput,
   Pill,
   Popover,
+  Progress,
+  ProgressRoot,
   Radio,
   RadioGroup,
   RadioIndicator,
+  RangeSlider,
+  RingProgress,
   SegmentedControl,
   Select,
   Skeleton,
+  Slider,
   Stepper,
   Switch,
   Table,
@@ -96,6 +103,10 @@ import chartClasses from './styles/chart.module.css';
 import checkboxClasses from './styles/checkbox.module.css';
 import chipClasses from './styles/chip.module.css';
 import drawerClasses from './styles/drawer.module.css';
+import datesClasses from './styles/dates.module.css';
+import emptyStateClasses from './styles/empty-state.module.css';
+import loaderClasses from './styles/loader.module.css';
+import dropzoneClasses from './styles/dropzone.module.css';
 import inlineInputClasses from './styles/inline-input.module.css';
 import inputClasses from './styles/input.module.css';
 import menuClasses from './styles/menu.module.css';
@@ -106,6 +117,8 @@ import notificationsClasses from './styles/notifications.module.css';
 import paginationClasses from './styles/pagination.module.css';
 import popoverClasses from './styles/popover.module.css';
 import pillClasses from './styles/pill.module.css';
+import progressClasses from './styles/progress.module.css';
+import sliderClasses from './styles/slider.module.css';
 import radioClasses from './styles/radio.module.css';
 import segmentedControlClasses from './styles/segmented-control.module.css';
 import selectClasses from './styles/select.module.css';
@@ -191,6 +204,60 @@ const chartComponents = {
   Sparkline: { defaultProps: { curveType: 'natural' } },
   // The tooltip resolves its Styles API under its own name, not the chart's.
   ChartTooltip: { classNames: chartClassNames },
+};
+
+// Dates are optional; Styles API names allow applications without @mantine/dates to load the theme.
+const dateClassNames = {
+  day: datesClasses.day,
+  weekday: datesClasses.weekday,
+  calendarHeader: datesClasses.calendarHeader,
+  calendarHeaderControl: datesClasses.calendarHeaderControl,
+  calendarHeaderLevel: datesClasses.calendarHeaderLevel,
+  monthsListControl: datesClasses.monthsListControl,
+  yearsListControl: datesClasses.yearsListControl,
+};
+const calendarDefaults = {
+  monthLabelFormat: 'YYYY年M月',
+  ariaLabels: {
+    previousMonth: '前の月',
+    nextMonth: '次の月',
+    previousYear: '前年',
+    nextYear: '翌年',
+    previousDecade: '前の10年',
+    nextDecade: '次の10年',
+    monthLevelControl: '月を選択',
+    yearLevelControl: '年を選択',
+  },
+};
+const dateComponents = {
+  Calendar: { classNames: dateClassNames, defaultProps: calendarDefaults },
+  DatePicker: { classNames: dateClassNames, defaultProps: calendarDefaults },
+  DateInput: {
+    classNames: dateClassNames,
+    defaultProps: {
+      ...calendarDefaults,
+      valueFormat: 'YYYY/MM/DD',
+      clearButtonProps: clearInputProps,
+    },
+  },
+  DatePickerInput: {
+    classNames: dateClassNames,
+    defaultProps: {
+      ...calendarDefaults,
+      valueFormat: 'YYYY/MM/DD',
+      clearButtonProps: clearSelectionProps,
+    },
+  },
+  DateTimePicker: {
+    classNames: dateClassNames,
+    defaultProps: {
+      ...calendarDefaults,
+      valueFormat: 'YYYY/MM/DD HH:mm',
+      clearButtonProps: clearSelectionProps,
+      submitButtonProps: { 'aria-label': '日時を確定' },
+    },
+  },
+  InlineDateTimePicker: { classNames: dateClassNames, defaultProps: calendarDefaults },
 };
 
 const comboboxClassNames = {
@@ -279,6 +346,9 @@ export const efooTheme: MantineThemeOverride = createTheme({
   variantColorResolver: efooVariantColorResolver,
   components: {
     ...chartComponents,
+    ...dateComponents,
+    // The extension remains optional for services; Mantine resolves its theme by component name.
+    Dropzone: { classNames: { root: dropzoneClasses.root } },
     Accordion: Accordion.extend({
       classNames: {
         root: accordionClasses.root,
@@ -426,6 +496,13 @@ export const efooTheme: MantineThemeOverride = createTheme({
       }),
       defaultProps: { transitionProps: drawerTransitionProps, overlayProps, shadow: 'lg' },
     }),
+    EmptyState: EmptyState.extend({
+      classNames: {
+        root: emptyStateClasses.root,
+        title: emptyStateClasses.title,
+        description: emptyStateClasses.description,
+      },
+    }),
     Indicator: Indicator.extend({
       vars: (theme, props) => ({
         root: { '--indicator-text-color': getFilledContrast(theme, props.color) },
@@ -441,6 +518,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
         error: inputClasses.error,
       },
     }),
+    Loader: Loader.extend({ classNames: { root: loaderClasses.root } }),
     Menu: Menu.extend({
       classNames: {
         item: menuClasses.item,
@@ -527,6 +605,11 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: { dropdown: popoverClasses.dropdown },
       defaultProps: { transitionProps: overlayTransitionProps, shadow: 'md' },
     }),
+    Progress: Progress.extend({
+      classNames: { root: progressClasses.root },
+      defaultProps: { size: 4 },
+    }),
+    ProgressRoot: ProgressRoot.extend({ defaultProps: { size: 4 } }),
     Radio: Radio.extend({
       classNames: {
         root: `${radioClasses.root} ${inlineInputClasses.root}`,
@@ -546,6 +629,13 @@ export const efooTheme: MantineThemeOverride = createTheme({
         indicator: { '--radio-icon-color': getRadioIconColor(theme, props) },
       }),
     }),
+    RangeSlider: RangeSlider.extend({
+      classNames: { root: sliderClasses.root, thumb: sliderClasses.thumb },
+      defaultProps: { size: 'xs', thumbSize: 12 },
+    }),
+    RingProgress: RingProgress.extend({
+      defaultProps: { rootColor: 'var(--mantine-color-default-hover)' },
+    }),
     SegmentedControl: SegmentedControl.extend({
       classNames: {
         root: segmentedControlClasses.root,
@@ -563,6 +653,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
     Skeleton: Skeleton.extend({
       classNames: { root: skeletonClasses.root },
       defaultProps: { radius: 'md' },
+    }),
+    Slider: Slider.extend({
+      classNames: { root: sliderClasses.root, thumb: sliderClasses.thumb },
+      defaultProps: { size: 'xs', thumbSize: 12 },
     }),
     Stepper: Stepper.extend({
       vars: (theme, props) => ({

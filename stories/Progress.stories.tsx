@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Progress, Stack, Title } from '@mantine/core';
+import { Group, Progress, RingProgress, Stack, Text, Title } from '@mantine/core';
 
 const meta = {
   title: '表示 / 進捗バー（Progress）',
@@ -56,5 +56,31 @@ export const ProgressStates: Story = {
         </Progress.Root>
       </Stack>
     </Stack>
+  ),
+};
+
+export const Ring: Story = {
+  name: '円形の進捗（RingProgress）',
+  render: () => (
+    <Group>
+      <RingProgress
+        sections={[{ value: 60, color: 'var(--mantine-primary-color-filled)' }]}
+        label={
+          <Text ta="center" size="sm">
+            60%
+          </Text>
+        }
+        aria-label="進捗 60%"
+      />
+      <RingProgress
+        sections={[{ value: 25, color: 'red' }]}
+        label={
+          <Text ta="center" size="sm">
+            25%
+          </Text>
+        }
+        aria-label="進捗 25%"
+      />
+    </Group>
   ),
 };

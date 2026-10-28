@@ -1,0 +1,16 @@
+@layer efoo {
+  .root {
+    --slider-track-bg: var(--mantine-color-default-hover);
+  }
+
+  .thumb {
+    border-width: calc(0.0625rem * var(--mantine-scale));
+    border-color: var(--mantine-color-default-border);
+    background-color: var(--mantine-color-body);
+  }
+
+  .thumb[data-disabled] {
+    display: flex;
+    cursor: not-allowed;
+  }
+}

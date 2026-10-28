@@ -1,0 +1,5 @@
+@layer efoo {
+  .root {
+    background-color: var(--mantine-color-default-hover);
+  }
+}
