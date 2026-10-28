@@ -16,8 +16,8 @@ import { motionCssVariables } from './motion.js';
  * shadcn/ui fills only destructive; efoo keeps fills for status but at calm shades: green and blue 700, yellow 600
  * with black text (500 reads as a bright yellow, 700 as brown), red 600 (shadcn/ui's destructive). The hover goes one
  * shade darker, except yellow, which goes lighter so its black text keeps 4.5:1. Both schemes share the shades;
- * the dark red is the 500, the darkest red that keeps 3:1 against a card and a Progress track (white 10% over the
- * card). No red keeps both that and 4.5:1 for white text, so the dark red takes black text from the contrast below.
+ * the dark red is the 500, the darkest red that keeps 3:1 against a card and a Progress track (the default hover
+ * surface). No red keeps both that and 4.5:1 for white text, so the dark red takes black text from the contrast below.
  * The light variant is the fill at 10% (20% of the 400 in dark) behind colored text. The light-scheme text takes
  * the lightest shade that keeps 4.5:1 on that tint, and colored text on the page (Mantine's -text, which otherwise
  * follows the fill) the lightest that keeps 4.5:1 on white. The dark text is the 300 shade, as in shadcn/ui.

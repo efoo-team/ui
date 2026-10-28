@@ -7,14 +7,13 @@ import { GLOBALS_UPDATED } from 'storybook/internal/core-events';
 import { themes } from 'storybook/theming';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { DatesProvider } from '@mantine/dates';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import 'dayjs/locale/ja';
 import '@mantine/core/styles.layer.css';
 import '@mantine/notifications/styles.layer.css';
 import '@mantine/dates/styles.layer.css';
-import { efooTheme, efooCssVariablesResolver, efooDatesSettings } from '../src';
+import { efooTheme, efooCssVariablesResolver } from '../src';
 import './preview.css';
 
 dayjs.extend(customParseFormat);
@@ -83,15 +82,13 @@ const preview: Preview = {
           cssVariablesResolver={efooCssVariablesResolver}
           forceColorScheme={colorScheme}
         >
-          <DatesProvider settings={efooDatesSettings}>
-            <Notifications position="top-right" />
-            <div
-              className="storybook-canvas"
-              data-layout={context.parameters.layout === 'fullscreen' ? 'fullscreen' : undefined}
-            >
-              <Story />
-            </div>
-          </DatesProvider>
+          <Notifications position="top-right" />
+          <div
+            className="storybook-canvas"
+            data-layout={context.parameters.layout === 'fullscreen' ? 'fullscreen' : undefined}
+          >
+            <Story />
+          </div>
         </MantineProvider>
       );
     },

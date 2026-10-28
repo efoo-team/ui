@@ -1,6 +1,5 @@
 @layer efoo {
   .root {
-    background: var(--mantine-color-body);
     border-color: var(--efoo-input-border);
     transition-duration: calc(var(--efoo-motion-duration-fast) * var(--efoo-motion-scale));
     transition-timing-function: var(--efoo-motion-easing);

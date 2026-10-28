@@ -5,12 +5,14 @@
 
   .thumb {
     border-width: calc(0.0625rem * var(--mantine-scale));
-    border-color: var(--mantine-color-default-border);
+    border-color: var(--slider-color);
     background-color: var(--mantine-color-body);
   }
 
-  .thumb[data-disabled] {
+  .thumb:where([data-disabled]),
+  fieldset:disabled .thumb {
     display: flex;
     cursor: not-allowed;
+    opacity: 0.5;
   }
 }

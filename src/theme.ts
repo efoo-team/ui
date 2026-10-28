@@ -105,7 +105,6 @@ import chipClasses from './styles/chip.module.css';
 import drawerClasses from './styles/drawer.module.css';
 import datesClasses from './styles/dates.module.css';
 import emptyStateClasses from './styles/empty-state.module.css';
-import loaderClasses from './styles/loader.module.css';
 import dropzoneClasses from './styles/dropzone.module.css';
 import inlineInputClasses from './styles/inline-input.module.css';
 import inputClasses from './styles/input.module.css';
@@ -206,18 +205,20 @@ const chartComponents = {
   ChartTooltip: { classNames: chartClassNames },
 };
 
+const sliderTheme = {
+  classNames: { root: sliderClasses.root, thumb: sliderClasses.thumb },
+  defaultProps: { size: 'xs', thumbSize: 12 },
+};
+
 // Dates are optional; Styles API names allow applications without @mantine/dates to load the theme.
 const dateClassNames = {
   day: datesClasses.day,
-  weekday: datesClasses.weekday,
   calendarHeader: datesClasses.calendarHeader,
-  calendarHeaderControl: datesClasses.calendarHeaderControl,
-  calendarHeaderLevel: datesClasses.calendarHeaderLevel,
   monthsListControl: datesClasses.monthsListControl,
   yearsListControl: datesClasses.yearsListControl,
 };
-const calendarDefaults = {
-  monthLabelFormat: 'YYYY年M月',
+const dateDefaults = {
+  locale: 'ja',
   ariaLabels: {
     previousMonth: '前の月',
     nextMonth: '次の月',
@@ -229,9 +230,24 @@ const calendarDefaults = {
     yearLevelControl: '年を選択',
   },
 };
+const calendarDefaults = { ...dateDefaults, firstDayOfWeek: 0, monthLabelFormat: 'YYYY年M月' };
 const dateComponents = {
   Calendar: { classNames: dateClassNames, defaultProps: calendarDefaults },
   DatePicker: { classNames: dateClassNames, defaultProps: calendarDefaults },
+  MonthPicker: { classNames: dateClassNames, defaultProps: dateDefaults },
+  YearPicker: { classNames: dateClassNames, defaultProps: dateDefaults },
+  MonthPickerInput: {
+    classNames: dateClassNames,
+    defaultProps: {
+      ...dateDefaults,
+      valueFormat: 'YYYY年M月',
+      clearButtonProps: clearSelectionProps,
+    },
+  },
+  YearPickerInput: {
+    classNames: dateClassNames,
+    defaultProps: { ...dateDefaults, valueFormat: 'YYYY年', clearButtonProps: clearSelectionProps },
+  },
   DateInput: {
     classNames: dateClassNames,
     defaultProps: {
@@ -518,7 +534,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
         error: inputClasses.error,
       },
     }),
-    Loader: Loader.extend({ classNames: { root: loaderClasses.root } }),
+    Loader: Loader.extend({ defaultProps: { size: 16 } }),
     Menu: Menu.extend({
       classNames: {
         item: menuClasses.item,
@@ -607,7 +623,6 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     Progress: Progress.extend({
       classNames: { root: progressClasses.root },
-      defaultProps: { size: 4 },
     }),
     ProgressRoot: ProgressRoot.extend({ defaultProps: { size: 4 } }),
     Radio: Radio.extend({
@@ -629,10 +644,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
         indicator: { '--radio-icon-color': getRadioIconColor(theme, props) },
       }),
     }),
-    RangeSlider: RangeSlider.extend({
-      classNames: { root: sliderClasses.root, thumb: sliderClasses.thumb },
-      defaultProps: { size: 'xs', thumbSize: 12 },
-    }),
+    RangeSlider: RangeSlider.extend(sliderTheme),
     RingProgress: RingProgress.extend({
       defaultProps: { rootColor: 'var(--mantine-color-default-hover)' },
     }),
@@ -654,10 +666,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: { root: skeletonClasses.root },
       defaultProps: { radius: 'md' },
     }),
-    Slider: Slider.extend({
-      classNames: { root: sliderClasses.root, thumb: sliderClasses.thumb },
-      defaultProps: { size: 'xs', thumbSize: 12 },
-    }),
+    Slider: Slider.extend(sliderTheme),
     Stepper: Stepper.extend({
       vars: (theme, props) => ({
         root: { '--stepper-icon-color': getFilledContrast(theme, props.color) },

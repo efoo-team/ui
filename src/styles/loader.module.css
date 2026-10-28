@@ -1,5 +1,0 @@
-@layer efoo {
-  .root {
-    --loader-size-md: calc(1rem * var(--mantine-scale));
-  }
-}
