@@ -75,6 +75,7 @@ import {
   yellowColors,
   zincColors,
 } from './colors.js';
+import { efooDateParser } from './date-parser.js';
 import {
   drawerTransitionProps,
   modalTransitionProps,
@@ -271,6 +272,7 @@ const dateComponents = {
     defaultProps: {
       ...calendarDefaults,
       valueFormat: 'YYYY/MM/DD',
+      dateParser: efooDateParser,
       clearButtonProps: clearInputProps,
     },
   },
