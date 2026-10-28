@@ -101,18 +101,19 @@ interface IconColorProps {
   variant?: string;
 }
 
-// Mantine computes the check and dot color without the color scheme and writes white inline.
+// Mantine computes the check and dot color from the primaryShade without the color scheme and writes it inline;
+// the mark follows the fill the resolver actually draws (black on green and yellow, the scheme's contrast on zinc).
 function getCheckboxIconColor(theme: MantineTheme, props: IconColorProps) {
   if (props.iconColor) return undefined;
   if (props.variant === 'outline') return 'var(--checkbox-color)';
-  return props.variant === 'light' ? undefined : getZincContrast(theme, props.color);
+  return props.variant === 'light' ? undefined : getFilledContrast(theme, props.color);
 }
 
 function getRadioIconColor(theme: MantineTheme, props: IconColorProps) {
   if (props.iconColor || (props.variant !== undefined && props.variant !== 'filled')) {
     return undefined;
   }
-  return getZincContrast(theme, props.color);
+  return getFilledContrast(theme, props.color);
 }
 
 // The dark filled shade is too dark for the thin bar on the dark surface. The outline color is each scheme's line color.
