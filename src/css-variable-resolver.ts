@@ -13,16 +13,22 @@ import { NEUTRAL_COLOR as z, STATUS_COLORS, type StatusColor } from './colors.js
 import { motionCssVariables } from './motion.js';
 
 /*
- * Status colors follow shadcn/ui's destructive: the light-scheme fill is the 600 shade (yellow 500, which reads as
- * yellow rather than ochre and takes black text), and the light variant is
- * the fill at 10% (20% in dark) behind colored text. The light-scheme text takes the lightest shade that keeps
- * 4.5:1 on that tint (600 falls to 2.7-4.0:1 for red, green and yellow), and colored text on the page
- * (Mantine's -text, which otherwise follows the fill) takes the lightest shade that keeps 4.5:1 on white.
+ * shadcn/ui fills only destructive; efoo keeps fills for status but at calm shades: green and blue 700, yellow 600
+ * with black text (500 reads as a bright yellow, 700 as brown), red 600 (shadcn/ui's destructive). The hover goes one
+ * shade darker, except yellow, which goes lighter so its black text keeps 4.5:1. Both schemes share the shades;
+ * the dark red is shadcn/ui's destructive at 60% over the page, which does not sink into a card like red 800.
+ * The light variant is the fill at 10% (20% of the 400 in dark) behind colored text. The light-scheme text takes
+ * the lightest shade that keeps 4.5:1 on that tint, and colored text on the page (Mantine's -text, which otherwise
+ * follows the fill) the lightest that keeps 4.5:1 on white. The dark text is the 300 shade, as in shadcn/ui.
  */
-const LIGHT_FILLED_SHADE: Record<StatusColor, number> = { red: 6, yellow: 5, green: 6, blue: 6 };
+const FILLED_SHADE: Record<StatusColor, number> = { red: 6, yellow: 6, green: 7, blue: 7 };
+const FILLED_HOVER_SHADE: Record<StatusColor, number> = { red: 7, yellow: 5, green: 8, blue: 8 };
 const LIGHT_TEXT_SHADE: Record<StatusColor, number> = { red: 7, yellow: 8, green: 8, blue: 7 };
 const LIGHT_PAGE_TEXT_SHADE: Record<StatusColor, number> = { red: 6, yellow: 7, green: 7, blue: 6 };
-const DARK_TEXT_SHADE = 4;
+const DARK_TINT_SHADE = 4;
+const DARK_TEXT_SHADE = 3;
+const darkRed = (amount: number) =>
+  `color-mix(in srgb, var(--mantine-color-red-${DARK_TINT_SHADE}) ${amount}%, var(--mantine-color-body))`;
 
 // Mantine picks black or white text from the primaryShade; the fill here is another shade, so the text follows the fill.
 function getContrast(theme: MantineTheme, color: StatusColor, shade: number) {
@@ -32,16 +38,11 @@ function getContrast(theme: MantineTheme, color: StatusColor, shade: number) {
     : 'var(--mantine-color-white)';
 }
 
-/*
- * A status color chosen as primaryColor keeps the fill of the service's primaryShade; only its text follows that fill.
- * hoverStep is +1 in light (darker, like Mantine) and -1 in dark (lighter).
- */
+// A status color chosen as primaryColor keeps the fill of the service's primaryShade; only its text follows that fill.
 function fillVariables(
   theme: MantineTheme,
   color: StatusColor,
   scheme: 'light' | 'dark',
-  shade: number,
-  hoverStep: number,
 ): [string, string][] {
   if (color === theme.primaryColor) {
     return [
@@ -51,17 +52,27 @@ function fillVariables(
       ],
     ];
   }
+  if (color === 'red' && scheme === 'dark') {
+    return [
+      ['--mantine-color-red-filled', darkRed(60)],
+      ['--mantine-color-red-filled-hover', darkRed(70)],
+      ['--mantine-color-red-contrast', 'var(--mantine-color-white)'],
+    ];
+  }
   return [
-    [`--mantine-color-${color}-filled`, `var(--mantine-color-${color}-${shade})`],
-    [`--mantine-color-${color}-filled-hover`, `var(--mantine-color-${color}-${shade + hoverStep})`],
-    [`--mantine-color-${color}-contrast`, getContrast(theme, color, shade)],
+    [`--mantine-color-${color}-filled`, `var(--mantine-color-${color}-${FILLED_SHADE[color]})`],
+    [
+      `--mantine-color-${color}-filled-hover`,
+      `var(--mantine-color-${color}-${FILLED_HOVER_SHADE[color]})`,
+    ],
+    [`--mantine-color-${color}-contrast`, getContrast(theme, color, FILLED_SHADE[color])],
   ];
 }
 
 const lightStatusColors = (theme: MantineTheme) =>
   Object.fromEntries(
     STATUS_COLORS.flatMap((color) => [
-      ...fillVariables(theme, color, 'light', LIGHT_FILLED_SHADE[color], 1),
+      ...fillVariables(theme, color, 'light'),
       [
         `--mantine-color-${color}-text`,
         `var(--mantine-color-${color}-${LIGHT_PAGE_TEXT_SHADE[color]})`,
@@ -81,23 +92,17 @@ const lightStatusColors = (theme: MantineTheme) =>
     ]),
   );
 
-/*
- * The dark scheme fills with the same shades as light, so yellow stays yellow instead of Mantine's brown 800.
- * Red keeps the 800 of the destructive button. The hover lightens one shade instead of Mantine's darker one.
- */
-const DARK_FILLED_SHADE: Record<StatusColor, number> = { red: 8, yellow: 5, green: 6, blue: 6 };
-
 const darkStatusColors = (theme: MantineTheme) =>
   Object.fromEntries(
     STATUS_COLORS.flatMap((color) => [
-      ...fillVariables(theme, color, 'dark', DARK_FILLED_SHADE[color], -1),
+      ...fillVariables(theme, color, 'dark'),
       [
         `--mantine-color-${color}-light`,
-        `color-mix(in srgb, var(--mantine-color-${color}-${DARK_TEXT_SHADE}) 20%, transparent)`,
+        `color-mix(in srgb, var(--mantine-color-${color}-${DARK_TINT_SHADE}) 20%, transparent)`,
       ],
       [
         `--mantine-color-${color}-light-hover`,
-        `color-mix(in srgb, var(--mantine-color-${color}-${DARK_TEXT_SHADE}) 30%, transparent)`,
+        `color-mix(in srgb, var(--mantine-color-${color}-${DARK_TINT_SHADE}) 30%, transparent)`,
       ],
       [`--mantine-color-${color}-light-color`, `var(--mantine-color-${color}-${DARK_TEXT_SHADE})`],
     ]),
