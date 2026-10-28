@@ -2,8 +2,25 @@
   /* The same track and active surface as the Tabs pills, after shadcn/ui's tabs list and trigger.
      Mantine's dark track is the card surface, so the control disappears inside a Card. */
   .root {
+    --sc-padding-sm: 0.1875rem 0.5rem;
     padding: 0.1875rem;
     background-color: var(--mantine-color-default-hover);
+  }
+
+  /* Tabs pills metrics: 20px lines and corners 2px inside the track, so the default size is 32px high. */
+  .indicator,
+  .label {
+    border-radius: calc(var(--sc-radius, var(--mantine-radius-default)) - 2px);
+  }
+
+  .label {
+    line-height: var(--mantine-line-height-sm);
+  }
+
+  /* The theme's focus halo instead of Mantine's 2px line. */
+  .input:where(:focus-visible, [data-focus-ring='always']:focus) + .label {
+    --segmented-control-outline: none;
+    box-shadow: var(--efoo-focus-ring);
   }
 
   .indicator {

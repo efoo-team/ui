@@ -465,7 +465,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
         root: segmentedControlClasses.root,
         indicator: segmentedControlClasses.indicator,
         label: segmentedControlClasses.label,
+        input: segmentedControlClasses.input,
       },
+      // shadcn/ui's tabs list has no lines between the triggers.
+      defaultProps: { withItemsBorders: false },
     }),
     Select: Select.extend({
       classNames: comboboxClassNames,
