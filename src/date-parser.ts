@@ -1,7 +1,7 @@
 /** Parses a date in YYYY/MM/DD format without normalizing invalid dates. */
 export function efooDateParser(value: string): string | null {
   const match = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec(value);
-  if (!match || match[0] !== value) return null;
+  if (!match) return null;
 
   const year = Number(match[1]);
   const month = Number(match[2]);
