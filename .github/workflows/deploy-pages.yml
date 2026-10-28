@@ -10,7 +10,7 @@ permissions:
 
 concurrency:
   group: github-pages
-  cancel-in-progress: false
+  queue: max
 
 jobs:
   build:
@@ -29,6 +29,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Type check
         run: pnpm typecheck
+      - name: Test date parser
+        run: node --experimental-strip-types --test tests/date-parser.test.ts
       - name: Lint
         run: pnpm lint
       - name: Check formatting
@@ -55,3 +57,77 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+  release:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Check release
+        id: release
+        shell: bash
+        run: |
+          version=$(node -p "require('./package.json').version")
+          tag="v${version}"
+          asset="efoo-team-ui-${version}.tgz"
+          gh api --paginate --slurp "repos/${GITHUB_REPOSITORY}/releases?per_page=100" > "$RUNNER_TEMP/releases.json"
+          release=$(jq -c --arg tag "$tag" '[.[][] | select(.tag_name == $tag)] | first // null' "$RUNNER_TEMP/releases.json")
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "asset=$asset" >> "$GITHUB_OUTPUT"
+          if [[ "$release" != null ]]; then
+            if [[ $(jq -r '.draft' <<< "$release") == true ]]; then
+              echo "A draft release already exists for $tag" >&2
+              exit 1
+            fi
+            if jq -e --arg asset "$asset" '.assets[] | select(.name == $asset and .state == "uploaded")' <<< "$release" > /dev/null; then
+              echo "published=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          fi
+          gh api "repos/${GITHUB_REPOSITORY}/git/matching-refs/tags/${tag}" > "$RUNNER_TEMP/tags.json"
+          if jq -e --arg ref "refs/tags/$tag" '.[] | select(.ref == $ref)' "$RUNNER_TEMP/tags.json" > /dev/null; then
+            tag_commit=$(gh api "repos/${GITHUB_REPOSITORY}/commits/${tag}" --jq .sha)
+            if [[ "$tag_commit" != "$GITHUB_SHA" ]]; then
+              echo "Tag $tag points to $tag_commit, not $GITHUB_SHA; rerun the original workflow." >&2
+              exit 1
+            fi
+          elif [[ "$release" != null ]]; then
+            echo "Release $tag exists but its tag is missing." >&2
+            exit 1
+          fi
+      - name: Set up pnpm
+        if: steps.release.outputs.published != 'true'
+        uses: pnpm/action-setup@v6
+      - name: Set up Node.js
+        if: steps.release.outputs.published != 'true'
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Install dependencies and build
+        if: steps.release.outputs.published != 'true'
+        env:
+          ASSET: ${{ steps.release.outputs.asset }}
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build
+          pnpm pack --out "$RUNNER_TEMP/$ASSET"
+      - name: Publish release
+        if: steps.release.outputs.published != 'true'
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+          ASSET: ${{ steps.release.outputs.asset }}
+          RELEASE_EXISTS: ${{ steps.release.outputs.exists }}
+        run: |
+          if [[ "$RELEASE_EXISTS" == true ]]; then
+            gh release upload "$TAG" "$RUNNER_TEMP/$ASSET"
+          else
+            gh release create "$TAG" "$RUNNER_TEMP/$ASSET" --target "$GITHUB_SHA" --title "$TAG" --notes ""
+          fi
