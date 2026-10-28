@@ -98,7 +98,13 @@ const preview: Preview = {
           ['ダッシュボード', 'サインイン'],
           '構造',
           '操作',
-          ['ボタン（Button）', 'タブ（Tabs）'],
+          [
+            'ボタン（Button）',
+            'アイコンボタン（ActionIcon）',
+            'タブ（Tabs）',
+            '切り替え（SegmentedControl）',
+            'ページ送り（Pagination）',
+          ],
           '入力',
           [
             'テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）',
@@ -109,6 +115,8 @@ const preview: Preview = {
           '表示',
           [
             '表・カード・バッジ（Table, Card, Badge）',
+            'アバター（Avatar）',
+            '進捗バー（Progress）',
             '読み込み表示とツールチップ（Skeleton, Tooltip）',
           ],
           '重ねて表示',
