@@ -1,0 +1,6 @@
+@layer efoo {
+  /* Mantine's Burger has square corners, so its focus ring was square; it takes the corners of the other buttons. */
+  .root {
+    border-radius: var(--mantine-radius-default);
+  }
+}
