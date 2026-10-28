@@ -221,7 +221,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
     Button: Button.extend({
       classNames: { root: buttonClasses.root, section: buttonClasses.section },
     }),
-    Card: Card.extend({ defaultProps: { withBorder: true, radius: 'xl' } }),
+    // shadcn/ui's dashboard-01 card: 24px padding, 14px corners and shadow-xs.
+    Card: Card.extend({
+      defaultProps: { withBorder: true, radius: 'xl', padding: 'lg', shadow: 'xs' },
+    }),
     Checkbox: Checkbox.extend({
       classNames: {
         root: `${checkboxClasses.root} ${inlineInputClasses.root}`,
