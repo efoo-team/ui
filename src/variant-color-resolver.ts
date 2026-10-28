@@ -9,7 +9,7 @@ import {
   type MantineTheme,
   type VariantColorsResolver,
 } from '@mantine/core';
-import { NEUTRAL_COLOR } from './colors.js';
+import { NEUTRAL_COLOR, STATUS_COLORS } from './colors.js';
 
 export const ZINC_CONTRAST = `var(--mantine-color-${NEUTRAL_COLOR}-contrast, var(--mantine-color-white))`;
 
@@ -26,8 +26,24 @@ export function getZincContrast(
   return isNeutralColor(theme, color) ? ZINC_CONTRAST : undefined;
 }
 
+function isStatusColor(theme: MantineTheme, color: string | undefined): boolean {
+  if (!color) return false;
+  const parsed = parseThemeColor({ color, theme });
+  return (
+    parsed.isThemeColor &&
+    parsed.shade === undefined &&
+    (STATUS_COLORS as readonly string[]).includes(parsed.color)
+  );
+}
+
 export const efooVariantColorResolver: VariantColorsResolver = (input) => {
   const resolved = defaultVariantColorsResolver(input);
+  const autoContrast = input.autoContrast ?? input.theme.autoContrast;
+
+  // The status fill is not the primaryShade Mantine judges the text by; the resolver sets the text per scheme.
+  if (input.variant === 'filled' && autoContrast && isStatusColor(input.theme, input.color)) {
+    return { ...resolved, color: `var(--mantine-color-${input.color}-contrast)` };
+  }
 
   if (!isNeutralColor(input.theme, input.color)) {
     return resolved;

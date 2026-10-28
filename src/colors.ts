@@ -73,6 +73,7 @@ export const darkColors: MantineColorsTuple = [
 ];
 
 export const STATUS_COLORS = ['red', 'yellow', 'green', 'blue'] as const;
+export type StatusColor = (typeof STATUS_COLORS)[number];
 
 // Tailwind v4 50-900 for the colors used to show status.
 export const redColors: MantineColorsTuple = [
