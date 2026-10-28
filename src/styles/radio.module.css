@@ -1,8 +1,12 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
   .root {
+    /* The same steps as Checkbox. */
     --radio-size-xs: calc(0.875rem * var(--mantine-scale));
     --radio-size-sm: calc(1rem * var(--mantine-scale));
+    --radio-size-md: calc(1.125rem * var(--mantine-scale));
+    --radio-size-lg: calc(1.25rem * var(--mantine-scale));
+    --radio-size-xl: calc(1.5rem * var(--mantine-scale));
   }
 
   /* Radio.Group does not pass its error to each Radio, so the group root's data-error selects the circles. */
@@ -13,6 +17,10 @@
   .radio:not(:checked, [data-error]),
   .indicator:not([data-checked], [data-error]) {
     border-color: var(--efoo-input-border);
+  }
+
+  .root:has(label) .inner {
+    margin-top: calc((var(--label-lh) - var(--radio-size)) / 2);
   }
 
   .radio:disabled {

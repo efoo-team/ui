@@ -1,13 +1,24 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
   .root {
+    /* shadcn/ui's box is 16px; the other sizes step by 2-4px instead of Mantine's 30 and 36px, which outgrow
+       the 40 and 44px inputs they sit beside. */
     --checkbox-size-xs: calc(0.875rem * var(--mantine-scale));
     --checkbox-size-sm: calc(1rem * var(--mantine-scale));
+    --checkbox-size-md: calc(1.125rem * var(--mantine-scale));
+    --checkbox-size-lg: calc(1.25rem * var(--mantine-scale));
+    --checkbox-size-xl: calc(1.5rem * var(--mantine-scale));
   }
 
   .input:not(:checked, [data-indeterminate], [data-error]),
   .indicator:not([data-checked], [data-indeterminate], [data-error]) {
     border-color: var(--efoo-input-border);
+  }
+
+  /* Mantine aligns the box with the top of the label line; centered on the first line, it stays level with the
+     text at every size. */
+  .root:has(label) .inner {
+    margin-top: calc((var(--label-lh) - var(--checkbox-size)) / 2);
   }
 
   .input:disabled {

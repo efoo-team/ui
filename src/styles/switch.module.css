@@ -1,10 +1,27 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
   .root {
+    /* shadcn/ui's switch is 32x18 with a 16px thumb; each size adds 4x2px and keeps the 1px inset. */
+    --switch-height-xs: calc(1rem * var(--mantine-scale));
     --switch-height-sm: calc(1.125rem * var(--mantine-scale));
+    --switch-height-md: calc(1.25rem * var(--mantine-scale));
+    --switch-height-lg: calc(1.375rem * var(--mantine-scale));
+    --switch-height-xl: calc(1.5rem * var(--mantine-scale));
+    --switch-width-xs: calc(1.75rem * var(--mantine-scale));
     --switch-width-sm: calc(2rem * var(--mantine-scale));
+    --switch-width-md: calc(2.25rem * var(--mantine-scale));
+    --switch-width-lg: calc(2.5rem * var(--mantine-scale));
+    --switch-width-xl: calc(2.75rem * var(--mantine-scale));
+    --switch-thumb-size-xs: calc(0.875rem * var(--mantine-scale));
     --switch-thumb-size-sm: calc(1rem * var(--mantine-scale));
+    --switch-thumb-size-md: calc(1.125rem * var(--mantine-scale));
+    --switch-thumb-size-lg: calc(1.25rem * var(--mantine-scale));
+    --switch-thumb-size-xl: calc(1.375rem * var(--mantine-scale));
+    --switch-track-label-padding-xs: calc(0.0625rem * var(--mantine-scale));
     --switch-track-label-padding-sm: calc(0.0625rem * var(--mantine-scale));
+    --switch-track-label-padding-md: calc(0.0625rem * var(--mantine-scale));
+    --switch-track-label-padding-lg: calc(0.0625rem * var(--mantine-scale));
+    --switch-track-label-padding-xl: calc(0.0625rem * var(--mantine-scale));
     --switch-label-font-size-xs: calc(0.625rem * var(--mantine-scale));
     --switch-label-font-size-sm: calc(0.625rem * var(--mantine-scale));
     --switch-label-font-size-md: calc(0.625rem * var(--mantine-scale));
@@ -21,6 +38,10 @@
   .input:checked + .track {
     --switch-bg: var(--switch-color);
     --switch-text-color: var(--efoo-switch-checked-contrast, var(--mantine-color-white));
+  }
+
+  .root:has(label) .track {
+    margin-top: calc((var(--label-lh) - var(--switch-height)) / 2);
   }
 
   .input:focus-visible + .track {
