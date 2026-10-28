@@ -1,10 +1,24 @@
 @layer efoo {
-  /* The input-* sizes stand next to inputs, so they follow the input heights. */
   .root {
+    /* shadcn/ui's icon buttons are 24, 28, 32 and 36px, and the default (md) is 32px like Button and the inputs. */
+    --ai-size-xs: calc(1.5rem * var(--mantine-scale));
+    --ai-size-sm: calc(1.75rem * var(--mantine-scale));
+    --ai-size-md: calc(2rem * var(--mantine-scale));
+    --ai-size-lg: calc(2.25rem * var(--mantine-scale));
+    --ai-size-xl: calc(2.5rem * var(--mantine-scale));
+    /* The input-* sizes stand next to inputs, so they follow the input heights. */
     --ai-size-input-xs: calc(1.75rem * var(--mantine-scale));
     --ai-size-input-sm: calc(2rem * var(--mantine-scale));
     --ai-size-input-md: calc(2.25rem * var(--mantine-scale));
     --ai-size-input-lg: calc(2.5rem * var(--mantine-scale));
     --ai-size-input-xl: calc(2.75rem * var(--mantine-scale));
+  }
+
+  /* Like Button: a disabled icon button keeps its variant at half opacity instead of Mantine's gray block. */
+  .root:where(:disabled, [data-disabled]):not([data-loading]) {
+    border: var(--ai-bd, 1px solid transparent);
+    background: var(--ai-bg, var(--mantine-primary-color-filled));
+    color: var(--ai-color, var(--mantine-color-white));
+    opacity: 0.5;
   }
 }
