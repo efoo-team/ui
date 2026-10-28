@@ -27,6 +27,12 @@
     padding: var(--efoo-navbar-inset-block) var(--efoo-navbar-inset-inline);
   }
 
+  /* In the rail Mantine's 12px scrollbar covered the right of the icon squares; 6px stays in the gutter beside the
+     32px column of a 48px rail, and the links still scroll by wheel, touch and keyboard. */
+  .navbar[data-rail] :global(.mantine-ScrollArea-scrollbar)[data-orientation='vertical'] {
+    --scrollarea-scrollbar-size: calc(0.375rem * var(--mantine-scale));
+  }
+
   /* AppShell's transitions take the theme motion and stop with reduced motion, for every part that moves with
      the navbar (the header and footer shift with it in layout="alt"). */
   .navbar,
