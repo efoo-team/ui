@@ -174,27 +174,27 @@ interface Stat {
 
 const STATS: Stat[] = [
   {
-    label: '10 月の受注額',
+    label: '受注額',
     value: yen(sum(OCTOBER)),
     note: `9 月より ${OCTOBER_GROWTH.toFixed(1)}% 多い`,
     badge: { label: `+${OCTOBER_GROWTH.toFixed(1)}%`, attention: false, trend: true },
   },
   {
-    label: '10 月の新規顧客（社）',
+    label: '新規顧客',
     value: '128',
     note: '9 月より 12 社多い',
     badge: { label: '+12', attention: false, trend: true },
   },
   {
-    label: '発注が必要な品目数',
+    label: '発注が必要な品目',
     value: String(REORDER_COUNT),
-    note: '在庫数が発注点を下回っています',
+    note: `${REORDER_COUNT} 品目の在庫数が発注点を下回っています`,
     badge: { label: '要発注', attention: true },
   },
   {
-    label: '未対応の問合せ（件）',
+    label: '未対応の問い合わせ',
     value: String(INQUIRIES.open),
-    note: `うち ${INQUIRIES.overdue} 件は受付から 2 日以上`,
+    note: `${INQUIRIES.open} 件のうち ${INQUIRIES.overdue} 件は受付から 2 日以上`,
     badge: { label: '要対応', attention: true },
   },
 ];
@@ -393,8 +393,8 @@ function OrganizationMenu({
 /*
  * One set of NavLinks serves both widths and keeps the same elements when the navbar folds, so the theme can cut the
  * labels at the edge and hide them at the end. With <AppShell.Navbar mod={{ rail }}> the theme folds the links into
- * icons, so each link carries its name in aria-label and a Tooltip, and a parent opens its child links from a Menu
- * instead of its own children, which the theme hides in the rail.
+ * icons, so each link carries its name in aria-label and a Tooltip. The theme hides child links in the rail, so
+ * pressing a parent there widens the sidebar with that parent open; only the organization switcher opens a Menu.
  */
 function Navbar({
   rail,
@@ -784,9 +784,9 @@ function OrdersCard() {
 
 function InquiriesCard() {
   const rows = [
-    { label: '対応済み（件）', value: INQUIRIES.done },
-    { label: '対応中（件）', value: INQUIRIES.inProgress },
-    { label: '未対応（件）', value: INQUIRIES.open },
+    { label: '対応済み', value: INQUIRIES.done },
+    { label: '対応中', value: INQUIRIES.inProgress },
+    { label: '未対応', value: INQUIRIES.open },
   ];
 
   return (
@@ -921,31 +921,34 @@ function DashboardPage() {
       {/* The open narrow-screen navbar covers the header and main, so they leave the Tab order meanwhile. */}
       <AppShell.Header px="md" inert={narrowOpen ? true : undefined}>
         <Group h="100%" justify="space-between" wrap="nowrap">
+          {/* Like shadcn/ui: 8px from the toggle to the divider, 16px from the divider to the page path. */}
           <Group gap="md" wrap="nowrap" miw={0}>
-            <Burger
-              ref={burgerRef}
-              opened={opened}
-              onClick={toggle}
-              hiddenFrom="sm"
-              size="lg"
-              aria-label="サイドバー"
-              aria-expanded={opened}
-              aria-controls={navbarId}
-            />
-            <ActionIcon
-              variant="subtle"
-              visibleFrom="sm"
-              onClick={toggleDesktop}
-              aria-label="サイドバー"
-              aria-expanded={desktopOpened}
-              aria-controls={navbarId}
-            >
-              <IconLayoutSidebar size={ICON_SIZE} />
-            </ActionIcon>
-            {/* The vertical Divider stretches to its box, so a 16px box gives it its height. */}
-            <Box h={16} display="flex">
-              <Divider orientation="vertical" />
-            </Box>
+            <Group gap="xs" wrap="nowrap">
+              <Burger
+                ref={burgerRef}
+                opened={opened}
+                onClick={toggle}
+                hiddenFrom="sm"
+                size="lg"
+                aria-label="サイドバー"
+                aria-expanded={opened}
+                aria-controls={navbarId}
+              />
+              <ActionIcon
+                variant="subtle"
+                visibleFrom="sm"
+                onClick={toggleDesktop}
+                aria-label="サイドバー"
+                aria-expanded={desktopOpened}
+                aria-controls={navbarId}
+              >
+                <IconLayoutSidebar size={ICON_SIZE} />
+              </ActionIcon>
+              {/* The vertical Divider stretches to its box, so a 16px box gives it its height. */}
+              <Box h={16} display="flex">
+                <Divider orientation="vertical" />
+              </Box>
+            </Group>
             {/* On narrow screens the sidebar is hidden, so the header names the organization instead of the path. */}
             <Text variant="emphasis" hiddenFrom="sm" truncate>
               {organization.name}
@@ -994,7 +997,7 @@ function DashboardPage() {
               ダッシュボード
             </Title>
             <Text size="sm" c="dimmed">
-              2026 年 10 月 31 日時点の状況
+              2026 年 10 月の実績（10 月 31 日時点）
             </Text>
           </Stack>
           {/* Columns follow the width of the main area, not the viewport, so an open sidebar is taken into account. */}
