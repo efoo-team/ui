@@ -15,18 +15,15 @@
     opacity: 0.5;
   }
 
-  .input:disabled + .label[data-checked] {
-    background: var(--chip-bg);
-    color: var(--chip-color);
-  }
-
-  .root[data-variant='outline'] .input:disabled + .label {
+  .root:where([data-variant='outline']) .input:disabled + .label {
+    --chip-disabled-checked-bg: var(--mantine-color-default);
     background: var(--mantine-color-default);
-    border: 1px solid var(--efoo-input-border);
+    border: calc(0.0625rem * var(--mantine-scale)) solid var(--efoo-input-border);
   }
 
-  .root[data-variant='outline'] .input:disabled + .label[data-checked] {
-    border: var(--chip-bd);
+  .input:disabled + .label[data-checked] {
+    background: var(--chip-disabled-checked-bg, var(--chip-bg));
     color: var(--chip-color);
+    border: var(--chip-bd);
   }
 }

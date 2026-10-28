@@ -1,6 +1,8 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
   .tooltip {
+    background: var(--tooltip-bg, var(--efoo-tooltip-bg));
+    color: var(--tooltip-color, var(--efoo-tooltip-color));
     padding: 0.375rem 0.75rem;
     font-size: var(--mantine-font-size-xs);
     line-height: var(--mantine-line-height-xs);

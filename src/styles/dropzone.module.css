@@ -1,17 +1,13 @@
 @layer efoo {
   .root {
-    border-color: color-mix(
-      in srgb,
-      var(--efoo-color-ring, var(--mantine-primary-color-filled)) 75%,
-      var(--efoo-input-border)
-    );
+    border-color: color-mix(in srgb, var(--efoo-color-ring) 75%, var(--efoo-input-border));
     transition-duration: calc(var(--efoo-motion-duration-fast) * var(--efoo-motion-scale));
     transition-timing-function: var(--efoo-motion-easing);
   }
 
   .root:where(:focus-visible) {
     outline: none;
-    border-color: var(--efoo-color-ring, var(--mantine-primary-color-filled));
+    border-color: var(--efoo-color-ring);
     box-shadow: var(--efoo-focus-ring);
   }
 

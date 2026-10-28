@@ -4,6 +4,15 @@
     line-height: var(--mantine-line-height-sm);
   }
 
+  .neutral {
+    --alert-bg: var(--mantine-color-default);
+    --alert-bd: calc(0.0625rem * var(--mantine-scale)) solid var(--mantine-color-default-border);
+  }
+
+  .neutral .message {
+    color: var(--mantine-color-dimmed);
+  }
+
   .body {
     gap: calc(0.125rem * var(--mantine-scale));
   }

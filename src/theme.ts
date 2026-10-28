@@ -212,7 +212,7 @@ const sliderTheme = {
     root: sliderClasses.root,
     thumb: sliderClasses.thumb,
     bar: sliderClasses.bar,
-    label: sliderClasses.label,
+    label: `${sliderClasses.label} ${Tooltip.classes.tooltip} ${tooltipClasses.tooltip}`,
   },
   defaultProps: { size: 'xs', thumbSize: 12 },
 };
@@ -398,21 +398,11 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     ActionIcon: ActionIcon.extend({ classNames: { root: actionIconClasses.root } }),
     Alert: Alert.extend({
-      classNames: { root: alertClasses.root, body: alertClasses.body, title: alertClasses.title },
-      vars: (theme, props) => ({
-        root:
-          !props.color && !props.variant && theme.primaryColor === NEUTRAL_COLOR
-            ? {
-                '--alert-bg': 'var(--mantine-color-default)',
-                '--alert-bd': '1px solid var(--mantine-color-default-border)',
-              }
-            : {},
-      }),
-      styles: (theme, props) => ({
-        message:
-          !props.color && !props.variant && theme.primaryColor === NEUTRAL_COLOR
-            ? { color: 'var(--mantine-color-dimmed)' }
-            : {},
+      classNames: (theme, props) => ({
+        root: `${alertClasses.root} ${!props.color && !props.variant && theme.primaryColor === NEUTRAL_COLOR ? alertClasses.neutral : ''}`,
+        body: alertClasses.body,
+        title: alertClasses.title,
+        message: alertClasses.message,
       }),
     }),
     // Without the underline a link in body text only differs by its weight.

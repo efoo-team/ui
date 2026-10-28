@@ -10,7 +10,7 @@
 
   .thumb {
     border-width: calc(0.0625rem * var(--mantine-scale));
-    border-color: var(--efoo-color-ring, var(--mantine-primary-color-filled));
+    border-color: var(--slider-color);
     background-color: var(--mantine-color-white);
   }
 
@@ -26,19 +26,6 @@
   }
 
   .label {
-    padding: 0.375rem 0.75rem;
-    font-size: var(--mantine-font-size-xs);
-    line-height: var(--mantine-line-height-xs);
     border-radius: var(--mantine-radius-md);
-  }
-
-  :where([data-mantine-color-scheme='light']) .label {
-    background-color: var(--mantine-color-gray-9);
-    color: var(--mantine-color-white);
-  }
-
-  :where([data-mantine-color-scheme='dark']) .label {
-    background-color: var(--mantine-color-gray-2);
-    color: var(--mantine-color-black);
   }
 }

@@ -141,6 +141,8 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
       ? {}
       : { '--mantine-color-red-outline': 'var(--mantine-color-red-6)' }),
     '--efoo-color-ring': `var(--mantine-color-${z}-4)`,
+    '--efoo-tooltip-bg': 'var(--mantine-color-gray-9)',
+    '--efoo-tooltip-color': 'var(--mantine-color-white)',
     '--efoo-color-tab-pills-text': 'var(--mantine-color-gray-7)',
     '--efoo-color-skeleton': 'var(--mantine-color-default-hover)',
     '--efoo-color-sidebar': `var(--mantine-color-${z}-0)`,
@@ -168,6 +170,8 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
     '--mantine-color-gray-light-color': 'var(--mantine-color-text)',
     '--mantine-color-error': 'var(--mantine-color-red-4)',
     '--efoo-color-ring': `var(--mantine-color-${z}-5)`,
+    '--efoo-tooltip-bg': 'var(--mantine-color-gray-2)',
+    '--efoo-tooltip-color': 'var(--mantine-color-black)',
     '--efoo-color-sidebar': `var(--mantine-color-${z}-9)`,
     // shadcn/ui's dark accent (#404040 in the docs and dashboard-01) behind hovered menu items and options.
     '--efoo-color-accent': `var(--mantine-color-${z}-7)`,

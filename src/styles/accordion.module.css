@@ -12,13 +12,20 @@
     line-height: var(--mantine-line-height-sm);
   }
 
-  /* Keep the trigger's focus ring clear of the text and align the panel with it. */
+  /* Keep trigger and panel text aligned with the dividers. */
   .root[data-variant='default'] .control {
-    padding-inline: var(--mantine-spacing-xs);
+    padding-inline: 0;
     border-radius: var(--accordion-radius);
   }
 
+  @media (hover: hover) {
+    .root[data-variant='default'] .control:hover {
+      background: transparent;
+      text-decoration: underline;
+    }
+  }
+
   .root[data-variant='default'] .content {
-    padding: 0 var(--mantine-spacing-xs) calc(0.625rem * var(--mantine-scale));
+    padding: 0 0 calc(0.625rem * var(--mantine-scale));
   }
 }

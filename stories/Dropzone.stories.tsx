@@ -64,7 +64,17 @@ export const FileSelection: Story = {
                   またはクリックして選択
                 </Text>
               </Dropzone.Idle>
-              <Text size="sm">画像 1 件につき 5 MB まで</Text>
+              <Dropzone.Idle>
+                <Text size="sm" c="dimmed">
+                  画像 1 件につき 5 MB まで
+                </Text>
+              </Dropzone.Idle>
+              <Dropzone.Accept>
+                <Text size="sm">画像 1 件につき 5 MB まで</Text>
+              </Dropzone.Accept>
+              <Dropzone.Reject>
+                <Text size="sm">画像 1 件につき 5 MB まで</Text>
+              </Dropzone.Reject>
             </div>
           </Group>
         </Dropzone>

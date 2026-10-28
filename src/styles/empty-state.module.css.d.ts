@@ -1,2 +1,8 @@
-declare const classes: { readonly [key: string]: string };
-export default classes;
+declare const classNames: {
+  readonly actions: string;
+  readonly description: string;
+  readonly indicator: string;
+  readonly root: string;
+  readonly title: string;
+};
+export default classNames;
