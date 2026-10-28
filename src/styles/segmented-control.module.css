@@ -33,8 +33,12 @@
       var(--mantine-shadow-xs);
   }
 
-  /* Hover, disabled and read-only labels keep Mantine's colors. */
-  .label:not([data-active], [data-disabled], [data-read-only], fieldset:disabled *):not(:hover) {
+  /* Idle labels take the Tabs pills text; hovered and disabled ones keep Mantine's colors. Read-only labels do not
+     react to hover, so they keep the idle color instead of Mantine's brighter read-only one. */
+  .label:not([data-active], [data-disabled], fieldset:disabled *):where(
+      [data-read-only],
+      :not(:hover)
+    ) {
     color: var(--efoo-color-tab-pills-text, var(--mantine-color-dimmed));
   }
 
