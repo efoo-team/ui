@@ -3,4 +3,30 @@
   .root[data-variant='outline'] .label:not([data-checked], [data-disabled]) {
     border-color: var(--efoo-input-border);
   }
+
+  .input:focus-visible + .label {
+    outline: none;
+    box-shadow: var(--efoo-focus-ring);
+  }
+
+  .input:disabled + .label {
+    background: var(--mantine-color-default-hover);
+    color: var(--mantine-color-text);
+    opacity: 0.5;
+  }
+
+  .input:disabled + .label[data-checked] {
+    background: var(--chip-bg);
+    color: var(--chip-color);
+  }
+
+  .root[data-variant='outline'] .input:disabled + .label {
+    background: var(--mantine-color-default);
+    border: 1px solid var(--efoo-input-border);
+  }
+
+  .root[data-variant='outline'] .input:disabled + .label[data-checked] {
+    border: var(--chip-bd);
+    color: var(--chip-color);
+  }
 }

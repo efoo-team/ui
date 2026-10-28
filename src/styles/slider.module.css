@@ -3,16 +3,42 @@
     --slider-track-bg: var(--mantine-color-default-hover);
   }
 
+  .root:has(.thumb[data-disabled]),
+  fieldset:disabled .root {
+    opacity: 0.5;
+  }
+
   .thumb {
     border-width: calc(0.0625rem * var(--mantine-scale));
-    border-color: var(--slider-color);
-    background-color: var(--mantine-color-body);
+    border-color: var(--efoo-color-ring, var(--mantine-primary-color-filled));
+    background-color: var(--mantine-color-white);
   }
 
   .thumb:where([data-disabled]),
   fieldset:disabled .thumb {
     display: flex;
     cursor: not-allowed;
-    opacity: 0.5;
+  }
+
+  .bar:where([data-disabled]):not([data-inverted]),
+  fieldset:disabled .bar:not([data-inverted]) {
+    background-color: var(--slider-color);
+  }
+
+  .label {
+    padding: 0.375rem 0.75rem;
+    font-size: var(--mantine-font-size-xs);
+    line-height: var(--mantine-line-height-xs);
+    border-radius: var(--mantine-radius-md);
+  }
+
+  :where([data-mantine-color-scheme='light']) .label {
+    background-color: var(--mantine-color-gray-9);
+    color: var(--mantine-color-white);
+  }
+
+  :where([data-mantine-color-scheme='dark']) .label {
+    background-color: var(--mantine-color-gray-2);
+    color: var(--mantine-color-black);
   }
 }

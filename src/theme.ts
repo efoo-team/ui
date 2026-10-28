@@ -124,6 +124,7 @@ import selectClasses from './styles/select.module.css';
 import skeletonClasses from './styles/skeleton.module.css';
 import switchClasses from './styles/switch.module.css';
 import tableClasses from './styles/table.module.css';
+import timelineClasses from './styles/timeline.module.css';
 import tabsClasses from './styles/tabs.module.css';
 import textClasses from './styles/text.module.css';
 import './text-variants.js';
@@ -206,7 +207,12 @@ const chartComponents = {
 };
 
 const sliderTheme = {
-  classNames: { root: sliderClasses.root, thumb: sliderClasses.thumb },
+  classNames: {
+    root: sliderClasses.root,
+    thumb: sliderClasses.thumb,
+    bar: sliderClasses.bar,
+    label: sliderClasses.label,
+  },
   defaultProps: { size: 'xs', thumbSize: 12 },
 };
 
@@ -391,6 +397,21 @@ export const efooTheme: MantineThemeOverride = createTheme({
     ActionIcon: ActionIcon.extend({ classNames: { root: actionIconClasses.root } }),
     Alert: Alert.extend({
       classNames: { root: alertClasses.root, body: alertClasses.body, title: alertClasses.title },
+      vars: (theme, props) => ({
+        root:
+          !props.color && !props.variant && theme.primaryColor === NEUTRAL_COLOR
+            ? {
+                '--alert-bg': 'var(--mantine-color-default)',
+                '--alert-bd': '1px solid var(--mantine-color-default-border)',
+              }
+            : {},
+      }),
+      styles: (theme, props) => ({
+        message:
+          !props.color && !props.variant && theme.primaryColor === NEUTRAL_COLOR
+            ? { color: 'var(--mantine-color-dimmed)' }
+            : {},
+      }),
     }),
     // Without the underline a link in body text only differs by its weight.
     Anchor: Anchor.extend({
@@ -487,7 +508,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     // Mantine sets the checked text only when color or variant is given, and white otherwise.
     Chip: Chip.extend({
-      classNames: { root: chipClasses.root, label: chipClasses.label },
+      classNames: { root: chipClasses.root, input: chipClasses.input, label: chipClasses.label },
       vars: (theme, props) => ({
         root: {
           '--chip-color':
@@ -530,8 +551,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
     EmptyState: EmptyState.extend({
       classNames: {
         root: emptyStateClasses.root,
+        indicator: emptyStateClasses.indicator,
         title: emptyStateClasses.title,
         description: emptyStateClasses.description,
+        actions: emptyStateClasses.actions,
       },
     }),
     Indicator: Indicator.extend({
@@ -716,6 +739,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     Text: Text.extend({ classNames: { root: textClasses.root } }),
     ThemeIcon: ThemeIcon.extend({ defaultProps: { variant: 'filled' } }),
     Timeline: Timeline.extend({
+      classNames: { itemTitle: timelineClasses.itemTitle, itemBullet: timelineClasses.itemBullet },
       vars: (theme, props) => ({
         root: { '--tl-icon-color': getFilledContrast(theme, props.color) },
       }),

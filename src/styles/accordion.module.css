@@ -12,13 +12,13 @@
     line-height: var(--mantine-line-height-sm);
   }
 
-  /* The default variant only draws lines between items, so the text starts at the edge like shadcn/ui.
-     The other variants draw a box around each item and keep Mantine's inner padding. */
+  /* Keep the trigger's focus ring clear of the text and align the panel with it. */
   .root[data-variant='default'] .control {
-    padding-inline: 0;
+    padding-inline: var(--mantine-spacing-xs);
+    border-radius: var(--accordion-radius);
   }
 
   .root[data-variant='default'] .content {
-    padding: 0 0 calc(0.625rem * var(--mantine-scale));
+    padding: 0 var(--mantine-spacing-xs) calc(0.625rem * var(--mantine-scale));
   }
 }
