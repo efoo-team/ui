@@ -21,7 +21,7 @@ export const TableExample: Story = {
   },
   render: () => (
     <Stack>
-      <Table striped highlightOnHover withTableBorder withColumnBorders verticalSpacing="md">
+      <Table striped highlightOnHover withTableBorder withColumnBorders>
         <Table.Thead>
           <Table.Tr>
             <Table.Th>項目</Table.Th>
@@ -107,7 +107,9 @@ export const CardAndBadgeExamples: Story = {
         <Badge variant="light">薄い背景</Badge>
         <Badge variant="outline">枠線</Badge>
         <Badge variant="dot">Dot</Badge>
-        <Badge color="green">完了</Badge>
+        <Badge color="green" variant="light">
+          完了
+        </Badge>
         <Badge color="red" variant="light">
           要対応
         </Badge>
@@ -159,13 +161,17 @@ export const BadgeStatusColors: Story = {
     docs: {
       description: {
         story:
-          '状態を表す 4 色を、塗りつぶし・薄い背景・枠線で並べます。ツールバーでライトとダークを切り替えて、文字が読めることを確認できます。',
+          '状態を表す 4 色を、薄い背景と枠線で並べます。塗りつぶしは既定の色と、削除などの取り消せない操作を表す赤だけに使います。ツールバーでライトとダークを切り替えて、文字が読めることを確認できます。',
       },
     },
   },
   render: () => (
     <Stack>
-      {(['filled', 'light', 'outline'] as const).map((variant) => (
+      <Group>
+        <Badge>既定</Badge>
+        <Badge color="red">要対応</Badge>
+      </Group>
+      {(['light', 'outline'] as const).map((variant) => (
         <Group key={variant}>
           {statusColors.map(({ color, label }) => (
             <Badge key={color} color={color} variant={variant}>
