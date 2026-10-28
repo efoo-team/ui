@@ -3,12 +3,7 @@
  * shadcn theme: https://github.com/RubixCube-Innovations/mantine-theme-builder
  * Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md.
  */
-import {
-  getPrimaryShade,
-  isLightColor,
-  type CSSVariablesResolver,
-  type MantineTheme,
-} from '@mantine/core';
+import { isLightColor, type CSSVariablesResolver, type MantineTheme } from '@mantine/core';
 import { NEUTRAL_COLOR as z, STATUS_COLORS, type StatusColor } from './colors.js';
 import { motionCssVariables } from './motion.js';
 
@@ -63,15 +58,24 @@ const lightStatusColors = (theme: MantineTheme) =>
     ]),
   );
 
-// Mantine's dark filled hover is one shade darker; the status colors lighten instead.
+/*
+ * The dark scheme fills with the same shades as light, so yellow stays yellow instead of Mantine's brown 800.
+ * Red keeps the 800 of the destructive button. The hover lightens one shade instead of Mantine's darker one.
+ */
+const DARK_FILLED_SHADE: Record<StatusColor, number> = { red: 8, yellow: 5, green: 6, blue: 6 };
+
 const darkStatusColors = (theme: MantineTheme) =>
   Object.fromEntries(
     STATUS_COLORS.flatMap((color) => [
-      [`--mantine-color-${color}-filled-hover`, `var(--mantine-color-${color}-7)`],
       [
-        `--mantine-color-${color}-contrast`,
-        getContrast(theme, color, getPrimaryShade(theme, 'dark')),
+        `--mantine-color-${color}-filled`,
+        `var(--mantine-color-${color}-${DARK_FILLED_SHADE[color]})`,
       ],
+      [
+        `--mantine-color-${color}-filled-hover`,
+        `var(--mantine-color-${color}-${DARK_FILLED_SHADE[color] - 1})`,
+      ],
+      [`--mantine-color-${color}-contrast`, getContrast(theme, color, DARK_FILLED_SHADE[color])],
       [
         `--mantine-color-${color}-light`,
         `color-mix(in srgb, var(--mantine-color-${color}-${DARK_TEXT_SHADE}) 20%, transparent)`,
