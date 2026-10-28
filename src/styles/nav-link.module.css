@@ -100,28 +100,34 @@
     background-color: var(--mantine-color-default-hover);
   }
 
-  /* Inside <AppShell.Navbar mod={{ rail }}> (data-rail) links fold into 32px icon squares centered in the rail,
-     like shadcn/ui's icon rail, whatever the navbar width and padding: the margins split the space left of 2rem,
-     also when it is negative. The label, description, chevron and child links are hidden; a switcher keeps its avatar. */
+  /* Inside <AppShell.Navbar mod={{ rail }}> (data-rail) the navbar padding (app-shell.module.css) leaves 32px, so
+     each link becomes an icon square while the navbar narrows: the label is cut at the right edge as the rail closes,
+     like shadcn/ui, and is hidden from assistive technology only when the AppShell transition ends. */
   [data-rail] .root {
-    justify-content: center;
-    width: calc(2rem * var(--mantine-scale));
-    min-height: calc(2rem * var(--mantine-scale));
-    margin-inline: calc(50% - 1rem * var(--mantine-scale));
-    padding: 0.5rem;
+    --efoo-rail-delay: calc(var(--app-shell-transition-duration, 0ms) * var(--efoo-motion-scale));
+    overflow: hidden;
   }
 
   [data-rail] .root:has(> .section > :global(.mantine-Avatar-root)) {
     padding: 0;
   }
 
-  [data-rail] .section[data-position='left'] {
-    margin-inline-end: 0;
+  [data-rail] .body {
+    visibility: hidden;
+    transition: visibility 0s linear var(--efoo-rail-delay);
   }
 
-  [data-rail] .body,
-  [data-rail] .section[data-position='right'],
+  [data-rail] .section[data-position='right'] {
+    visibility: hidden;
+    transition:
+      transform calc(var(--efoo-motion-duration-standard) * var(--efoo-motion-scale))
+        var(--efoo-motion-easing),
+      visibility 0s linear var(--efoo-rail-delay);
+  }
+
+  /* Child links fold away with the navbar and leave the layout at the end, so the rail keeps one row per link. */
   [data-rail] .collapse {
     display: none;
+    transition: display 0s allow-discrete var(--efoo-rail-delay);
   }
 }

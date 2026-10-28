@@ -164,13 +164,13 @@ Popover の中で操作させる場合は、Escape で閉じられるように `
 
 AppShell の navbar に NavLink を並べると、shadcn/ui の sidebar と同じ見た目になります。入れ子は NavLink の `children` に子の NavLink を渡すと、左の線と字下げつきで開閉します。`leftSection` に Avatar を置いた NavLink は組織の切り替えの起点（高さ 48px）になるので、`Menu.Target` で包みます。
 
-アイコンだけの帯（rail）にするときは、`navbar.width` に 48 を渡し、`AppShell.Navbar` に `mod={{ rail }}`（`data-rail` が付く）を渡します。theme が NavLink を帯の中央の 32px のアイコンにし、名前・説明・chevron・子の項目を隠します。帯の幅や navbar の padding が違っても中央に並びます。rail ではアイコンしか見えないので、NavLink には `aria-label` で名前を渡し、Tooltip で名前を示します（Mantine の Tooltip は名前を付けません）。子を持つ項目は、rail では子が見えないので、`Menu` で子を開きます。Tooltip は `Menu.Target` の外側に置きます（内側に置くと Menu の aria 属性が NavLink に届きません）。見出しなど NavLink 以外の文字は、rail のときに描かないようにしてください。
+アイコンだけの帯（rail）にするときは、`navbar.width` に 48 を渡し、`AppShell.Navbar` に `mod={{ rail }}`（`data-rail` が付く）を渡します。navbar の余白は theme が持つので、`p` は渡しません（渡すと theme の余白より優先され、開閉でアイコンの位置がずれます）。theme は navbar の幅に合わせて NavLink を帯の中央の 32px のアイコンに畳み、名前は右端で切れていき、畳み終わると名前・説明・chevron・子の項目を隠します。rail ではアイコンしか見えないので、NavLink には `aria-label` で名前を渡し、Tooltip で名前を示します（Mantine の Tooltip は名前を付けません）。子を持つ項目は、rail では子が見えないので、`Menu` で子を開きます。Tooltip は `Menu.Target` の外側に置きます（内側に置くと Menu の aria 属性が NavLink に届きません）。見出しなど NavLink 以外の文字は、rail のときに描かないようにしてください。
 
 ```tsx
 const [rail, setRail] = useState(false);
 
 <AppShell navbar={{ width: rail ? 48 : 256, breakpoint: 'sm' }}>
-  <AppShell.Navbar p="xs" mod={{ rail }}>
+  <AppShell.Navbar mod={{ rail }}>
     <Menu position={rail ? 'right-start' : 'bottom-start'}>
       <Menu.Target>
         <NavLink

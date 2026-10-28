@@ -5,6 +5,17 @@
     background-color: var(--efoo-color-sidebar, var(--mantine-color-body));
     /* Mantine animates the main padding but not the navbar width, so a narrowing navbar jumped. */
     transition-property: transform, top, height, width;
+    /* The navbar keeps 8px around its links; links and icons stay at the same x when it folds into a rail. */
+    padding: var(--mantine-spacing-xs);
+  }
+
+  /* In the rail (mod={{ rail }}) the padding leaves a 32px column for the icon squares, centered in any rail width
+     (the 1px is the navbar border). */
+  .navbar[data-rail] {
+    padding-inline: max(
+      0px,
+      calc((var(--app-shell-navbar-width) - 2rem * var(--mantine-scale) - 1px) / 2)
+    );
   }
 
   /* AppShell's transition takes the theme motion and stops with reduced motion. */
