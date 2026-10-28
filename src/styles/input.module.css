@@ -38,7 +38,7 @@
 
   /* shadcn/ui's dark error line is the destructive red at 50%; light keeps the full red. */
   .wrapper[data-error]:not([data-variant='unstyled']) {
-    --input-bd: var(--efoo-color-input-error-border, var(--mantine-color-error));
+    --input-bd: var(--efoo-input-error-border);
   }
 
   /* Mantine keeps the unstyled border transparent on focus; the ring alone marks focus because the text has no padding. */

@@ -11,8 +11,9 @@
   }
 
   /* Radio.Group does not pass its error to each Radio, so the group root's data-error selects the circles. */
-  .group[data-error] .radio:not(:checked, :disabled) {
-    border-color: var(--mantine-color-error);
+  .group[data-error] .radio:not(:checked, :disabled),
+  .radio[data-error]:not(:checked) {
+    border-color: var(--efoo-input-error-border);
   }
 
   .radio:not(:checked, [data-error]),

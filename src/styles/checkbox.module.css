@@ -20,6 +20,10 @@
     margin-top: var(--efoo-inline-offset, 0px);
   }
 
+  .input[data-error]:not(:checked, [data-indeterminate]) {
+    border-color: var(--efoo-input-error-border);
+  }
+
   .input:disabled {
     background-color: var(--mantine-color-default);
   }

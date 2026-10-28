@@ -12,6 +12,8 @@
     /* The line of controls that take input. The resolver raises it to shadcn/ui's white 15% in dark;
        surface lines (Card, Table, Divider) keep --mantine-color-default-border. */
     --efoo-input-border: var(--efoo-color-input-border, var(--mantine-color-default-border));
+    /* The error line of the same controls: the full red in light, shadcn/ui's 50% red in dark. */
+    --efoo-input-error-border: var(--efoo-color-input-error-border, var(--mantine-color-error));
     --efoo-focus-ring-color: color-mix(
       in srgb,
       var(--efoo-color-ring, var(--mantine-primary-color-filled)) 50%,
