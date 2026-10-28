@@ -12,6 +12,10 @@
     background-color: var(--efoo-notification-bar, var(--notification-color));
   }
 
+  .icon {
+    color: var(--efoo-notification-icon-color, var(--mantine-color-white));
+  }
+
   .closeButton:hover {
     background-color: var(--mantine-color-default-hover);
   }

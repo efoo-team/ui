@@ -36,13 +36,26 @@ function isStatusColor(theme: MantineTheme, color: string | undefined): boolean 
   );
 }
 
+const statusContrast = (color: string) =>
+  `var(--mantine-color-${color}-contrast, var(--mantine-color-white))`;
+
+// Text on a filled surface of the color. Mantine writes white for components outside the variant resolver
+// (Pagination, Chip, Stepper and others), which is unreadable on the light dark-scheme neutral fill.
+export function getFilledContrast(
+  theme: MantineTheme,
+  color: string | undefined,
+): string | undefined {
+  if (isNeutralColor(theme, color)) return ZINC_CONTRAST;
+  return color && isStatusColor(theme, color) ? statusContrast(color) : undefined;
+}
+
 export const efooVariantColorResolver: VariantColorsResolver = (input) => {
   const resolved = defaultVariantColorsResolver(input);
   const autoContrast = input.autoContrast ?? input.theme.autoContrast;
 
   // The status fill is not the primaryShade Mantine judges the text by; the resolver sets the text per scheme.
   if (input.variant === 'filled' && autoContrast && isStatusColor(input.theme, input.color)) {
-    return { ...resolved, color: `var(--mantine-color-${input.color}-contrast)` };
+    return { ...resolved, color: statusContrast(input.color as string) };
   }
 
   if (!isNeutralColor(input.theme, input.color)) {

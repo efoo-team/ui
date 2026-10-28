@@ -15,9 +15,11 @@ import {
   Card,
   Checkbox,
   CheckboxIndicator,
+  Chip,
   Combobox,
   createTheme,
   Drawer,
+  Indicator,
   Input,
   InputWrapper,
   Menu,
@@ -25,6 +27,7 @@ import {
   MultiSelect,
   NavLink,
   Notification,
+  Pagination,
   parseThemeColor,
   PasswordInput,
   Pill,
@@ -34,10 +37,12 @@ import {
   RadioIndicator,
   Select,
   Skeleton,
+  Stepper,
   Switch,
   Table,
   Tabs,
   ThemeIcon,
+  Timeline,
   Tooltip,
   type MantineTheme,
   type MantineThemeOverride,
@@ -53,7 +58,11 @@ import {
   zincColors,
 } from './colors.js';
 import { drawerTransitionProps, modalTransitionProps, overlayTransitionProps } from './motion.js';
-import { efooVariantColorResolver, getZincContrast } from './variant-color-resolver.js';
+import {
+  efooVariantColorResolver,
+  getFilledContrast,
+  getZincContrast,
+} from './variant-color-resolver.js';
 // Imported before the other styles so that dist/styles.css starts with the layer order.
 import baseClasses from './styles/base.module.css';
 import accordionClasses from './styles/accordion.module.css';
@@ -232,6 +241,17 @@ export const efooTheme: MantineThemeOverride = createTheme({
         indicator: { '--checkbox-icon-color': getCheckboxIconColor(theme, props) },
       }),
     }),
+    // Mantine sets the checked text only when color or variant is given, and white otherwise.
+    Chip: Chip.extend({
+      vars: (theme, props) => ({
+        root: {
+          '--chip-color':
+            props.variant === undefined || props.variant === 'filled'
+              ? getFilledContrast(theme, props.color)
+              : undefined,
+        },
+      }),
+    }),
     Combobox: Combobox.extend({ defaultProps: { transitionProps: overlayTransitionProps } }),
     Drawer: Drawer.extend({
       classNames: (_theme, props) => ({
@@ -248,6 +268,11 @@ export const efooTheme: MantineThemeOverride = createTheme({
         close: drawerClasses.close,
       }),
       defaultProps: { transitionProps: drawerTransitionProps, overlayProps, shadow: 'lg' },
+    }),
+    Indicator: Indicator.extend({
+      vars: (theme, props) => ({
+        root: { '--indicator-text-color': getFilledContrast(theme, props.color) },
+      }),
     }),
     Input: Input.extend({
       classNames: { wrapper: inputClasses.wrapper, input: inputClasses.input },
@@ -288,11 +313,23 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: { root: navLinkClasses.root, children: navLinkClasses.children },
     }),
     Notification: Notification.extend({
-      classNames: { root: notificationClasses.root, closeButton: notificationClasses.closeButton },
+      classNames: {
+        root: notificationClasses.root,
+        icon: notificationClasses.icon,
+        closeButton: notificationClasses.closeButton,
+      },
       styles: (theme, props) => ({
-        root: { '--efoo-notification-bar': getNotificationBarColor(theme, props.color) },
+        root: {
+          '--efoo-notification-bar': getNotificationBarColor(theme, props.color),
+          '--efoo-notification-icon-color': getFilledContrast(theme, props.color),
+        },
       }),
       defaultProps: { withBorder: true },
+    }),
+    Pagination: Pagination.extend({
+      vars: (theme, props) => ({
+        root: { '--pagination-active-color': getFilledContrast(theme, props.color) },
+      }),
     }),
     PasswordInput: PasswordInput.extend({
       classNames: { visibilityToggle: inputClasses.visibilityToggle },
@@ -338,6 +375,11 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: { root: skeletonClasses.root },
       defaultProps: { radius: 'md' },
     }),
+    Stepper: Stepper.extend({
+      vars: (theme, props) => ({
+        root: { '--stepper-icon-color': getFilledContrast(theme, props.color) },
+      }),
+    }),
     Switch: Switch.extend({
       classNames: {
         root: `${switchClasses.root} ${inlineInputClasses.root}`,
@@ -360,6 +402,11 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: { root: tabsClasses.root, list: tabsClasses.list, tab: tabsClasses.tab },
     }),
     ThemeIcon: ThemeIcon.extend({ defaultProps: { variant: 'filled' } }),
+    Timeline: Timeline.extend({
+      vars: (theme, props) => ({
+        root: { '--tl-icon-color': getFilledContrast(theme, props.color) },
+      }),
+    }),
     Tooltip: Tooltip.extend({
       classNames: { tooltip: tooltipClasses.tooltip },
       defaultProps: {
