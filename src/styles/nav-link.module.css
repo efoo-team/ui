@@ -120,42 +120,52 @@
 
   /* Inside <AppShell.Navbar mod={{ rail }}> (data-rail) the navbar inset (app-shell.module.css) leaves 32px, so
      each link becomes an icon square while the navbar narrows: the label is cut at the right edge as the rail closes,
-     like shadcn/ui, and is hidden from assistive technology only when the AppShell transition ends. The right section
-     (chevron, badge) and the child links cannot be cut into whole pieces, so they hide as the navbar starts to fold
-     and come back once it has opened. */
+     like shadcn/ui, and is hidden from assistive technology only when the AppShell transition ends. */
   .root,
-  .collapse {
-    --efoo-rail-delay: calc(var(--app-shell-transition-duration, 0ms) * var(--efoo-motion-scale));
+  .children {
+    --efoo-rail-duration: calc(
+      var(--app-shell-transition-duration, 0ms) * var(--efoo-motion-scale)
+    );
   }
 
   [data-rail] .body {
     visibility: hidden;
-    transition: visibility 0s linear var(--efoo-rail-delay);
+    transition: visibility 0s linear var(--efoo-rail-duration);
   }
 
+  /* The right section (chevron, badge) cannot be cut into whole pieces: it hides as the navbar starts to fold, and
+     fades in with --efoo-rail-fold (app-shell.module.css) as the navbar opens. */
   .section[data-position='right'] {
+    opacity: calc(1 - var(--efoo-rail-fold, 0));
     transition:
       transform calc(var(--efoo-motion-duration-standard) * var(--efoo-motion-scale))
         var(--efoo-motion-easing),
-      visibility 0s linear var(--efoo-rail-delay);
+      visibility 0s;
   }
 
   [data-rail] .section[data-position='right'] {
     visibility: hidden;
-    transition-delay: 0s;
   }
 
-  /* The children come back into the layout as the navbar starts to open (they were display: none, so no transition
-     can delay them); --efoo-rail-fold keeps them transparent until it reaches 0. */
+  /* Child links shrink to no height with the navbar width and fade with --efoo-rail-fold, so the links below move
+     with the fold instead of jumping at its start or end. The height animates on the children element, which
+     Mantine's Collapse does not style inline; browsers without interpolate-size drop the children at once. The
+     children leave assistive technology when the fold ends, and stay clipped until the navbar has opened. */
   .children {
-    opacity: max(0, 1 - var(--efoo-rail-fold, 0) * 1000);
+    interpolate-size: allow-keywords;
+    opacity: calc(1 - var(--efoo-rail-fold, 0));
+    transition-behavior: allow-discrete;
+    transition-property: height, padding-block, overflow, visibility;
+    transition-duration: var(--efoo-rail-duration), var(--efoo-rail-duration), 0s, 0s;
+    transition-timing-function: var(--app-shell-transition-timing-function, linear);
+    transition-delay: 0s, 0s, var(--efoo-rail-duration), 0s;
   }
 
-  /* Child links leave the layout only when the navbar has folded, so the links below keep their place during the
-     fold and the rail keeps one row per link. Mantine's Collapse writes its own transition inline, which only an
-     !important declaration can replace; it applies in the rail alone, where the children are not shown. */
-  [data-rail] .collapse {
-    display: none;
-    transition: display 0s allow-discrete var(--efoo-rail-delay) !important;
+  [data-rail] .children {
+    height: 0;
+    padding-block: 0;
+    overflow: hidden;
+    visibility: hidden;
+    transition-delay: 0s, 0s, 0s, var(--efoo-rail-duration);
   }
 }
