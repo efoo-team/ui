@@ -188,13 +188,13 @@ const STATS: Stat[] = [
   {
     label: '発注が必要な品目',
     value: String(REORDER_COUNT),
-    note: `${REORDER_COUNT} 品目の在庫数が発注点を下回っています`,
+    note: '発注点を下回っています',
     badge: { label: '要発注', attention: true },
   },
   {
     label: '未対応の問い合わせ',
     value: String(INQUIRIES.open),
-    note: `${INQUIRIES.open} 件のうち ${INQUIRIES.overdue} 件は受付から 2 日以上`,
+    note: `${INQUIRIES.overdue} 件は受付から 2 日以上`,
     badge: { label: '要対応', attention: true },
   },
 ];
