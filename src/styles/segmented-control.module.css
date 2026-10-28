@@ -16,7 +16,14 @@
       var(--mantine-shadow-xs);
   }
 
-  .label:not([data-active]) {
+  /* Hover, disabled and read-only labels keep Mantine's colors. */
+  .label:not([data-active], [data-disabled], [data-read-only], fieldset:disabled *):not(:hover) {
     color: var(--efoo-color-tab-pills-text, var(--mantine-color-dimmed));
+  }
+
+  /* Mantine's dark disabled color equals the idle label; like Tabs and Menu items, disabled shows as half opacity. */
+  .label:where([data-disabled], fieldset:disabled *) {
+    color: var(--efoo-color-tab-pills-text, var(--mantine-color-dimmed));
+    opacity: 0.5;
   }
 }
