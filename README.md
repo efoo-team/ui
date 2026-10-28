@@ -8,6 +8,8 @@ efoo のサービスで共有する Mantine theme と、その theme を使っ�
 
 React 19 と Mantine 9.7 系を使います。各 Mantine パッケージは同じバージョンにしてください。
 
+新しい版を公開するときは、`package.json` の `version` を未公開の値に更新して main に push すると、CI が GitHub Release を作成します。
+
 ### pnpm
 
 ```sh
