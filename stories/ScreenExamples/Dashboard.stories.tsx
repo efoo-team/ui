@@ -64,7 +64,7 @@ import {
 import classes from './Dashboard.module.css';
 
 const meta = {
-  title: 'Blocks/Dashboard',
+  title: '画面例 / ダッシュボード',
   parameters: {
     layout: 'fullscreen',
   },

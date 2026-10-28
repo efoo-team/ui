@@ -12,7 +12,7 @@ import {
 } from '@mantine/core';
 
 const meta = {
-  title: 'Blocks/Login',
+  title: '画面例 / サインイン',
   parameters: {
     layout: 'fullscreen',
   },
@@ -83,7 +83,7 @@ function LoginPage() {
   );
 }
 
-export const Login: Story = {
-  name: 'ログイン',
+export const SignIn: Story = {
+  name: 'サインイン',
   render: () => <LoginPage />,
 };
