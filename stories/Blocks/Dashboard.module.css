@@ -1,6 +1,11 @@
-/* shadcn/ui's sidebar surface: zinc-50 in light, the card surface in dark. The theme has no token for it yet. */
+/* shadcn/ui's sidebar surface: zinc-50 in light, the card surface in dark. The theme has no token for it yet.
+   The scheme comes from Mantine's attribute on <html>; the Storybook build rewrites CSS light-dark() into invalid values. */
 .shell {
-  --dashboard-sidebar-bg: light-dark(var(--mantine-color-zinc-0), var(--mantine-color-dark-6));
+  --dashboard-sidebar-bg: var(--mantine-color-zinc-0);
+}
+
+:where([data-mantine-color-scheme='dark']) .shell {
+  --dashboard-sidebar-bg: var(--mantine-color-dark-6);
 }
 
 .navbar,
