@@ -30,6 +30,7 @@ import {
   MultiSelect,
   NavLink,
   Notification,
+  NumberInput,
   Pagination,
   parseThemeColor,
   PasswordInput,
@@ -453,6 +454,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
         root: { '--pagination-active-color': getFilledContrast(theme, props.color) },
       }),
     }),
+    NumberInput: NumberInput.extend({ classNames: { control: inputClasses.numberControl } }),
     PasswordInput: PasswordInput.extend({
       classNames: { visibilityToggle: inputClasses.visibilityToggle },
       defaultProps: {

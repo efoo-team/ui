@@ -18,6 +18,24 @@
     --input-bd: var(--efoo-input-border);
   }
 
+  /* shadcn/ui marks an error with the line and ring only. Mantine also turns the value, the placeholder and the
+     sections red, which makes a placeholder read as an entered value. */
+  .wrapper[data-error] {
+    --input-color: var(--mantine-color-text);
+    --input-placeholder-color: var(--mantine-color-placeholder);
+    --input-section-color: var(--mantine-color-dimmed);
+    --combobox-chevron-color: var(--mantine-color-dimmed);
+  }
+
+  /* NumberInput's step buttons stay neutral in an error too; only the outer line turns red. */
+  .numberControl {
+    --control-border: 1px solid var(--efoo-input-border);
+  }
+
+  .numberControl:where(:not(:disabled, [data-disabled])) {
+    color: var(--mantine-color-text);
+  }
+
   /* shadcn/ui's dark error line is the destructive red at 50%; light keeps the full red. */
   .wrapper[data-error]:not([data-variant='unstyled']) {
     --input-bd: var(--efoo-color-input-error-border, var(--mantine-color-error));
