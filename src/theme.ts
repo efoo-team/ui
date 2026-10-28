@@ -35,6 +35,7 @@ import {
   Radio,
   RadioGroup,
   RadioIndicator,
+  SegmentedControl,
   Select,
   Skeleton,
   Stepper,
@@ -83,6 +84,7 @@ import notificationClasses from './styles/notification.module.css';
 import notificationsClasses from './styles/notifications.module.css';
 import pillClasses from './styles/pill.module.css';
 import radioClasses from './styles/radio.module.css';
+import segmentedControlClasses from './styles/segmented-control.module.css';
 import selectClasses from './styles/select.module.css';
 import skeletonClasses from './styles/skeleton.module.css';
 import switchClasses from './styles/switch.module.css';
@@ -369,6 +371,13 @@ export const efooTheme: MantineThemeOverride = createTheme({
       vars: (theme, props) => ({
         indicator: { '--radio-icon-color': getRadioIconColor(theme, props) },
       }),
+    }),
+    SegmentedControl: SegmentedControl.extend({
+      classNames: {
+        root: segmentedControlClasses.root,
+        indicator: segmentedControlClasses.indicator,
+        label: segmentedControlClasses.label,
+      },
     }),
     Select: Select.extend({
       classNames: comboboxClassNames,

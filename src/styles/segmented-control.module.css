@@ -1,0 +1,22 @@
+@layer efoo {
+  /* The same track and active surface as the Tabs pills, after shadcn/ui's tabs list and trigger.
+     Mantine's dark track is the card surface, so the control disappears inside a Card. */
+  .root {
+    padding: 0.1875rem;
+    background-color: var(--mantine-color-default-hover);
+  }
+
+  .indicator {
+    background-color: var(
+      --sc-color,
+      var(--efoo-color-tab-pills-active, var(--mantine-color-default))
+    );
+    box-shadow:
+      inset 0 0 0 1px var(--mantine-color-default-border),
+      var(--mantine-shadow-xs);
+  }
+
+  .label:not([data-active]) {
+    color: var(--efoo-color-tab-pills-text, var(--mantine-color-dimmed));
+  }
+}
