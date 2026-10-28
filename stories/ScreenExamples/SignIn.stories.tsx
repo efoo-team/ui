@@ -31,7 +31,7 @@ function SignInPage() {
               サインイン
             </Title>
             <Text size="sm" c="dimmed">
-              登録したメールアドレスとパスワードを入力してください
+              メールアドレスとパスワードを入力します
             </Text>
           </Stack>
           <form onSubmit={(event) => event.preventDefault()}>

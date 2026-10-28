@@ -248,7 +248,7 @@ function Navbar() {
               leftSection={<ItemIcon size={ICON_SIZE} />}
               rightSection={
                 count ? (
-                  <Badge size="sm" color="red" variant="light">
+                  <Badge color="red" variant="light">
                     {count}
                   </Badge>
                 ) : undefined
@@ -273,7 +273,7 @@ function AccountMenu() {
   return (
     <Menu position="bottom-end" width={200}>
       <Menu.Target>
-        <ActionIcon variant="subtle" size="lg" aria-label="アカウントのメニュー">
+        <ActionIcon variant="subtle" size="input-sm" aria-label="アカウントのメニュー">
           <Avatar size="sm">青</Avatar>
         </ActionIcon>
       </Menu.Target>
