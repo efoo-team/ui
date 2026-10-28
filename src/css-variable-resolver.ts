@@ -144,6 +144,10 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
     '--efoo-color-tab-pills-text': 'var(--mantine-color-gray-7)',
     '--efoo-color-skeleton': 'var(--mantine-color-default-hover)',
     '--efoo-color-sidebar': `var(--mantine-color-${z}-0)`,
+    // A colorless Avatar sits one step darker than the hover surface of rows and menu items, so it keeps its outline
+    // on a hovered NavLink or Menu item; the initials stay above 4.5:1.
+    '--efoo-color-avatar': `var(--mantine-color-${z}-2)`,
+    '--efoo-color-avatar-text': `var(--mantine-color-${z}-6)`,
   },
   dark: {
     ...neutralAnchor(theme),
@@ -169,6 +173,9 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
     '--efoo-color-accent': `var(--mantine-color-${z}-7)`,
     // shadcn/ui's skeleton is the accent surface, #404040 in dashboard-01; white 10% vanishes on a Card.
     '--efoo-color-skeleton': `var(--mantine-color-${z}-7)`,
+    // One step lighter than the menu hover (zinc-7) and two above the row hover (zinc-8).
+    '--efoo-color-avatar': `var(--mantine-color-${z}-6)`,
+    '--efoo-color-avatar-text': `var(--mantine-color-${z}-2)`,
     // shadcn/ui's dark input line is white 15%; other surfaces keep white 10%.
     '--efoo-color-input-border': 'rgba(255, 255, 255, 0.15)',
     '--efoo-color-input-error-border':

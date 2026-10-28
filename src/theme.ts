@@ -313,15 +313,17 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: comboboxClassNames,
       defaultProps: { clearButtonProps: clearInputProps },
     }),
-    // Without a color the fallback is shadcn/ui's muted surface and text; Mantine's dark gray light variant is nearly black.
+    // Without a color the fallback takes the avatar surface of the resolver, which stays visible on hovered rows and menu
+    // items (shadcn/ui's muted equals its hover surface, so its avatar loses its outline there); Mantine's dark gray light
+    // variant is nearly black.
     Avatar: Avatar.extend({
       classNames: { root: avatarClasses.root, placeholder: avatarClasses.placeholder },
       vars: (_theme, props) =>
         props.color === undefined && (props.variant === undefined || props.variant === 'light')
           ? {
               root: {
-                '--avatar-bg': 'var(--mantine-color-default-hover)',
-                '--avatar-color': 'var(--mantine-color-dimmed)',
+                '--avatar-bg': 'var(--efoo-color-avatar, var(--mantine-color-default-hover))',
+                '--avatar-color': 'var(--efoo-color-avatar-text, var(--mantine-color-dimmed))',
               },
             }
           : { root: {} },
