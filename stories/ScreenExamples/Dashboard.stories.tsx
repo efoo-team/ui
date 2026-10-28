@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useId, useState, type KeyboardEvent } from 'react';
+import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import {
   ActionIcon,
   AppShell,
@@ -308,7 +308,7 @@ function OrganizationMenu({
           type="button"
           label={organization.name}
           description={organization.note}
-          leftSection={<Avatar size="sm">{organization.initial}</Avatar>}
+          leftSection={<Avatar aria-hidden>{organization.initial}</Avatar>}
           rightSection={<IconSelector size={16} />}
           aria-label={`組織を切り替える（現在：${organization.name}）`}
         />
@@ -318,7 +318,11 @@ function OrganizationMenu({
         {ORGANIZATIONS.map((item) => (
           <Menu.Item
             key={item.name}
-            leftSection={<Avatar size="sm">{item.initial}</Avatar>}
+            leftSection={
+              <Avatar size="sm" aria-hidden>
+                {item.initial}
+              </Avatar>
+            }
             rightSection={item.name === organization.name ? <IconCheck size={16} /> : undefined}
             aria-current={item.name === organization.name ? 'true' : undefined}
             onClick={() => onOrganizationChange(item)}
@@ -330,6 +334,48 @@ function OrganizationMenu({
         <Menu.Item leftSection={<IconPlus size={16} />}>組織を追加</Menu.Item>
       </Menu.Dropdown>
     </Menu>
+  );
+}
+
+/*
+ * A parent link in the rail opens its children from a Menu. The NavLink sits directly under Menu.Target so it
+ * receives aria-haspopup, aria-expanded and aria-controls; the Tooltip points at it through \`target\` instead of
+ * wrapping it, because a wrapping Tooltip would take those attributes.
+ */
+function RailParent({
+  label,
+  name,
+  icon,
+  items,
+}: {
+  label: string;
+  name: string;
+  icon: ReactNode;
+  items: string[];
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
+  return (
+    <>
+      <Menu position="right-start" width={180}>
+        <Menu.Target>
+          <NavLink
+            ref={ref}
+            component="button"
+            type="button"
+            label={label}
+            aria-label={name}
+            leftSection={icon}
+          />
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Label>{label}</Menu.Label>
+          {items.map((child) => (
+            <Menu.Item key={child}>{child}</Menu.Item>
+          ))}
+        </Menu.Dropdown>
+      </Menu>
+      <Tooltip label={label} position="right" target={ref} />
+    </>
   );
 }
 
@@ -362,25 +408,7 @@ function Navbar({
             const icon = <ItemIcon size={ICON_SIZE} />;
             if (children && rail) {
               return (
-                <Menu key={label} position="right-start" width={180}>
-                  <Menu.Target>
-                    <Tooltip label={label} position="right">
-                      <NavLink
-                        component="button"
-                        type="button"
-                        label={label}
-                        aria-label={name}
-                        leftSection={icon}
-                      />
-                    </Tooltip>
-                  </Menu.Target>
-                  <Menu.Dropdown>
-                    <Menu.Label>{label}</Menu.Label>
-                    {children.map((child) => (
-                      <Menu.Item key={child}>{child}</Menu.Item>
-                    ))}
-                  </Menu.Dropdown>
-                </Menu>
+                <RailParent key={label} label={label} name={name} icon={icon} items={children} />
               );
             }
             if (children) {
@@ -802,7 +830,8 @@ function DashboardPage() {
   // renders in a portal, but React still bubbles its keydown here, so events from outside the navbar's DOM and
   // from an open menu button are left to the menu.
   const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    const target = event.target as HTMLElement;
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
     const fromPortal = !event.currentTarget.contains(target);
     const closesMenu =
       target.hasAttribute('aria-haspopup') && target.getAttribute('aria-expanded') === 'true';
@@ -836,7 +865,7 @@ function DashboardPage() {
               variant="subtle"
               visibleFrom="sm"
               onClick={toggleDesktop}
-              aria-label={desktopOpened ? 'サイドバーを折りたたむ' : 'サイドバーを広げる'}
+              aria-label="サイドバー"
               aria-expanded={desktopOpened}
               aria-controls={navbarId}
             >
