@@ -77,7 +77,10 @@ const preview: Preview = {
           forceColorScheme={colorScheme}
         >
           <Notifications position="top-right" />
-          <div className="storybook-canvas">
+          <div
+            className="storybook-canvas"
+            data-layout={context.parameters.layout === 'fullscreen' ? 'fullscreen' : undefined}
+          >
             <Story />
           </div>
         </MantineProvider>

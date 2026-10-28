@@ -10,3 +10,8 @@ body,
   background: var(--mantine-color-body);
   color: var(--mantine-color-text);
 }
+
+/* Full-screen stories such as Blocks draw their own page surface edge to edge. */
+.storybook-canvas[data-layout='fullscreen'] {
+  padding: 0;
+}
