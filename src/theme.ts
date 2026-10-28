@@ -8,6 +8,7 @@ import {
   ActionIcon,
   Alert,
   Autocomplete,
+  Avatar,
   Badge,
   Button,
   Card,
@@ -57,6 +58,7 @@ import baseClasses from './styles/base.module.css';
 import accordionClasses from './styles/accordion.module.css';
 import actionIconClasses from './styles/action-icon.module.css';
 import alertClasses from './styles/alert.module.css';
+import avatarClasses from './styles/avatar.module.css';
 import badgeClasses from './styles/badge.module.css';
 import buttonClasses from './styles/button.module.css';
 import checkboxClasses from './styles/checkbox.module.css';
@@ -184,11 +186,19 @@ export const efooTheme: MantineThemeOverride = createTheme({
   variantColorResolver: efooVariantColorResolver,
   components: {
     Accordion: Accordion.extend({
-      classNames: { label: accordionClasses.label, content: accordionClasses.content },
+      classNames: {
+        root: accordionClasses.root,
+        control: accordionClasses.control,
+        label: accordionClasses.label,
+        content: accordionClasses.content,
+      },
     }),
     ActionIcon: ActionIcon.extend({ classNames: { root: actionIconClasses.root } }),
-    Alert: Alert.extend({ classNames: { root: alertClasses.root, title: alertClasses.title } }),
+    Alert: Alert.extend({
+      classNames: { root: alertClasses.root, body: alertClasses.body, title: alertClasses.title },
+    }),
     Autocomplete: Autocomplete.extend({ classNames: comboboxClassNames }),
+    Avatar: Avatar.extend({ classNames: { root: avatarClasses.root } }),
     // Without a variant Mantine leaves the text color to its CSS default (white), which is unreadable on the dark-scheme neutral fill.
     Badge: Badge.extend({
       classNames: { root: badgeClasses.root },
@@ -200,7 +210,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     Card: Card.extend({ defaultProps: { withBorder: true } }),
     Checkbox: Checkbox.extend({
       classNames: {
-        root: checkboxClasses.root,
+        root: `${checkboxClasses.root} ${inlineInputClasses.root}`,
         inner: checkboxClasses.inner,
         input: checkboxClasses.input,
         icon: checkboxClasses.icon,
@@ -244,11 +254,18 @@ export const efooTheme: MantineThemeOverride = createTheme({
         error: inputClasses.error,
       },
     }),
-    Menu: Menu.extend({ classNames: { item: menuClasses.item, label: menuClasses.label } }),
+    Menu: Menu.extend({
+      classNames: {
+        item: menuClasses.item,
+        itemSection: menuClasses.itemSection,
+        label: menuClasses.label,
+      },
+    }),
     Modal: Modal.extend({
       classNames: {
         inner: modalClasses.inner,
         content: modalClasses.content,
+        header: modalClasses.header,
         title: modalClasses.title,
         body: modalClasses.body,
         close: modalClasses.close,
@@ -275,14 +292,18 @@ export const efooTheme: MantineThemeOverride = createTheme({
       },
     }),
     // @mantine/notifications is optional for services, so the theme refers to it by name instead of importing it.
-    Notifications: { classNames: { notification: notificationsClasses.notification } },
+    // Sonner's toasts are 356px wide.
+    Notifications: {
+      classNames: { notification: notificationsClasses.notification },
+      defaultProps: { containerWidth: 356 },
+    },
     Pill: Pill.extend({ classNames: { root: pillClasses.root }, defaultProps: { radius: 'sm' } }),
     Popover: Popover.extend({
       defaultProps: { transitionProps: overlayTransitionProps, shadow: 'md' },
     }),
     Radio: Radio.extend({
       classNames: {
-        root: radioClasses.root,
+        root: `${radioClasses.root} ${inlineInputClasses.root}`,
         inner: radioClasses.inner,
         radio: radioClasses.radio,
         icon: radioClasses.icon,
@@ -305,7 +326,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     Skeleton: Skeleton.extend({ classNames: { root: skeletonClasses.root } }),
     Switch: Switch.extend({
       classNames: {
-        root: switchClasses.root,
+        root: `${switchClasses.root} ${inlineInputClasses.root}`,
         input: switchClasses.input,
         track: switchClasses.track,
         thumb: switchClasses.thumb,
@@ -316,7 +337,11 @@ export const efooTheme: MantineThemeOverride = createTheme({
       }),
       defaultProps: { withThumbIndicator: false },
     }),
-    Table: Table.extend({ classNames: { table: tableClasses.table, th: tableClasses.th } }),
+    // Mantine's 7px leaves rows at 35px; shadcn/ui's cells have 8px above and below.
+    Table: Table.extend({
+      classNames: { table: tableClasses.table, th: tableClasses.th },
+      defaultProps: { verticalSpacing: 'xs' },
+    }),
     Tabs: Tabs.extend({
       classNames: { root: tabsClasses.root, list: tabsClasses.list, tab: tabsClasses.tab },
     }),

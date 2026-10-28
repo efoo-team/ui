@@ -13,6 +13,13 @@
     border: 0;
   }
 
+  /* shadcn/ui puts the close button 8px from the corner and the title right above the content. */
+  .header {
+    min-height: 0;
+    padding-block: calc(var(--mb-padding, var(--mantine-spacing-md)) / 2);
+    padding-inline-end: calc(var(--mb-padding, var(--mantine-spacing-md)) / 2);
+  }
+
   .title {
     font-weight: var(--mantine-font-weight-medium);
   }

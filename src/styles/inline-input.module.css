@@ -1,5 +1,14 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
+  /* shadcn/ui leaves 8px between the control and its label. */
+  .root[data-label-position='right'] {
+    --label-offset-start: var(--mantine-spacing-xs);
+  }
+
+  .root[data-label-position='left'] {
+    --label-offset-end: var(--mantine-spacing-xs);
+  }
+
   .label {
     font-weight: var(--mantine-font-weight-medium);
   }

@@ -1,6 +1,7 @@
 @layer efoo {
   /* shadcn/ui's accordion is 14/20 text with a medium trigger. */
   .label {
+    padding-block: calc(0.625rem * var(--mantine-scale));
     font-size: var(--mantine-font-size-sm);
     font-weight: var(--mantine-font-weight-medium);
     line-height: var(--mantine-line-height-sm);
@@ -9,5 +10,15 @@
   .content {
     font-size: var(--mantine-font-size-sm);
     line-height: var(--mantine-line-height-sm);
+  }
+
+  /* The default variant only draws lines between items, so the text starts at the edge like shadcn/ui.
+     The other variants draw a box around each item and keep Mantine's inner padding. */
+  .root[data-variant='default'] .control {
+    padding-inline: 0;
+  }
+
+  .root[data-variant='default'] .content {
+    padding: 0 0 calc(0.625rem * var(--mantine-scale));
   }
 }

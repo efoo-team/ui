@@ -1,0 +1,6 @@
+@layer efoo {
+  /* shadcn/ui's avatar is 32px; md is the default size. */
+  .root {
+    --avatar-size-md: calc(2rem * var(--mantine-scale));
+  }
+}

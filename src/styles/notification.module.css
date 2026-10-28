@@ -1,5 +1,11 @@
 /* MantineHub-derived component styling; Copyright (c) 2024 RubixCube Innovations. See THIRD_PARTY_NOTICES.md. */
 @layer efoo {
+  /* Sonner's toast has 16px padding; the start side keeps Mantine's room for the bar. */
+  .root {
+    padding-block: var(--mantine-spacing-md);
+    padding-inline-end: var(--mantine-spacing-md);
+  }
+
   /* The bar keeps the icon and loader on --notification-color and only takes the line color of the status. */
   .root::before {
     background-color: var(--efoo-notification-bar, var(--notification-color));

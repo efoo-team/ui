@@ -1,6 +1,11 @@
 @layer efoo {
   .root {
+    padding: var(--mantine-spacing-xs) var(--mantine-spacing-sm);
     line-height: var(--mantine-line-height-sm);
+  }
+
+  .body {
+    gap: calc(0.125rem * var(--mantine-scale));
   }
 
   .title {

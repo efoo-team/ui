@@ -3,7 +3,9 @@
   /* Mantine writes --menu-item-color inline as var(--mantine-color-red-6) for color="red".
      Remapping the variable on the item itself changes only Menu items. red-text is Mantine's
      scheme-aware text red (red-filled in light, red-4 in dark), so it also works without the resolver. */
+  /* shadcn/ui's items are 28px high with 8px sides. */
   .item {
+    padding: calc(0.25rem * var(--mantine-scale)) calc(0.5rem * var(--mantine-scale));
     line-height: var(--mantine-line-height-sm);
     --mantine-color-red-6: var(--mantine-color-red-text);
     /* Mantine writes --menu-item-hover inline as the red light-hover (red-2 in light). shadcn/ui tints with 10% of the red. */
@@ -30,7 +32,16 @@
   }
 
   .label {
+    padding: calc(0.25rem * var(--mantine-scale)) calc(0.5rem * var(--mantine-scale));
     line-height: var(--mantine-line-height-xs);
+  }
+
+  .itemSection[data-position='left'] {
+    margin-inline-end: calc(0.375rem * var(--mantine-scale));
+  }
+
+  .itemSection[data-position='right'] {
+    margin-inline-start: calc(0.375rem * var(--mantine-scale));
   }
 
   .item:focus-visible {

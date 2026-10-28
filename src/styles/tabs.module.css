@@ -31,8 +31,9 @@
   }
 
   .root[data-variant='pills'] .tab {
-    padding: 0.375rem 0.75rem;
+    padding: 0.125rem 0.5rem;
     border: 1px solid transparent;
+    line-height: var(--mantine-line-height-sm);
     font-weight: var(--mantine-font-weight-medium);
   }
 
