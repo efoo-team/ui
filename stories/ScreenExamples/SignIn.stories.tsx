@@ -10,6 +10,7 @@ import {
   TextInput,
   Title,
 } from '@mantine/core';
+import { useForm, type FormErrors } from '@mantine/form';
 
 const meta = {
   title: '画面例 / サインイン',
@@ -21,20 +22,51 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function SignInPage() {
+interface SignInValues {
+  email: string;
+  password: string;
+}
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validateEmail(value: string) {
+  if (value.trim() === '') return 'メールアドレスを入力してください';
+  return EMAIL_PATTERN.test(value) ? null : 'メールアドレスの形式が正しくありません';
+}
+
+function validatePassword(value: string) {
+  return value === '' ? 'パスワードを入力してください' : null;
+}
+
+function SignInPage({
+  initialValues = { email: '', password: '' },
+  initialErrors,
+}: {
+  initialValues?: SignInValues;
+  initialErrors?: FormErrors;
+}) {
+  const form = useForm<SignInValues>({
+    mode: 'uncontrolled',
+    initialValues,
+    initialErrors,
+    validate: { email: validateEmail, password: validatePassword },
+    validateInputOnBlur: true,
+  });
+
   return (
     <Center mih="100dvh" p="md">
       <Card w="100%" maw={384}>
         <Stack gap="lg">
           <Stack gap={4}>
-            <Title order={3} component="h1">
+            <Title order={1} size="h5">
               サインイン
             </Title>
             <Text size="sm" c="dimmed">
               メールアドレスとパスワードを入力します
             </Text>
           </Stack>
-          <form onSubmit={(event) => event.preventDefault()}>
+          {/* noValidate replaces the browser's English bubbles with the Japanese messages below each field. */}
+          <form noValidate onSubmit={form.onSubmit(() => undefined)}>
             <Stack gap="md">
               <TextInput
                 type="email"
@@ -42,9 +74,17 @@ function SignInPage() {
                 placeholder="user@example.com"
                 autoComplete="email"
                 required
+                key={form.key('email')}
+                {...form.getInputProps('email')}
               />
               <Stack gap={4}>
-                <PasswordInput label="パスワード" autoComplete="current-password" required />
+                <PasswordInput
+                  label="パスワード"
+                  autoComplete="current-password"
+                  required
+                  key={form.key('password')}
+                  {...form.getInputProps('password')}
+                />
                 <Anchor href="#" size="sm" ta="right">
                   パスワードを忘れた場合
                 </Anchor>
@@ -74,4 +114,24 @@ function SignInPage() {
 export const SignIn: Story = {
   name: 'サインイン',
   render: () => <SignInPage />,
+};
+
+export const SignInWithErrors: Story = {
+  name: '入力に誤りがあるとき',
+  parameters: {
+    docs: {
+      description: {
+        story: '送信したときに、欄ごとに日本語の理由を表示します。',
+      },
+    },
+  },
+  render: () => (
+    <SignInPage
+      initialValues={{ email: 'user@example', password: '' }}
+      initialErrors={{
+        email: validateEmail('user@example'),
+        password: validatePassword(''),
+      }}
+    />
+  ),
 };
