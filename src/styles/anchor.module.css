@@ -1,0 +1,7 @@
+@layer efoo {
+  /* shadcn/ui's links are the body text with a medium weight and an underline 4px below it. */
+  .root {
+    font-weight: var(--mantine-font-weight-medium);
+    text-underline-offset: 4px;
+  }
+}

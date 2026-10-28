@@ -7,6 +7,7 @@ import {
   Accordion,
   ActionIcon,
   Alert,
+  Anchor,
   AppShell,
   Autocomplete,
   Avatar,
@@ -69,6 +70,7 @@ import baseClasses from './styles/base.module.css';
 import accordionClasses from './styles/accordion.module.css';
 import actionIconClasses from './styles/action-icon.module.css';
 import alertClasses from './styles/alert.module.css';
+import anchorClasses from './styles/anchor.module.css';
 import appShellClasses from './styles/app-shell.module.css';
 import avatarClasses from './styles/avatar.module.css';
 import badgeClasses from './styles/badge.module.css';
@@ -211,6 +213,11 @@ export const efooTheme: MantineThemeOverride = createTheme({
     ActionIcon: ActionIcon.extend({ classNames: { root: actionIconClasses.root } }),
     Alert: Alert.extend({
       classNames: { root: alertClasses.root, body: alertClasses.body, title: alertClasses.title },
+    }),
+    // Without the underline a link in body text only differs by its weight.
+    Anchor: Anchor.extend({
+      classNames: { root: anchorClasses.root },
+      defaultProps: { underline: 'always' },
     }),
     AppShell: AppShell.extend({ classNames: { navbar: appShellClasses.navbar } }),
     Autocomplete: Autocomplete.extend({ classNames: comboboxClassNames }),
