@@ -19,6 +19,7 @@ import {
   Checkbox,
   CheckboxIndicator,
   Chip,
+  Collapse,
   Combobox,
   createTheme,
   Drawer,
@@ -65,7 +66,12 @@ import {
   yellowColors,
   zincColors,
 } from './colors.js';
-import { drawerTransitionProps, modalTransitionProps, overlayTransitionProps } from './motion.js';
+import {
+  drawerTransitionProps,
+  modalTransitionProps,
+  motion,
+  overlayTransitionProps,
+} from './motion.js';
 import {
   efooVariantColorResolver,
   getFilledContrast,
@@ -362,6 +368,13 @@ export const efooTheme: MantineThemeOverride = createTheme({
         },
       }),
     }),
+    // Collapse (NavLink children, Accordion panels) opens with the theme motion; Mantine skips it with reduced motion.
+    Collapse: Collapse.extend({
+      defaultProps: {
+        transitionDuration: motion.durationStandard,
+        transitionTimingFunction: motion.easing,
+      },
+    }),
     Combobox: Combobox.extend({
       classNames: { dropdown: popoverClasses.list },
       defaultProps: { transitionProps: overlayTransitionProps },
@@ -430,7 +443,11 @@ export const efooTheme: MantineThemeOverride = createTheme({
       defaultProps: { clearButtonProps: clearSelectionProps },
     }),
     NavLink: NavLink.extend({
-      classNames: { root: navLinkClasses.root, children: navLinkClasses.children },
+      classNames: {
+        root: navLinkClasses.root,
+        section: navLinkClasses.section,
+        children: navLinkClasses.children,
+      },
     }),
     Notification: Notification.extend({
       classNames: {

@@ -4,6 +4,8 @@
     min-height: calc(2rem * var(--mantine-scale));
     padding: 0.25rem 0.5rem;
     border-radius: var(--mantine-radius-md);
+    /* The label is 14px; at Mantine's 16px root the line box was 22.9px and pushed the item past 28px. */
+    font-size: var(--mantine-font-size-sm);
     line-height: var(--mantine-line-height-sm);
     transition-property: color, background-color;
     transition-duration: calc(var(--efoo-motion-duration-fast) * var(--efoo-motion-scale));
@@ -25,9 +27,35 @@
     opacity: 0.5;
   }
 
+  /* shadcn/ui's menu buttons keep 8px between the icon, the label and the chevron. */
+  .section[data-position='left'] {
+    margin-inline-end: 0.5rem;
+  }
+
+  .section[data-position='right'] {
+    margin-inline-start: 0.5rem;
+  }
+
+  /* The chevron turns with the theme motion (Mantine uses 150ms ease) and stops with reduced motion. */
+  .section {
+    transition-duration: calc(var(--efoo-motion-duration-standard) * var(--efoo-motion-scale));
+    transition-timing-function: var(--efoo-motion-easing);
+  }
+
+  /* shadcn/ui's sub-menu: a 1px line 14px in from the parent, 10px before the items, 14px off the right edge,
+     28px items 4px apart. childrenOffset is still the distance from the parent's edge to the child items. */
   .children {
-    margin-inline-start: 0.875rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-inline: 0.875rem;
+    padding-block: 0.125rem;
     padding-inline-start: calc(var(--nl-offset, var(--mantine-spacing-lg)) - 0.875rem);
+    padding-inline-end: 0.625rem;
     border-inline-start: 1px solid var(--mantine-color-default-border);
+  }
+
+  .children .root {
+    min-height: calc(1.75rem * var(--mantine-scale));
   }
 }
