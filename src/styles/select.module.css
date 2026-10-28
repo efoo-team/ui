@@ -21,7 +21,7 @@
 
   .option:hover:where(:not([data-combobox-disabled])),
   .option[data-combobox-selected] {
-    background-color: var(--mantine-color-default-hover);
+    background-color: var(--efoo-color-accent, var(--mantine-color-default-hover));
     color: var(--mantine-color-text);
   }
 }

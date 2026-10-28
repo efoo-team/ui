@@ -17,8 +17,13 @@
     );
   }
 
-  /* On the tinted background red-text falls below 4.5:1 in light; mixing in the body text keeps both schemes above it. */
+  /* On the tinted background red-text falls below 4.5:1 in light; mixing in the body text keeps both schemes above it.
+     Other items take shadcn/ui's accent surface, which is stronger than Mantine's white 10% in dark. */
   .item:where(:hover, :focus, [data-menu-active]):where(:not(:disabled, [data-disabled])) {
+    background-color: var(
+      --menu-item-hover,
+      var(--efoo-color-accent, var(--mantine-color-default-hover))
+    );
     --mantine-color-red-6: color-mix(
       in srgb,
       var(--mantine-color-red-text) 80%,
