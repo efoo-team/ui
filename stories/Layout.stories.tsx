@@ -42,7 +42,7 @@ export const AppShellExample: Story = {
                 size="sm"
                 aria-label="メニューを開閉"
               />
-              <Text>サンプル管理画面</Text>
+              <Text variant="emphasis">サンプル管理画面</Text>
             </Group>
             <Button size="xs" variant="outline">
               ヘルプ

@@ -338,7 +338,7 @@ function StatCard({ stat }: { stat: Stat }) {
             </Badge>
           )}
         </Group>
-        <Text size="xl">{stat.value}</Text>
+        <Text variant="metric">{stat.value}</Text>
         <Text size="sm" c="dimmed">
           {stat.note}
         </Text>
@@ -610,7 +610,7 @@ function InquiriesCard() {
             <Text size="sm" c="dimmed">
               {row.label}
             </Text>
-            <Text size="lg">{row.value} 件</Text>
+            <Text variant="metric">{row.value} 件</Text>
           </Stack>
         ))}
       </SimpleGrid>
@@ -668,7 +668,7 @@ function DashboardPage() {
               aria-expanded={opened}
               aria-controls={navbarId}
             />
-            <Text>サンプル販売管理</Text>
+            <Text variant="emphasis">サンプル販売管理</Text>
           </Group>
           <Group gap="sm" wrap="nowrap">
             <TextInput
