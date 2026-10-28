@@ -513,7 +513,7 @@ function OrdersCard() {
         <Text size="sm" c="dimmed">
           {filtered.length} 件中 {rows.length} 件を表示
         </Text>
-        <Pagination total={totalPages} value={page} onChange={setPage} size="sm" />
+        <Pagination total={totalPages} value={page} onChange={setPage} />
       </Group>
     </Card>
   );
