@@ -296,6 +296,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: {
         navbar: appShellClasses.navbar,
         main: appShellClasses.main,
+        header: appShellClasses.header,
+        footer: appShellClasses.footer,
+        aside: appShellClasses.aside,
+        section: appShellClasses.section,
       },
       // shadcn/ui folds its sidebar in 200ms linear; an ease-out finished most of the width in the first frames.
       defaultProps: {

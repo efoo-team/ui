@@ -2,25 +2,38 @@
   /* shadcn/ui's sidebar sits on its own surface (--sidebar), one step off the page; the header stays on the page color.
      Mantine already draws the 1px border between them. */
   .navbar {
+    /* 8px around the links. In the rail the sides leave a 32px column for the icon squares, centered in any rail
+       width (the 1px is the navbar border), so links and icons keep their x when the navbar folds. */
+    --efoo-navbar-inset-block: var(--mantine-spacing-xs);
+    --efoo-navbar-inset-inline: var(--mantine-spacing-xs);
     background-color: var(--efoo-color-sidebar, var(--mantine-color-body));
     /* Mantine animates the main padding but not the navbar width, so a narrowing navbar jumped. */
     transition-property: transform, top, height, width;
-    /* The navbar keeps 8px around its links; links and icons stay at the same x when it folds into a rail. */
-    padding: var(--mantine-spacing-xs);
   }
 
-  /* In the rail (mod={{ rail }}) the padding leaves a 32px column for the icon squares, centered in any rail width
-     (the 1px is the navbar border). */
   .navbar[data-rail] {
-    padding-inline: max(
+    --efoo-navbar-inset-inline: max(
       0px,
       calc((var(--app-shell-navbar-width) - 2rem * var(--mantine-scale) - 1px) / 2)
     );
   }
 
-  /* AppShell's transition takes the theme motion and stops with reduced motion. */
+  /* The inset sits inside whatever scrolls, like shadcn/ui's SidebarGroup inside SidebarContent, so focus rings are
+     not cut by a ScrollArea viewport: on the navbar when links sit directly in it, on each AppShell.Section, and on
+     the content of a ScrollArea (also a Section rendered as one). */
+  .navbar:not(:has(> .section)),
+  .navbar > .section:not(:has(> :global(.mantine-ScrollArea-viewport))),
+  .navbar :global(.mantine-ScrollArea-content) {
+    padding: var(--efoo-navbar-inset-block) var(--efoo-navbar-inset-inline);
+  }
+
+  /* AppShell's transitions take the theme motion and stop with reduced motion, for every part that moves with
+     the navbar (the header and footer shift with it in layout="alt"). */
   .navbar,
-  .main {
+  .main,
+  .header,
+  .footer,
+  .aside {
     transition-duration: calc(var(--app-shell-transition-duration) * var(--efoo-motion-scale));
   }
 }
