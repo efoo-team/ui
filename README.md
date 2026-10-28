@@ -162,19 +162,22 @@ Popover の中で操作させる場合は、Escape で閉じられるように `
 
 ### サイドメニュー
 
-AppShell の navbar に NavLink を並べると、shadcn/ui の sidebar と同じ見た目になります。入れ子は NavLink の `children` に子の NavLink を渡すと、左の線と字下げつきで開閉します。`leftSection` に Avatar を置いた NavLink は、組織の切り替えの起点（高さ 48px）になるので、`Menu.Target` で包みます。
+AppShell の navbar に NavLink を並べると、shadcn/ui の sidebar と同じ見た目になります。入れ子は NavLink の `children` に子の NavLink を渡すと、左の線と字下げつきで開閉します。`leftSection` に Avatar を置いた NavLink は組織の切り替えの起点（高さ 48px）になるので、`Menu.Target` で包みます。
+
+アイコンだけの帯（rail）にするときは、`navbar.width` に 48 を渡し、`AppShell.Navbar` に `mod={{ rail }}`（`data-rail` が付く）を渡します。theme が NavLink を帯の中央の 32px のアイコンにし、名前・説明・chevron・子の項目を隠します。帯の幅や navbar の padding が違っても中央に並びます。rail ではアイコンしか見えないので、NavLink には `aria-label` で名前を渡し、Tooltip で名前を示します（Mantine の Tooltip は名前を付けません）。子を持つ項目は、rail では子が見えないので、`Menu` で子を開きます。Tooltip は `Menu.Target` の外側に置きます（内側に置くと Menu の aria 属性が NavLink に届きません）。見出しなど NavLink 以外の文字は、rail のときに描かないようにしてください。
 
 ```tsx
-const [collapsed, setCollapsed] = useState(false);
+const [rail, setRail] = useState(false);
 
-<AppShell navbar={{ width: collapsed ? 48 : 256, breakpoint: 'sm' }}>
-  <AppShell.Navbar p="xs" mod={{ collapsed }}>
-    <Menu position="right-start">
+<AppShell navbar={{ width: rail ? 48 : 256, breakpoint: 'sm' }}>
+  <AppShell.Navbar p="xs" mod={{ rail }}>
+    <Menu position={rail ? 'right-start' : 'bottom-start'}>
       <Menu.Target>
         <NavLink
           component="button"
           label="組織名"
           description="プラン"
+          aria-label="組織を切り替える（現在：組織名）"
           leftSection={
             <Avatar radius="md" color="zinc" variant="filled">
               A
@@ -185,17 +188,43 @@ const [collapsed, setCollapsed] = useState(false);
       </Menu.Target>
       <Menu.Dropdown>{/* 組織の一覧 */}</Menu.Dropdown>
     </Menu>
-    <Tooltip label="設定" position="right" disabled={!collapsed}>
+
+    <Tooltip label="ダッシュボード" position="right" disabled={!rail}>
+      <NavLink
+        label="ダッシュボード"
+        aria-label="ダッシュボード"
+        leftSection={<IconHome size={16} />}
+      />
+    </Tooltip>
+
+    {rail ? (
+      <Menu position="right-start">
+        <Tooltip label="設定" position="right">
+          <Menu.Target>
+            <NavLink
+              component="button"
+              label="設定"
+              aria-label="設定"
+              leftSection={<IconSettings size={16} />}
+            />
+          </Menu.Target>
+        </Tooltip>
+        <Menu.Dropdown>
+          <Menu.Item>全般</Menu.Item>
+          <Menu.Item>通知</Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+    ) : (
       <NavLink label="設定" leftSection={<IconSettings size={16} />} defaultOpened>
         <NavLink label="全般" active />
         <NavLink label="通知" />
       </NavLink>
-    </Tooltip>
+    )}
   </AppShell.Navbar>
 </AppShell>;
 ```
 
-アイコンだけの帯に閉じるときは、`AppShell` の `navbar.width` を 48（3rem）にし、`AppShell.Navbar` に `mod={{ collapsed }}` を渡します。theme が NavLink を 32px のアイコンだけの見え方にし（Avatar の起点は Avatar だけ）、名前・説明・chevron・子の項目を隠します。navbar の `p="xs"`（8px）で、アイコンが帯の中央に並びます。見出しなど NavLink 以外の文字は、`collapsed` のときに描かないようにしてください。閉じた状態で名前を示すには、上の例のように Tooltip で包みます。
+組織の切り替えの起点は Mantine の静的な class（`mantine-Avatar-root`）で見分けるので、MantineProvider の `classNamesPrefix` を変えたり、`withStaticClasses={false}` にしたりすると、48px の行になりません。
 
 ### shadcn/ui の variant との対応
 
@@ -210,6 +239,8 @@ const [collapsed, setCollapsed] = useState(false);
 状態を表す色は `red`・`yellow`・`green`・`blue` です（Tailwind CSS v4 の値）。
 
 見出しではないが目立たせたい文字は、Text の variant で選びます。ダッシュボードの数値などは `<Text variant="metric">`（30/36・600・桁をそろえる数字）、サービス名や名前など短く強調する文字は `<Text variant="emphasis">`（その文字の大きさのまま 600）で、どちらも `size` を渡せばその大きさになります。
+
+パッケージは Text の `variant` の型に `metric`・`emphasis` を足しています（`declare module '@mantine/core'` で `TextProps.variant` を広げる形）。サービスでも `TextProps.variant` を独自の型で広げると TypeScript が TS2717 を出すので、独自の variant は文字列のまま渡してください（型は任意の文字列を受け付けます）。
 
 Badge の既定は `variant="light"` です。`color` を指定しない Badge は shadcn/ui の secondary（muted の面に本文の色の文字）、状態色の Badge は色の 10% の面に色の文字になります。塗りつぶしにする場合は `variant="filled"` を指定します。
 
