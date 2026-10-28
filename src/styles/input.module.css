@@ -59,6 +59,23 @@
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--mantine-color-error) 20%, transparent);
   }
 
+  /* The unstyled text has no padding, so a ring drawn on the box would touch it. The ring moves 2px outward
+     instead of adding padding, which would shift the text when it sits aligned inside another component. */
+  .wrapper[data-variant='unstyled'] .input:where(:focus, :focus-within) {
+    --efoo-unstyled-ring: color-mix(
+      in srgb,
+      var(--efoo-color-ring, var(--mantine-primary-color-filled)) 50%,
+      transparent
+    );
+    outline: 3px solid var(--efoo-unstyled-ring);
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+
+  .wrapper[data-variant='unstyled'][data-error] .input:where(:focus, :focus-within) {
+    --efoo-unstyled-ring: color-mix(in srgb, var(--mantine-color-error) 20%, transparent);
+  }
+
   .input:where(:disabled, [data-disabled], :has(input:disabled)) {
     opacity: 0.5;
   }
