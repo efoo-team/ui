@@ -225,6 +225,15 @@ export const efooTheme: MantineThemeOverride = createTheme({
     // Without a variant Mantine leaves the text color to its CSS default (white), which is unreadable on the dark-scheme neutral fill.
     Badge: Badge.extend({
       classNames: { root: badgeClasses.root },
+      // shadcn/ui's outline badge keeps the surface line (white 10% in dark), not the input line of buttons.
+      vars: (theme, props) => ({
+        root: {
+          '--badge-bd':
+            props.variant === 'outline' && getZincContrast(theme, props.color)
+              ? '1px solid var(--mantine-color-default-border)'
+              : undefined,
+        },
+      }),
       defaultProps: { variant: 'filled' },
     }),
     Button: Button.extend({

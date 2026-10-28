@@ -53,6 +53,17 @@ export const efooVariantColorResolver: VariantColorsResolver = (input) => {
   const resolved = defaultVariantColorsResolver(input);
   const autoContrast = input.autoContrast ?? input.theme.autoContrast;
 
+  // variant="default" is shadcn/ui's outline button (README): in dark it has the input line (white 15%) and the faint
+  // outline surface instead of Mantine's card surface. The light scheme leaves --efoo-color-* undefined.
+  if (input.variant === 'default') {
+    return {
+      ...resolved,
+      background: 'var(--efoo-color-outline-bg, var(--mantine-color-default))',
+      hover: 'var(--efoo-color-outline-hover, var(--mantine-color-default-hover))',
+      border: '1px solid var(--efoo-color-input-border, var(--mantine-color-default-border))',
+    };
+  }
+
   // The status fill is not the primaryShade Mantine judges the text by; the resolver sets the text per scheme.
   if (input.variant === 'filled' && autoContrast && isStatusColor(input.theme, input.color)) {
     return { ...resolved, color: statusContrast(input.color as string) };
@@ -66,13 +77,13 @@ export const efooVariantColorResolver: VariantColorsResolver = (input) => {
     return { ...resolved, color: ZINC_CONTRAST };
   }
 
-  // shadcn/ui's outline uses the surface border, the body text and the accent hover instead of the filled color.
+  // shadcn/ui's outline uses the input line, the body text and the accent hover instead of the filled color.
   // The dark scheme adds a faint surface (--efoo-color-outline-*); the light scheme leaves them undefined.
   if (input.variant === 'outline') {
     return {
       ...resolved,
       background: 'var(--efoo-color-outline-bg, transparent)',
-      border: '1px solid var(--mantine-color-default-border)',
+      border: '1px solid var(--efoo-color-input-border, var(--mantine-color-default-border))',
       color: 'var(--mantine-color-text)',
       hover: 'var(--efoo-color-outline-hover, var(--mantine-color-default-hover))',
     };
