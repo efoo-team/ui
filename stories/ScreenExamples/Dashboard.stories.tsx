@@ -337,7 +337,7 @@ function SalesCard() {
         h={260}
         data={data}
         dataKey="date"
-        series={[{ name: 'amount', label: '受注額', color: 'var(--mantine-primary-color-filled)' }]}
+        series={[{ name: 'amount', label: '受注額', color: 'var(--efoo-chart-1)' }]}
         curveType="monotone"
         withDots={false}
         withGradient
@@ -403,7 +403,7 @@ function OrdersCard() {
         <Title order={4} component="h2">
           最近の受注
         </Title>
-        <Button variant="outline" size="sm" leftSection={<IconPlus size={16} />}>
+        <Button variant="outline" leftSection={<IconPlus size={16} />}>
           受注を登録
         </Button>
       </Group>
@@ -599,7 +599,9 @@ function DashboardPage() {
               size="sm"
               aria-label="メニューを開閉"
             />
-            <Text fw={600}>サンプル販売管理</Text>
+            <Title order={5} component="p">
+              サンプル販売管理
+            </Title>
           </Group>
           <Group gap="sm" wrap="nowrap">
             <TextInput
@@ -619,7 +621,9 @@ function DashboardPage() {
       <AppShell.Main>
         <Stack gap="lg">
           <Stack gap={4}>
-            <Title order={2}>ダッシュボード</Title>
+            <Title order={1} size="h2">
+              ダッシュボード
+            </Title>
             <Text c="dimmed">2026 年 10 月 31 日時点の状況</Text>
           </Stack>
           <SimpleGrid cols={{ base: 1, xs: 2, lg: 4 }}>
