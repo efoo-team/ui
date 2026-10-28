@@ -64,13 +64,14 @@
   }
 
   /* A NavLink that leads with an Avatar is a switcher row, like shadcn/ui's size="lg" menu button: 48px high with an
-     8px inset around a 32px avatar, a medium name and a 12/16 second line. */
-  .root:has(> .section > .avatar) {
+     8px inset around a 32px avatar, a medium name and a 12/16 second line. Mantine's static Avatar class marks it, so
+     a service's own Avatar classNames do not switch it off. */
+  .root:has(> .section > :global(.mantine-Avatar-root)) {
     min-height: calc(3rem * var(--mantine-scale));
     padding: 0.375rem 0.5rem;
   }
 
-  .root:has(> .section > .avatar) .label {
+  .root:has(> .section > :global(.mantine-Avatar-root)) .label {
     font-weight: var(--mantine-font-weight-medium);
     line-height: 1.25;
   }
@@ -80,25 +81,28 @@
     background-color: var(--mantine-color-default-hover);
   }
 
-  /* <AppShell.Navbar mod={{ collapsed }}> folds the links into 32px icon squares, like shadcn/ui's icon rail:
-     the label, description, chevron and child links are hidden; a switcher keeps only its avatar. */
-  .navbar[data-collapsed] .root {
+  /* Inside <AppShell.Navbar mod={{ rail }}> (data-rail) links fold into 32px icon squares centered in the rail,
+     like shadcn/ui's icon rail, whatever the navbar width and padding: the margins split the space left of 2rem,
+     also when it is negative. The label, description, chevron and child links are hidden; a switcher keeps its avatar. */
+  [data-rail] .root {
+    justify-content: center;
     width: calc(2rem * var(--mantine-scale));
     min-height: calc(2rem * var(--mantine-scale));
+    margin-inline: calc(50% - 1rem * var(--mantine-scale));
     padding: 0.5rem;
   }
 
-  .navbar[data-collapsed] .root:has(> .section > .avatar) {
+  [data-rail] .root:has(> .section > :global(.mantine-Avatar-root)) {
     padding: 0;
   }
 
-  .navbar[data-collapsed] .section[data-position='left'] {
+  [data-rail] .section[data-position='left'] {
     margin-inline-end: 0;
   }
 
-  .navbar[data-collapsed] .body,
-  .navbar[data-collapsed] .section[data-position='right'],
-  .navbar[data-collapsed] .collapse {
+  [data-rail] .body,
+  [data-rail] .section[data-position='right'],
+  [data-rail] .collapse {
     display: none;
   }
 }

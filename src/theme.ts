@@ -292,10 +292,9 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: { root: anchorClasses.root },
       defaultProps: { underline: 'always' },
     }),
-    // navbar also carries the NavLink scope that folds links into icons under mod={{ collapsed }}.
     AppShell: AppShell.extend({
       classNames: {
-        navbar: `${appShellClasses.navbar} ${navLinkClasses.navbar}`,
+        navbar: appShellClasses.navbar,
         main: appShellClasses.main,
       },
       defaultProps: {
@@ -309,11 +308,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     // Without a color the fallback is shadcn/ui's muted surface and text; Mantine's dark gray light variant is nearly black.
     Avatar: Avatar.extend({
-      // navLinkClasses.avatar lets a NavLink that leads with an Avatar become a switcher row.
-      classNames: {
-        root: `${avatarClasses.root} ${navLinkClasses.avatar}`,
-        placeholder: avatarClasses.placeholder,
-      },
+      classNames: { root: avatarClasses.root, placeholder: avatarClasses.placeholder },
       vars: (_theme, props) =>
         props.color === undefined && (props.variant === undefined || props.variant === 'light')
           ? {
@@ -382,7 +377,8 @@ export const efooTheme: MantineThemeOverride = createTheme({
         },
       }),
     }),
-    // Collapse (NavLink children, Accordion panels) opens with the theme motion; Mantine skips it with reduced motion.
+    // Collapse (NavLink children) opens with the theme motion; Mantine skips it with reduced motion. Accordion passes its
+    // own 200ms to the panel, so only the easing reaches it.
     Collapse: Collapse.extend({
       defaultProps: {
         transitionDuration: motion.durationStandard,
