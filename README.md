@@ -8,7 +8,7 @@ efoo のサービスで共有する Mantine theme と、その theme を使っ�
 
 このパッケージは npm レジストリには置かず、GitHub から導入します。導入時に `prepare` が JavaScript、型定義、CSS を build します。
 
-利用側に必要なパッケージは React と React DOM 19、`@mantine/core` と `@mantine/hooks` の 9.7 系です。通知（`@mantine/notifications`）、日付・時刻（`@mantine/dates` と `dayjs`）、ファイルの選択（`@mantine/dropzone`）は、それぞれ使う場合だけ追加します。`@mantine/dates` と `@mantine/dropzone` は optional peer dependency です。Mantine の各パッケージは同じバージョンを使ってください。
+利用側に必要なパッケージは React と React DOM 19、`@mantine/core` と `@mantine/hooks` の 9.7 系です。通知・日付・時刻・ファイルの選択に必要なパッケージは、使う場合だけ下のコマンドで追加します。`@mantine/dates` と `@mantine/dropzone` は optional peer dependency です。Mantine の各パッケージは同じバージョンを使ってください。
 
 ### pnpm
 
@@ -106,7 +106,7 @@ export function App() {
 
 ### 日付・時刻の日本語設定
 
-日付・時刻を使う場合は、アプリケーションで日本語ロケールを読み込みます。DateInput に直接入力する場合は、入力解析用のプラグインも登録します。
+日付・時刻を使う場合は、アプリケーションで日本語ロケールを読み込みます。DateInput で指定した書式の日付を直接入力する場合は、入力を解析するプラグインも登録します。
 
 ```tsx
 import dayjs from 'dayjs';
@@ -115,6 +115,8 @@ import 'dayjs/locale/ja';
 
 dayjs.extend(customParseFormat);
 ```
+
+DateInput の既定の解析では不正な日付が繰り上がるため、厳密に検証する場合は、利用側で書式とロケールに合う `dateParser` を指定してください。
 
 ### サービスごとに調整する
 
@@ -271,36 +273,36 @@ Badge の既定は `variant="light"` です。`color` を指定しない Badge �
 
 部品ごとの表示例は、Storybook のサイドバーで「日本語名（Mantine の部品名）」から探せます。サイドバーの検索欄に Mantine の部品名（例: `Radio`）を入れても見つかります。
 
-| 部品                                             | サイドバーの場所                                                              |
-| ------------------------------------------------ | ----------------------------------------------------------------------------- |
-| AppShell・NavLink                                | 構造 / 画面の枠組みとナビゲーション（AppShell, NavLink）                      |
-| Button                                           | 操作 / ボタン（Button）                                                       |
-| Tabs                                             | 操作 / タブ（Tabs）                                                           |
-| ActionIcon                                       | 操作 / アイコンボタン（ActionIcon）                                           |
-| SegmentedControl                                 | 操作 / 切り替え（SegmentedControl）                                           |
-| Pagination                                       | 操作 / ページ送り（Pagination）                                               |
-| TextInput・Textarea・NumberInput・PasswordInput  | 入力 / テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）      |
-| Select・MultiSelect                              | 入力 / 選択欄（Select, MultiSelect）                                          |
-| DateInput・DateTimePicker・TimeInput・DatePicker | 入力 / 日付と時刻（DateInput, DatePicker, DateTimePicker, TimeInput）         |
-| Dropzone                                         | 入力 / ファイルの選択（Dropzone）                                             |
-| Checkbox・Radio・Switch                          | 入力 / チェック・選択・切り替え（Checkbox, Radio, Switch）                    |
-| Button・TextInput・Checkbox・Radio・Switch・Tabs | 入力 / フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs） |
-| Table・Card・Badge                               | 表示 / 表・カード・バッジ（Table, Card, Badge）                               |
-| Avatar                                           | 表示 / アバター（Avatar）                                                     |
-| Progress・RingProgress                           | 表示 / 進捗（Progress, RingProgress）                                         |
-| Accordion                                        | 操作 / 折りたたみ（Accordion）                                                |
-| Slider・RangeSlider                              | 入力 / スライダー（Slider, RangeSlider）                                      |
-| Chip                                             | 入力 / 選択肢（Chip）                                                         |
-| TagsInput                                        | 入力 / タグ入力（TagsInput）                                                  |
-| EmptyState                                       | 表示 / 空の状態（EmptyState）                                                 |
-| DataList                                         | 表示 / 定義の並び（DataList）                                                 |
-| Timeline                                         | 表示 / 履歴（Timeline）                                                       |
-| Loader                                           | フィードバック / 読み込み中（Loader）                                         |
-| Alert                                            | フィードバック / 注意・お知らせ（Alert）                                      |
-| Skeleton・Tooltip                                | 表示 / 読み込み表示とツールチップ（Skeleton, Tooltip）                        |
-| Menu・Popover・Modal・Drawer                     | 重ねて表示 / メニュー・モーダルほか（Menu, Popover, Modal, Drawer）           |
-| Notification                                     | フィードバック / 通知（Notification）                                         |
-| 開閉の動き                                       | 動き / 開閉の動き（Transition）                                               |
+| 部品                                                                   | サイドバーの場所                                                              |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| 画面の枠組みとナビゲーション（AppShell, NavLink）                      | 構造 / 画面の枠組みとナビゲーション（AppShell, NavLink）                      |
+| ボタン（Button）                                                       | 操作 / ボタン（Button）                                                       |
+| タブ（Tabs）                                                           | 操作 / タブ（Tabs）                                                           |
+| アイコンボタン（ActionIcon）                                           | 操作 / アイコンボタン（ActionIcon）                                           |
+| 切り替え（SegmentedControl）                                           | 操作 / 切り替え（SegmentedControl）                                           |
+| ページ送り（Pagination）                                               | 操作 / ページ送り（Pagination）                                               |
+| テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）      | 入力 / テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）      |
+| 選択欄（Select, MultiSelect）                                          | 入力 / 選択欄（Select, MultiSelect）                                          |
+| 日付と時刻（DateInput, DatePicker, DateTimePicker, TimeInput）         | 入力 / 日付と時刻（DateInput, DatePicker, DateTimePicker, TimeInput）         |
+| ファイルの選択（Dropzone）                                             | 入力 / ファイルの選択（Dropzone）                                             |
+| チェック・選択・切り替え（Checkbox, Radio, Switch）                    | 入力 / チェック・選択・切り替え（Checkbox, Radio, Switch）                    |
+| フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs） | 入力 / フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs） |
+| 表・カード・バッジ（Table, Card, Badge）                               | 表示 / 表・カード・バッジ（Table, Card, Badge）                               |
+| アバター（Avatar）                                                     | 表示 / アバター（Avatar）                                                     |
+| 進捗（Progress, RingProgress）                                         | 表示 / 進捗（Progress, RingProgress）                                         |
+| 折りたたみ（Accordion）                                                | 操作 / 折りたたみ（Accordion）                                                |
+| スライダー（Slider, RangeSlider）                                      | 入力 / スライダー（Slider, RangeSlider）                                      |
+| チップによる選択（Chip）                                               | 入力 / チップによる選択（Chip）                                               |
+| タグ入力（TagsInput）                                                  | 入力 / タグ入力（TagsInput）                                                  |
+| 空の状態（EmptyState）                                                 | 表示 / 空の状態（EmptyState）                                                 |
+| 定義の並び（DataList）                                                 | 表示 / 定義の並び（DataList）                                                 |
+| 履歴（Timeline）                                                       | 表示 / 履歴（Timeline）                                                       |
+| 読み込み中（Loader）                                                   | フィードバック / 読み込み中（Loader）                                         |
+| 注意・お知らせ（Alert）                                                | フィードバック / 注意・お知らせ（Alert）                                      |
+| 読み込み表示とツールチップ（Skeleton, Tooltip）                        | 表示 / 読み込み表示とツールチップ（Skeleton, Tooltip）                        |
+| メニュー・モーダルほか（Menu, Popover, Modal, Drawer）                 | 重ねて表示 / メニュー・モーダルほか（Menu, Popover, Modal, Drawer）           |
+| 通知（Notification）                                                   | フィードバック / 通知（Notification）                                         |
+| 開閉の動き（Transition）                                               | 動き / 開閉の動き（Transition）                                               |
 
 ## 開発
 

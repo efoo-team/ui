@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Chip, Group } from '@mantine/core';
 
 const meta = {
-  title: '入力 / 選択肢（Chip）',
+  title: '入力 / チップによる選択（Chip）',
   tags: ['autodocs'],
 } satisfies Meta;
 
@@ -10,7 +10,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Chips: Story = {
-  name: '選択肢（Chip）',
+  name: 'チップによる選択（Chip）',
   render: () => (
     <Chip.Group multiple defaultValue={['a']}>
       <Group>

@@ -10,7 +10,7 @@ efoo のサービスで共通して使う Mantine の theme と、その theme �
 
 このパッケージは npm レジストリには置かず、GitHub から導入します。導入時に `prepare` が JavaScript、型定義、CSS を build します。
 
-利用側に必要なパッケージは React と React DOM 19、`@mantine/core` と `@mantine/hooks` の 9.7 系です。通知（`@mantine/notifications`）、日付・時刻（`@mantine/dates` と `dayjs`）、ファイルの選択（`@mantine/dropzone`）は、それぞれ使う場合だけ追加します。`@mantine/dates` と `@mantine/dropzone` は optional peer dependency です。Mantine の各パッケージは同じバージョンを使ってください。
+利用側に必要なパッケージは React と React DOM 19、`@mantine/core` と `@mantine/hooks` の 9.7 系です。通知・日付・時刻・ファイルの選択に必要なパッケージは、使う場合だけ下のコマンドで追加します。`@mantine/dates` と `@mantine/dropzone` は optional peer dependency です。Mantine の各パッケージは同じバージョンを使ってください。
 
 ### pnpm
 
@@ -108,7 +108,7 @@ export function App() {
 
 ### 日付・時刻の日本語設定
 
-日付・時刻を使う場合は、アプリケーションで日本語ロケールを読み込みます。DateInput に直接入力する場合は、入力解析用のプラグインも登録します。
+日付・時刻を使う場合は、アプリケーションで日本語ロケールを読み込みます。DateInput で指定した書式の日付を直接入力する場合は、入力を解析するプラグインも登録します。
 
 ```tsx
 import dayjs from 'dayjs';
@@ -117,6 +117,8 @@ import 'dayjs/locale/ja';
 
 dayjs.extend(customParseFormat);
 ```
+
+DateInput の既定の解析では不正な日付が繰り上がるため、厳密に検証する場合は、利用側で書式とロケールに合う `dateParser` を指定してください。
 
 ### サービスごとに調整する
 
@@ -279,36 +281,36 @@ Badge の既定は `variant="light"` です。`color` を指定しない Badge �
 
 部品ごとの表示例は、サイドバーの「日本語名（Mantine の部品名）」から探せます。サイドバーの検索欄に Mantine の部品名（例: `Radio`）を入れても見つかります。上部ツールバーの「ライト」「ダーク」のボタンで、表示を切り替えられます。
 
-| 部品                                             | サイドバーの場所                                                                                                                                                          |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| AppShell・NavLink                                | [構造 / 画面の枠組みとナビゲーション（AppShell, NavLink）](?path=/docs/構造-画面の枠組みとナビゲーション（appshell-navlink）--docs)                                       |
-| Button                                           | [操作 / ボタン（Button）](?path=/docs/操作-ボタン（button）--docs)                                                                                                        |
-| Tabs                                             | [操作 / タブ（Tabs）](?path=/docs/操作-タブ（tabs）--docs)                                                                                                                |
-| ActionIcon                                       | [操作 / アイコンボタン（ActionIcon）](?path=/docs/操作-アイコンボタン（actionicon）--docs)                                                                                |
-| SegmentedControl                                 | [操作 / 切り替え（SegmentedControl）](?path=/docs/操作-切り替え（segmentedcontrol）--docs)                                                                                |
-| Pagination                                       | [操作 / ページ送り（Pagination）](?path=/docs/操作-ページ送り（pagination）--docs)                                                                                        |
-| TextInput・Textarea・NumberInput・PasswordInput  | [入力 / テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）](?path=/docs/入力-テキスト入力欄（textinput-textarea-numberinput-passwordinput）--docs)         |
-| Select・MultiSelect                              | [入力 / 選択欄（Select, MultiSelect）](?path=/docs/入力-選択欄（select-multiselect）--docs)                                                                               |
-| DateInput・DateTimePicker・TimeInput・DatePicker | [入力 / 日付と時刻（DateInput, DatePicker, DateTimePicker, TimeInput）](?path=/docs/入力-日付と時刻（dateinput-datepicker-datetimepicker-timeinput）--docs)               |
-| Dropzone                                         | [入力 / ファイルの選択（Dropzone）](?path=/docs/入力-ファイルの選択（dropzone）--docs)                                                                                    |
-| Checkbox・Radio・Switch                          | [入力 / チェック・選択・切り替え（Checkbox, Radio, Switch）](?path=/docs/入力-チェック・選択・切り替え（checkbox-radio-switch）--docs)                                    |
-| Button・TextInput・Checkbox・Radio・Switch・Tabs | [入力 / フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs）](?path=/docs/入力-フォーカスの見え方（button-textinput-checkbox-radio-switch-tabs）--docs) |
-| Table・Card・Badge                               | [表示 / 表・カード・バッジ（Table, Card, Badge）](?path=/docs/表示-表・カード・バッジ（table-card-badge）--docs)                                                          |
-| Avatar                                           | [表示 / アバター（Avatar）](?path=/docs/表示-アバター（avatar）--docs)                                                                                                    |
-| Progress・RingProgress                           | [表示 / 進捗（Progress, RingProgress）](?path=/docs/表示-進捗（progress-ringprogress）--docs)                                                                             |
-| Accordion                                        | [操作 / 折りたたみ（Accordion）](?path=/docs/操作-折りたたみ（accordion）--docs)                                                                                          |
-| Slider・RangeSlider                              | [入力 / スライダー（Slider, RangeSlider）](?path=/docs/入力-スライダー（slider-rangeslider）--docs)                                                                       |
-| Chip                                             | [入力 / 選択肢（Chip）](?path=/docs/入力-選択肢（chip）--docs)                                                                                                            |
-| TagsInput                                        | [入力 / タグ入力（TagsInput）](?path=/docs/入力-タグ入力（tagsinput）--docs)                                                                                              |
-| EmptyState                                       | [表示 / 空の状態（EmptyState）](?path=/docs/表示-空の状態（emptystate）--docs)                                                                                            |
-| DataList                                         | [表示 / 定義の並び（DataList）](?path=/docs/表示-定義の並び（datalist）--docs)                                                                                            |
-| Timeline                                         | [表示 / 履歴（Timeline）](?path=/docs/表示-履歴（timeline）--docs)                                                                                                        |
-| Loader                                           | [フィードバック / 読み込み中（Loader）](?path=/docs/フィードバック-読み込み中（loader）--docs)                                                                            |
-| Alert                                            | [フィードバック / 注意・お知らせ（Alert）](?path=/docs/フィードバック-注意・お知らせ（alert）--docs)                                                                      |
-| Skeleton・Tooltip                                | [表示 / 読み込み表示とツールチップ（Skeleton, Tooltip）](?path=/docs/表示-読み込み表示とツールチップ（skeleton-tooltip）--docs)                                           |
-| Menu・Popover・Modal・Drawer                     | [重ねて表示 / メニュー・モーダルほか（Menu, Popover, Modal, Drawer）](?path=/docs/重ねて表示-メニュー・モーダルほか（menu-popover-modal-drawer）--docs)                   |
-| Notification                                     | [フィードバック / 通知（Notification）](?path=/docs/フィードバック-通知（notification）--docs)                                                                            |
-| 開閉の動き                                       | [動き / 開閉の動き（Transition）](?path=/docs/動き-開閉の動き（transition）--docs)                                                                                        |
+| 部品                                                                   | サイドバーの場所                                                                                                                                                          |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 画面の枠組みとナビゲーション（AppShell, NavLink）                      | [構造 / 画面の枠組みとナビゲーション（AppShell, NavLink）](?path=/docs/構造-画面の枠組みとナビゲーション（appshell-navlink）--docs)                                       |
+| ボタン（Button）                                                       | [操作 / ボタン（Button）](?path=/docs/操作-ボタン（button）--docs)                                                                                                        |
+| タブ（Tabs）                                                           | [操作 / タブ（Tabs）](?path=/docs/操作-タブ（tabs）--docs)                                                                                                                |
+| アイコンボタン（ActionIcon）                                           | [操作 / アイコンボタン（ActionIcon）](?path=/docs/操作-アイコンボタン（actionicon）--docs)                                                                                |
+| 切り替え（SegmentedControl）                                           | [操作 / 切り替え（SegmentedControl）](?path=/docs/操作-切り替え（segmentedcontrol）--docs)                                                                                |
+| ページ送り（Pagination）                                               | [操作 / ページ送り（Pagination）](?path=/docs/操作-ページ送り（pagination）--docs)                                                                                        |
+| テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）      | [入力 / テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）](?path=/docs/入力-テキスト入力欄（textinput-textarea-numberinput-passwordinput）--docs)         |
+| 選択欄（Select, MultiSelect）                                          | [入力 / 選択欄（Select, MultiSelect）](?path=/docs/入力-選択欄（select-multiselect）--docs)                                                                               |
+| 日付と時刻（DateInput, DatePicker, DateTimePicker, TimeInput）         | [入力 / 日付と時刻（DateInput, DatePicker, DateTimePicker, TimeInput）](?path=/docs/入力-日付と時刻（dateinput-datepicker-datetimepicker-timeinput）--docs)               |
+| ファイルの選択（Dropzone）                                             | [入力 / ファイルの選択（Dropzone）](?path=/docs/入力-ファイルの選択（dropzone）--docs)                                                                                    |
+| チェック・選択・切り替え（Checkbox, Radio, Switch）                    | [入力 / チェック・選択・切り替え（Checkbox, Radio, Switch）](?path=/docs/入力-チェック・選択・切り替え（checkbox-radio-switch）--docs)                                    |
+| フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs） | [入力 / フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs）](?path=/docs/入力-フォーカスの見え方（button-textinput-checkbox-radio-switch-tabs）--docs) |
+| 表・カード・バッジ（Table, Card, Badge）                               | [表示 / 表・カード・バッジ（Table, Card, Badge）](?path=/docs/表示-表・カード・バッジ（table-card-badge）--docs)                                                          |
+| アバター（Avatar）                                                     | [表示 / アバター（Avatar）](?path=/docs/表示-アバター（avatar）--docs)                                                                                                    |
+| 進捗（Progress, RingProgress）                                         | [表示 / 進捗（Progress, RingProgress）](?path=/docs/表示-進捗（progress-ringprogress）--docs)                                                                             |
+| 折りたたみ（Accordion）                                                | [操作 / 折りたたみ（Accordion）](?path=/docs/操作-折りたたみ（accordion）--docs)                                                                                          |
+| スライダー（Slider, RangeSlider）                                      | [入力 / スライダー（Slider, RangeSlider）](?path=/docs/入力-スライダー（slider-rangeslider）--docs)                                                                       |
+| チップによる選択（Chip）                                               | [入力 / チップによる選択（Chip）](?path=/docs/入力-チップによる選択（chip）--docs)                                                                                        |
+| タグ入力（TagsInput）                                                  | [入力 / タグ入力（TagsInput）](?path=/docs/入力-タグ入力（tagsinput）--docs)                                                                                              |
+| 空の状態（EmptyState）                                                 | [表示 / 空の状態（EmptyState）](?path=/docs/表示-空の状態（emptystate）--docs)                                                                                            |
+| 定義の並び（DataList）                                                 | [表示 / 定義の並び（DataList）](?path=/docs/表示-定義の並び（datalist）--docs)                                                                                            |
+| 履歴（Timeline）                                                       | [表示 / 履歴（Timeline）](?path=/docs/表示-履歴（timeline）--docs)                                                                                                        |
+| 読み込み中（Loader）                                                   | [フィードバック / 読み込み中（Loader）](?path=/docs/フィードバック-読み込み中（loader）--docs)                                                                            |
+| 注意・お知らせ（Alert）                                                | [フィードバック / 注意・お知らせ（Alert）](?path=/docs/フィードバック-注意・お知らせ（alert）--docs)                                                                      |
+| 読み込み表示とツールチップ（Skeleton, Tooltip）                        | [表示 / 読み込み表示とツールチップ（Skeleton, Tooltip）](?path=/docs/表示-読み込み表示とツールチップ（skeleton-tooltip）--docs)                                           |
+| メニュー・モーダルほか（Menu, Popover, Modal, Drawer）                 | [重ねて表示 / メニュー・モーダルほか（Menu, Popover, Modal, Drawer）](?path=/docs/重ねて表示-メニュー・モーダルほか（menu-popover-modal-drawer）--docs)                   |
+| 通知（Notification）                                                   | [フィードバック / 通知（Notification）](?path=/docs/フィードバック-通知（notification）--docs)                                                                            |
+| 開閉の動き（Transition）                                               | [動き / 開閉の動き（Transition）](?path=/docs/動き-開閉の動き（transition）--docs)                                                                                        |
 
 ## ライセンス
 
