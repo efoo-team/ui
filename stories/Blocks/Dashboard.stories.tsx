@@ -16,6 +16,7 @@ import {
   NavLink,
   Pagination,
   Paper,
+  ScrollArea,
   SegmentedControl,
   Select,
   SimpleGrid,
@@ -267,7 +268,7 @@ function Sidebar({ onClose }: { onClose: () => void }) {
           <CloseButton hiddenFrom="sm" onClick={onClose} aria-label="サイドバーを閉じる" />
         </Group>
       </AppShell.Section>
-      <AppShell.Section grow mt="xs">
+      <AppShell.Section grow component={ScrollArea} my="xs">
         <Stack gap="lg">
           <Stack gap={4}>
             <Group gap="xs" wrap="nowrap" mb={4}>
