@@ -239,6 +239,8 @@ export const efooTheme: MantineThemeOverride = createTheme({
       h2: { fontSize: '1.875rem', lineHeight: '2.25rem' },
       h3: { fontSize: '1.5rem', lineHeight: '2rem' },
       h4: { fontSize: '1.25rem', lineHeight: '1.75rem' },
+      h5: { fontSize: '1rem', lineHeight: '1.5rem' },
+      h6: { fontSize: '0.875rem', lineHeight: '1.25rem' },
     },
   },
   // Tailwind v4 shadows. The negative spread keeps the shadow under the element instead of around it.
