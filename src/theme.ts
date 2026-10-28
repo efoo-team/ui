@@ -47,6 +47,7 @@ import {
   Table,
   Tabs,
   TagsInput,
+  Text,
   ThemeIcon,
   Timeline,
   TreeSelect,
@@ -102,6 +103,8 @@ import skeletonClasses from './styles/skeleton.module.css';
 import switchClasses from './styles/switch.module.css';
 import tableClasses from './styles/table.module.css';
 import tabsClasses from './styles/tabs.module.css';
+import textClasses from './styles/text.module.css';
+import './text-variants.js';
 import tooltipClasses from './styles/tooltip.module.css';
 
 interface IconColorProps {
@@ -541,6 +544,8 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: { ...comboboxClassNames, inputField: inputClasses.pillsField },
       defaultProps: { clearButtonProps: clearInputProps },
     }),
+    // variant="metric" and variant="emphasis"; see text-variants.ts.
+    Text: Text.extend({ classNames: { root: textClasses.root } }),
     ThemeIcon: ThemeIcon.extend({ defaultProps: { variant: 'filled' } }),
     Timeline: Timeline.extend({
       vars: (theme, props) => ({

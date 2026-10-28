@@ -1,0 +1,16 @@
+@layer efoo {
+  /* shadcn/ui's dashboard figure: 30/36, semibold and tabular figures so columns of numbers line up.
+     A size prop still sets the size, because Mantine writes --text-fz and --text-lh inline. */
+  .root[data-variant='metric'] {
+    --text-fz: var(--mantine-h2-font-size);
+    --text-lh: var(--mantine-h2-line-height);
+    font-weight: var(--mantine-font-weight-bold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* A short label that should stand out from body text without being a heading, like shadcn/ui's sidebar brand:
+     the text's own size, semibold. */
+  .root[data-variant='emphasis'] {
+    font-weight: var(--mantine-font-weight-bold);
+  }
+}
