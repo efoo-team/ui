@@ -89,6 +89,13 @@ export const efooVariantColorResolver: VariantColorsResolver = (input) => {
     };
   }
 
+  // shadcn/ui's ghost (subtle) hovers on the accent surface (#f5f5f5, and the accent at 50% in dark, about #252525),
+  // the hover surface of rows. Mantine's light-hover was zinc-2 in light, the avatar surface, and hid an Avatar inside
+  // an icon button.
+  if (input.variant === 'subtle') {
+    return { ...resolved, hover: 'var(--mantine-color-default-hover)' };
+  }
+
   // Mantine colors the white variant with the filled color, which is light in the dark scheme.
   if (input.variant === 'white') {
     return { ...resolved, color: `var(--mantine-color-${NEUTRAL_COLOR}-9)` };
