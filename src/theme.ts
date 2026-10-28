@@ -15,6 +15,7 @@ import {
   Badge,
   Button,
   Card,
+  Cascader,
   Checkbox,
   CheckboxIndicator,
   Chip,
@@ -47,6 +48,7 @@ import {
   TagsInput,
   ThemeIcon,
   Timeline,
+  TreeSelect,
   Tooltip,
   type MantineTheme,
   type MantineThemeOverride,
@@ -173,7 +175,11 @@ const chartComponents = {
   ChartTooltip: { classNames: chartClassNames },
 };
 
-const comboboxClassNames = { options: selectClasses.options, option: selectClasses.option };
+const comboboxClassNames = {
+  dropdown: popoverClasses.list,
+  options: selectClasses.options,
+  option: selectClasses.option,
+};
 
 const overlayProps = { backgroundOpacity: 0.15, blur: 4 };
 
@@ -315,6 +321,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: { root: cardClasses.root },
       defaultProps: { withBorder: true, padding: 'lg', shadow: 'xs' },
     }),
+    Cascader: Cascader.extend({ classNames: { dropdown: popoverClasses.list } }),
     Checkbox: Checkbox.extend({
       classNames: {
         root: `${checkboxClasses.root} ${inlineInputClasses.root}`,
@@ -347,7 +354,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
         },
       }),
     }),
-    Combobox: Combobox.extend({ defaultProps: { transitionProps: overlayTransitionProps } }),
+    Combobox: Combobox.extend({
+      classNames: { dropdown: popoverClasses.list },
+      defaultProps: { transitionProps: overlayTransitionProps },
+    }),
     Drawer: Drawer.extend({
       classNames: (_theme, props) => ({
         inner: drawerClasses.inner,
@@ -531,6 +541,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
         root: { '--tl-icon-color': getFilledContrast(theme, props.color) },
       }),
     }),
+    TreeSelect: TreeSelect.extend({ classNames: { dropdown: popoverClasses.list } }),
     Tooltip: Tooltip.extend({
       classNames: { tooltip: tooltipClasses.tooltip },
       defaultProps: {

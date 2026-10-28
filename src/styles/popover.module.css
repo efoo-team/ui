@@ -1,7 +1,8 @@
 @layer efoo {
   /* Like the dialog: 16px padding and 14/20 text, which Text without a size inside also follows.
-     Combobox and Menu reuse this dropdown with their own roles and keep their list padding. */
-  .dropdown[role='dialog'] {
+     Popover's theme classNames also reach the dropdowns that Combobox and Menu build on it; those carry .list and
+     keep their own list padding and text. */
+  .dropdown:not(.list) {
     --text-fz: var(--mantine-font-size-sm);
     --text-lh: var(--mantine-line-height-sm);
     padding: var(--mantine-spacing-md);
