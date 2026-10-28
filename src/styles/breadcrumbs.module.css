@@ -17,8 +17,10 @@
     color: var(--mantine-color-text);
   }
 
+  /* shadcn/ui's separator is a 14px icon; Mantine's separator text took the 16px body size. */
   .separator {
     margin-inline: 0.625rem;
+    font-size: var(--mantine-font-size-sm);
     color: var(--mantine-color-dimmed);
   }
 }
