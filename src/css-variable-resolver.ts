@@ -169,6 +169,8 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
     '--efoo-color-skeleton': `var(--mantine-color-${z}-7)`,
     // shadcn/ui's dark input line is white 15%; other surfaces keep white 10%.
     '--efoo-color-input-border': 'rgba(255, 255, 255, 0.15)',
+    '--efoo-color-input-error-border':
+      'color-mix(in srgb, var(--mantine-color-error) 50%, transparent)',
     // shadcn/ui's dark outline surface: input (white 15%) at 30%, and at 50% on hover.
     '--efoo-color-outline-bg': 'color-mix(in srgb, white 4.5%, transparent)',
     '--efoo-color-outline-hover': 'color-mix(in srgb, white 7.5%, transparent)',
