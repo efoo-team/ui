@@ -3,7 +3,7 @@ import { Stack } from '@mantine/core';
 import { DateInput, DatePicker, DateTimePicker, TimeInput } from '@mantine/dates';
 
 const meta = {
-  title: '入力 / 日付と時刻（DateInput, DateTimePicker, TimeInput）',
+  title: '入力 / 日付と時刻（DateInput, DatePicker, DateTimePicker, TimeInput）',
   component: DateInput,
   tags: ['autodocs'],
 } satisfies Meta<typeof DateInput>;

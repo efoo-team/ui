@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Group, Progress, RingProgress, Stack, Text, Title } from '@mantine/core';
 
 const meta = {
-  title: '表示 / 進捗バー（Progress）',
+  title: '表示 / 進捗（Progress, RingProgress）',
   component: Progress,
   tags: ['autodocs'],
 } satisfies Meta<typeof Progress>;
@@ -73,7 +73,7 @@ export const Ring: Story = {
         aria-label="進捗 60%"
       />
       <RingProgress
-        sections={[{ value: 25, color: 'red' }]}
+        sections={[{ value: 25, color: 'var(--mantine-primary-color-filled)' }]}
         label={
           <Text ta="center" size="sm">
             25%
