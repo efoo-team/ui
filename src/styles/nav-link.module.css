@@ -154,7 +154,7 @@
   .children {
     interpolate-size: allow-keywords;
     opacity: calc(1 - var(--efoo-rail-fold, 0));
-    transition-behavior: allow-discrete;
+    transition-behavior: normal, normal, allow-discrete, allow-discrete;
     transition-property: height, padding-block, overflow, visibility;
     transition-duration: var(--efoo-rail-duration), var(--efoo-rail-duration), 0s, 0s;
     transition-timing-function: var(--app-shell-transition-timing-function, linear);
