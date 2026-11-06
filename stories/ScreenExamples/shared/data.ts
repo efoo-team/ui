@@ -265,7 +265,7 @@ export const ORDER_STATUS: Record<OrderStatus, { label: string; attention: boole
   notShipped: { label: '未発送', attention: true },
   paymentPending: { label: '入金待ち', attention: false },
   shipped: { label: '発送済み', attention: false },
-  cancelled: { label: 'キャンセル', attention: false },
+  cancelled: { label: 'キャンセル済み', attention: false },
 };
 
 // A shipped or cancelled order can no longer be cancelled.
@@ -335,7 +335,7 @@ function orderHistory(
   const minute = String((index * 7) % 50).padStart(2, '0');
   const events: OrderEvent[] = [{ at: `${date} 09:${minute}`, label: '受注を登録', by: staff }];
   if (status === 'cancelled') {
-    events.push({ at: `${date} 15:${minute}`, label: '顧客の依頼でキャンセル', by: staff });
+    events.push({ at: `${date} 15:${minute}`, label: '受注をキャンセル（顧客の依頼）', by: staff });
     return events;
   }
   if (payment === PAYMENT_METHODS[1] && status !== 'paymentPending') {

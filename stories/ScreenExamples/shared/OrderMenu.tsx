@@ -19,7 +19,7 @@ export function OrderMenu({ order }: { order: Order }) {
         <Menu.Item>納品書を印刷</Menu.Item>
         <Menu.Divider />
         <Menu.Item color="red" disabled={!isCancellable(order)}>
-          キャンセル
+          受注をキャンセル
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>
