@@ -35,6 +35,7 @@ import {
 import { AppFrame, ICON_SIZE } from './shared/AppFrame';
 import {
   ATTENTION_COLOR,
+  CURRENT_USER,
   isoDate,
   lateDays,
   monthDay,
@@ -721,7 +722,7 @@ export const LoadFailed: Story = {
   render: () => (
     <OrderListPage
       state="error"
-      initialFilters={{ status: 'notShipped', staff: STAFF[0] ?? null }}
+      initialFilters={{ status: 'notShipped', staff: CURRENT_USER.name }}
     />
   ),
 };

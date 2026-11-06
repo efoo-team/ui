@@ -39,8 +39,15 @@ export interface Organization {
   note: string;
 }
 
+// The organization the switcher selects when a screen opens, and whose data the screens show.
+export const DEFAULT_ORGANIZATION: Organization = {
+  name: '青葉商店',
+  initial: '青',
+  note: '標準プラン',
+};
+
 export const ORGANIZATIONS: Organization[] = [
-  { name: '青葉商店', initial: '青', note: '標準プラン' },
+  DEFAULT_ORGANIZATION,
   { name: '北町センター', initial: '北', note: '標準プラン' },
   { name: 'みなと通販', initial: 'み', note: 'お試し中' },
 ];
@@ -48,7 +55,12 @@ export const ORGANIZATIONS: Organization[] = [
 // The signed-in user, who is also one of the staff.
 export const CURRENT_USER = { name: '青木 陽', initial: '青', email: 'user@example.com' };
 
-export const STAFF = [CURRENT_USER.name, '石川 舞', '上田 健'];
+// The other two staff, by what they do: 石川 checks the payments and is the organization's administrator, and 上田
+// ships the orders and looks after the stock.
+export const ACCOUNTING_STAFF = '石川 舞';
+export const SHIPPING_STAFF = '上田 健';
+
+export const STAFF = [CURRENT_USER.name, ACCOUNTING_STAFF, SHIPPING_STAFF];
 
 export interface Customer {
   name: string;
@@ -274,15 +286,20 @@ export const ORDER_STATUS: Record<OrderStatus, { label: string; attention: boole
   cancelled: { label: 'キャンセル済み', attention: false },
 };
 
-// A shipped or cancelled order can no longer be cancelled.
-export const isCancellable = (order: { status: OrderStatus }) =>
+/*
+ * An order on its way to shipping: neither shipped nor cancelled. Only such an order can still be cancelled, and only
+ * its lines still wait for stock, since an order takes its stock when it ships.
+ */
+export const awaitsShipment = (order: { status: OrderStatus }) =>
   order.status === 'notShipped' || order.status === 'paymentPending';
 
-export const PAYMENT_METHODS = [
-  '請求書払い（月末締め翌月末払い）',
-  '銀行振込（前払い）',
-  'クレジットカード',
-];
+// The payment methods by kind, so a screen names one by what it is rather than by its place in a list.
+export const PAYMENT_METHODS = {
+  invoice: '請求書払い（月末締め翌月末払い）',
+  // The only method paid before shipping.
+  bankTransfer: '銀行振込（前払い）',
+  card: 'クレジットカード',
+};
 
 export const TAX_RATE = 0.1;
 
@@ -361,16 +378,16 @@ function orderHistory(
     });
     return events;
   }
-  if (payment === PAYMENT_METHODS[1] && status !== 'paymentPending') {
+  if (payment === PAYMENT_METHODS.bankTransfer && status !== 'paymentPending') {
     events.push({
       at: `${date} 11:${minute}`,
       kind: 'paymentConfirmed',
       label: '入金を確認',
-      by: STAFF[1]!,
+      by: ACCOUNTING_STAFF,
     });
   }
   if (status === 'shipped')
-    events.push({ at: `${date} 16:${minute}`, kind: 'shipped', label: '発送', by: STAFF[2]! });
+    events.push({ at: `${date} 16:${minute}`, kind: 'shipped', label: '発送', by: SHIPPING_STAFF });
   return events;
 }
 
@@ -402,6 +419,8 @@ const ORDER_STATUSES: Record<string, OrderStatus> = {
   'SO-010208': 'cancelled',
 };
 
+const PAYMENT_METHOD_LIST = Object.values(PAYMENT_METHODS);
+
 // 36 orders, two a day from October 31 back to October 14.
 export const ORDERS: Order[] = Array.from({ length: 36 }, (_, index) => {
   const id = `SO-${String(10_240 - index).padStart(6, '0')}`;
@@ -410,7 +429,10 @@ export const ORDERS: Order[] = Array.from({ length: 36 }, (_, index) => {
   const staff = STAFF[(index * 2) % STAFF.length]!;
   const date = `10/${31 - Math.floor(index / 2)}`;
   // Only bank transfer is paid before shipping, so it is the payment of the orders waiting for it.
-  const payment = status === 'paymentPending' ? PAYMENT_METHODS[1]! : PAYMENT_METHODS[index % 3]!;
+  const payment =
+    status === 'paymentPending'
+      ? PAYMENT_METHODS.bankTransfer
+      : PAYMENT_METHOD_LIST[index % PAYMENT_METHOD_LIST.length]!;
   const lines = orderLines(index);
   const subtotal = sum(lines.map((line) => line.unitPrice * line.quantity));
   const tax = Math.floor(subtotal * TAX_RATE);

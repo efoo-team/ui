@@ -27,8 +27,8 @@ import {
   ALL_PRODUCTS,
   ATTENTION_COLOR,
   needsReorder,
+  ACCOUNTING_STAFF,
   PRODUCT_CATEGORIES,
-  STAFF,
   yen,
   type Product,
 } from './shared/data';
@@ -59,10 +59,10 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Every name and number below is fictional. The signed-in user (CURRENT_USER) has the member role; one of the staff
-// is the administrator the screens point to.
+// Every name and number below is fictional. The signed-in user (CURRENT_USER) has the member role; the staff member
+// who checks the payments is the administrator the screens point to.
 const ROLE = { admin: '管理者', member: 'メンバー' };
-const ADMIN = STAFF[1]!;
+const ADMIN = ACCOUNTING_STAFF;
 
 function SalesReportPage() {
   const [requested, setRequested] = useState(false);

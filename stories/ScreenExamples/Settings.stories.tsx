@@ -28,7 +28,15 @@ import { useForm, type FormErrors } from '@mantine/form';
 import { useWindowEvent } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { AppFrame } from './shared/AppFrame';
-import { ATTENTION_COLOR, ORGANIZATIONS, PAYMENT_METHODS, STAFF } from './shared/data';
+import {
+  ACCOUNTING_STAFF,
+  ATTENTION_COLOR,
+  CURRENT_USER,
+  DEFAULT_ORGANIZATION,
+  PAYMENT_METHODS,
+  SHIPPING_STAFF,
+  STAFF,
+} from './shared/data';
 import { SectionCard } from './shared/SectionCard';
 
 const meta = {
@@ -57,9 +65,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Every name, address and number below is fictional. The settings belong to the first organization in the switcher.
-const ORGANIZATION = ORGANIZATIONS[0]!;
-
+// Every name, address and number below is fictional. The settings belong to the organization the switcher opens with.
 const ORDER_OWNER = '受注の担当者';
 const ORDER_CREATOR = '受注を登録した人';
 
@@ -139,7 +145,7 @@ interface SettingsValues {
 // What the server holds. The staff split follows the order history: 石川 checks payments, 上田 ships.
 const SAVED_SETTINGS: SettingsValues = {
   organization: {
-    name: ORGANIZATION.name,
+    name: DEFAULT_ORGANIZATION.name,
     postalCode: '000-0010',
     address: '東京都見本区青葉町 2-8-1 青葉ビル 3 階',
     phone: '03-0000-1010',
@@ -147,17 +153,17 @@ const SAVED_SETTINGS: SettingsValues = {
     registrationNumber: 'T0000000000010',
   },
   orderDefaults: {
-    payment: PAYMENT_METHODS[0]!,
+    payment: PAYMENT_METHODS.invoice,
     staff: ORDER_CREATOR,
     shipAfterDays: 2,
     confirmationMail: true,
   },
   notifications: {
-    unshipped: { recipients: [ORDER_OWNER, STAFF[2]!], channels: ['mail', 'app'] },
-    reorder: { recipients: [STAFF[2]!], channels: ['app'] },
-    inquiry: { recipients: [STAFF[0]!, STAFF[1]!], channels: ['app'] },
-    payment: { recipients: [STAFF[1]!], channels: ['mail'] },
-    cancelled: { recipients: [ORDER_OWNER, STAFF[2]!], channels: ['app'] },
+    unshipped: { recipients: [ORDER_OWNER, SHIPPING_STAFF], channels: ['mail', 'app'] },
+    reorder: { recipients: [SHIPPING_STAFF], channels: ['app'] },
+    inquiry: { recipients: [CURRENT_USER.name, ACCOUNTING_STAFF], channels: ['app'] },
+    payment: { recipients: [ACCOUNTING_STAFF], channels: ['mail'] },
+    cancelled: { recipients: [ORDER_OWNER, SHIPPING_STAFF], channels: ['app'] },
   },
   mailTiming: 'each',
 };
@@ -165,11 +171,11 @@ const SAVED_SETTINGS: SettingsValues = {
 // Three edits in two sections: the default payment, one more person for low stock, and mail for open inquiries.
 const EDITED_SETTINGS: SettingsValues = {
   ...SAVED_SETTINGS,
-  orderDefaults: { ...SAVED_SETTINGS.orderDefaults, payment: PAYMENT_METHODS[2]! },
+  orderDefaults: { ...SAVED_SETTINGS.orderDefaults, payment: PAYMENT_METHODS.card },
   notifications: {
     ...SAVED_SETTINGS.notifications,
-    reorder: { recipients: [STAFF[2]!, STAFF[0]!], channels: ['app'] },
-    inquiry: { recipients: [STAFF[0]!, STAFF[1]!], channels: ['app', 'mail'] },
+    reorder: { recipients: [SHIPPING_STAFF, CURRENT_USER.name], channels: ['app'] },
+    inquiry: { recipients: [CURRENT_USER.name, ACCOUNTING_STAFF], channels: ['app', 'mail'] },
   },
 };
 
@@ -434,7 +440,11 @@ function SettingsPage({
   const changedSummary = `${changedSections.map((section) => section.title).join('・')}の変更 ${changedItems.length} 件`;
 
   return (
-    <AppFrame parent="設定" defaultOrganization={ORGANIZATION} onBeforeNavigate={confirmLeaving}>
+    <AppFrame
+      parent="設定"
+      defaultOrganization={DEFAULT_ORGANIZATION}
+      onBeforeNavigate={confirmLeaving}
+    >
       <form noValidate onSubmit={save}>
         {/* A narrow column keeps each label next to its field; the settings are read, not scanned like a table. */}
         <Stack gap="lg" maw={720}>
@@ -443,7 +453,7 @@ function SettingsPage({
               設定
             </Title>
             <Text size="sm" c="dimmed">
-              {ORGANIZATION.name}
+              {DEFAULT_ORGANIZATION.name}
               の全員に共通する設定です。項目を変えると画面の下に「変更を保存」が出るので、そこでまとめて保存します。
             </Text>
           </Stack>
@@ -588,7 +598,7 @@ function SettingsPage({
                     label={
                       <Label changed={isChanged((v) => v.orderDefaults.payment)}>支払い方法</Label>
                     }
-                    data={PAYMENT_METHODS}
+                    data={Object.values(PAYMENT_METHODS)}
                     allowDeselect={false}
                     {...form.getInputProps('orderDefaults.payment')}
                   />

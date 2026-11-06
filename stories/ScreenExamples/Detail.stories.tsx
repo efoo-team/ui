@@ -47,13 +47,13 @@ import { AppFrame, CONTENT_BREAKPOINTS, ICON_SIZE } from './shared/AppFrame';
 import { BackLink } from './shared/BackLink';
 import {
   ATTENTION_COLOR,
+  awaitsShipment,
   CURRENT_USER,
+  DEFAULT_ORGANIZATION,
   findOrder,
   fromIsoDate,
-  isCancellable,
   monthDay,
   NOW,
-  ORGANIZATIONS,
   PAYMENT_METHODS,
   TAX_RATE,
   yen,
@@ -99,9 +99,6 @@ const MISSING_ORDER_ID = 'SO-010420';
 const PAYMENT_PENDING_ORDER_ID = 'SO-010239';
 const SHORT_STOCK_ORDER_ID = 'SO-010228';
 
-// The organization AppFrame opens with, the one whose orders the screen looked in.
-const ORGANIZATION = ORGANIZATIONS[0]!;
-
 const DELIVERY_REQUESTS: Record<string, string> = { [ORDER_ID]: '11 月 4 日（水）午前中' };
 
 const CARRIERS = ['見本運輸', 'サンプル急便', '自社便'];
@@ -121,12 +118,8 @@ function validateTrackingNumber(value: string) {
   return /^[0-9-]+$/.test(value.trim()) ? null : '送り状番号は数字とハイフンで入力してください。';
 }
 
-// An order takes stock only when it ships, so stock is checked until then.
-const isUnshipped = (order: Order) =>
-  order.status === 'notShipped' || order.status === 'paymentPending';
-
 const shortLines = (order: Order) =>
-  isUnshipped(order) ? order.lines.filter((line) => line.product.quantity < line.quantity) : [];
+  awaitsShipment(order) ? order.lines.filter((line) => line.product.quantity < line.quantity) : [];
 
 // When each short product is due in. An order waiting for one is told the day, so the person can tell the customer.
 const RESTOCKS: Record<string, string> = { 'P-1002': '11 月 6 日（金）' };
@@ -136,9 +129,9 @@ const isDelayNoticeSent = (order: Order) =>
 
 // Why a paid-for or paid-later order does not wait for money, by payment method.
 const PAYMENT_CLEARANCE: Record<string, string> = {
-  [PAYMENT_METHODS[0]!]: '後払いのため入金を待ちません',
-  [PAYMENT_METHODS[1]!]: '入金も確認済みです',
-  [PAYMENT_METHODS[2]!]: 'カードの決済も済んでいます',
+  [PAYMENT_METHODS.invoice]: '後払いのため入金を待ちません',
+  [PAYMENT_METHODS.bankTransfer]: '入金も確認済みです',
+  [PAYMENT_METHODS.card]: 'カードの決済も済んでいます',
 };
 
 type Verdict = { icon: Icon; text: string };
@@ -187,12 +180,6 @@ function ShippingVerdict({ order }: { order: Order }) {
       <Text size="sm">{text}</Text>
     </Group>
   );
-}
-
-// '2026-10-31' -> '10 月 31 日'.
-function isoMonthDay(date: string) {
-  const [, month, day] = date.split('-');
-  return `${Number(month)} 月 ${Number(day)} 日`;
 }
 
 function ShipmentModal({
@@ -337,7 +324,7 @@ function delayNoticeDraft(order: Order): DelayNoticeValues {
       `${customer.name}\n${customer.contact} 様\n\n` +
       `いつもお世話になっております。${monthDay(order.date)}にご注文いただいた ${order.id} のうち、${products}の在庫が足りず、発送が遅れます。${due}\n\n` +
       '在庫のある商品だけを先にお送りすることもできます。ご希望の場合は、このメールにご返信ください。\n\n' +
-      `${ORGANIZATION.name} ${CURRENT_USER.name}`,
+      `${DEFAULT_ORGANIZATION.name} ${CURRENT_USER.name}`,
   };
 }
 
@@ -497,7 +484,7 @@ function OrderActions({
         <Menu.Dropdown>
           <Menu.Item leftSection={<IconEdit size={ICON_SIZE} />}>受注を編集</Menu.Item>
           <Menu.Item leftSection={<IconCopy size={ICON_SIZE} />}>受注を複製</Menu.Item>
-          {isCancellable(order) && (
+          {awaitsShipment(order) && (
             <>
               <Menu.Divider />
               <Menu.Item
@@ -530,7 +517,7 @@ function LinesCard({ order }: { order: Order }) {
         </Table.Thead>
         <Table.Tbody>
           {order.lines.map(({ product, quantity, unitPrice }) => {
-            const short = isUnshipped(order) && product.quantity < quantity;
+            const short = awaitsShipment(order) && product.quantity < quantity;
             return (
               <Table.Tr key={product.code}>
                 <Table.Td>
@@ -731,7 +718,7 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
   const recordPayment = ({ paidOn }: PaymentValues) => {
     addEvent('notShipped', {
       kind: 'paymentConfirmed',
-      label: `入金を確認（${isoMonthDay(paidOn ?? NOW.date)}の振込）`,
+      label: `入金を確認（${monthDay(fromIsoDate(paidOn ?? NOW.date))}の振込）`,
     });
     setPaymentOpened(false);
     notifications.show({
@@ -911,7 +898,7 @@ function NotFoundContent({ id }: { id: string }) {
         <EmptyState icon={<IconFileSearch />} withIndicatorBackground>
           <EmptyState.Title order={2}>受注が見つかりません</EmptyState.Title>
           <EmptyState.Description>
-            {ORGANIZATION.name}
+            {DEFAULT_ORGANIZATION.name}
             の受注に、この受注番号はありません。見出しの番号に打ち間違いが無いか確かめてください。ほかの組織の受注なら、サイドバーのいちばん上で組織を切り替えてから開き直してください。
           </EmptyState.Description>
           <EmptyState.Actions>
@@ -934,7 +921,8 @@ function OrderDetailPage({ id, state }: { id: string; state?: 'loading' }) {
       parent="受注"
       page="受注一覧"
       breadcrumbs={[...LIST_BREADCRUMBS, id]}
-      defaultOrganization={ORGANIZATION}
+      // The organization whose orders the screen looked in, named by the card when the order is not found.
+      defaultOrganization={DEFAULT_ORGANIZATION}
     >
       {/*
        * Said only to a screen reader, as the skeletons say nothing to it. The line stays in place empty once the order

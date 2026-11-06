@@ -45,7 +45,14 @@ import {
   IconUsers,
   type Icon,
 } from '@tabler/icons-react';
-import { ATTENTION_COLOR, CURRENT_USER, INQUIRIES, ORGANIZATIONS, type Organization } from './data';
+import {
+  ATTENTION_COLOR,
+  CURRENT_USER,
+  DEFAULT_ORGANIZATION,
+  INQUIRIES,
+  ORGANIZATIONS,
+  type Organization,
+} from './data';
 
 export const ICON_SIZE = 16;
 
@@ -364,7 +371,7 @@ export interface AppFrameProps {
   page?: string;
   /** The page path in the header. Defaults to [parent, page]; the last item is the current screen. */
   breadcrumbs?: string[];
-  /** The organization selected in the switcher when the screen opens. Defaults to the first of ORGANIZATIONS. */
+  /** The organization selected in the switcher when the screen opens. Defaults to DEFAULT_ORGANIZATION. */
   defaultOrganization?: Organization;
   /**
    * The counts beside the sidebar links without child links, by label. Defaults to the counts in NAV_ITEMS (the open
@@ -409,9 +416,7 @@ export function AppFrame({
   const [opened, { toggle, close }] = useDisclosure(false);
   const [desktopOpened, { toggle: toggleDesktop, open: openDesktop }] = useDisclosure(true);
   const [searchOpened, { open: openSearch, close: closeSearch }] = useDisclosure(false);
-  const [organization, setOrganization] = useState<Organization>(
-    defaultOrganization ?? ORGANIZATIONS[0]!,
-  );
+  const [organization, setOrganization] = useState(defaultOrganization ?? DEFAULT_ORGANIZATION);
   const [openedParents, setOpenedParents] = useState<string[]>([parent]);
   const navbarId = useId();
   const theme = useMantineTheme();
