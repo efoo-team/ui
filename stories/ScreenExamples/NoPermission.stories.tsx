@@ -98,23 +98,21 @@ function SalesReportPage() {
           </Text>
         </Stack>
         <Card>
-          <EmptyState
-            icon={<IconLock />}
-            withIndicatorBackground
-            title="売上のレポートを見る権限がありません"
-            /*
+          <EmptyState icon={<IconLock />} withIndicatorBackground>
+            {/* The compound Title takes a heading level, so the message sits under the page's h1 in the outline. */}
+            <EmptyState.Title order={2}>売上のレポートを見る権限がありません</EmptyState.Title>
+            {/*
              * With only two roles, a reader may fear the request makes them an administrator, so the text says it
              * opens this page alone and the role stays, in the words the button repeats (閲覧を依頼). The scope is
              * left to the text so the button stays short enough to sit beside the way on at a phone's width. Once
              * sent, the text says what happens next and where the answer arrives (the notices under ホーム) instead
              * of asking for the request again.
-             */
-            description={
-              requested
+             */}
+            <EmptyState.Description>
+              {requested
                 ? `10 月 31 日に、${ROLE.admin}の${ADMIN}さんへこのページの閲覧を依頼しました。許可されるとお知らせが届き、このページを開けるようになります。今月の受注額の合計は、ダッシュボードで見られます。`
-                : `売上のレポートは${ROLE.admin}だけが見られます。${ROLE.admin}の${ADMIN}さんに閲覧を依頼できます。許されるのはこのページだけで、役割は${ROLE.member}のままです。今月の受注額の合計は、ダッシュボードで見られます。`
-            }
-          >
+                : `売上のレポートは${ROLE.admin}だけが見られます。${ROLE.admin}の${ADMIN}さんに閲覧を依頼できます。許されるのはこのページだけで、役割は${ROLE.member}のままです。今月の受注額の合計は、ダッシュボードで見られます。`}
+            </EmptyState.Description>
             <EmptyState.Actions>
               {!requested && <Button onClick={request}>閲覧を依頼</Button>}
               <Button ref={dashboardRef} variant="default">

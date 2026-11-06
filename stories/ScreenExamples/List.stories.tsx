@@ -556,18 +556,15 @@ function OrdersCard({
               </Alert>
             ) : !loading && rows.length === 0 ? (
               // Not the first-run empty state: orders exist, the conditions exclude them, so the way out is to loosen them.
-              <EmptyState
-                icon={<IconSearch />}
-                title="条件に合う受注はありません"
-                description={
-                  // When other states hold matches, the way out is the tab; otherwise it is the fields above.
-                  filters.status !== 'all' && matching.length > 0
+              <EmptyState icon={<IconSearch />} withIndicatorBackground py="xl">
+                {/* The compound Title takes a heading level, so the message sits under the page's h1 in the outline. */}
+                <EmptyState.Title order={2}>条件に合う受注はありません</EmptyState.Title>
+                {/* When other states hold matches, the way out is the tab; otherwise it is the fields above. */}
+                <EmptyState.Description>
+                  {filters.status !== 'all' && matching.length > 0
                     ? `ほかの状態に ${matching.length} 件あります。`
-                    : '検索の言葉や条件を変えてください。'
-                }
-                withIndicatorBackground
-                py="xl"
-              >
+                    : '検索の言葉や条件を変えてください。'}
+                </EmptyState.Description>
                 {filters.status !== 'all' && matching.length > 0 && (
                   <EmptyState.Actions>
                     <Button variant="default" onClick={() => onChange({ status: 'all', page: 1 })}>

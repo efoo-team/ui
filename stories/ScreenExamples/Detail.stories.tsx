@@ -892,10 +892,7 @@ function NotFoundContent({ id }: { id: string }) {
         {id}
       </Title>
       <Card>
-        <EmptyState withIndicatorBackground>
-          <EmptyState.Indicator>
-            <IconFileSearch />
-          </EmptyState.Indicator>
+        <EmptyState icon={<IconFileSearch />} withIndicatorBackground>
           <EmptyState.Title order={2}>受注が見つかりません</EmptyState.Title>
           <EmptyState.Description>
             {ORGANIZATION.name}
