@@ -2,6 +2,7 @@ declare const classNames: {
   readonly description: string;
   readonly error: string;
   readonly input: string;
+  readonly inputWrapper: string;
   readonly label: string;
   readonly numberControl: string;
   readonly pillsField: string;

@@ -1,5 +1,4 @@
 declare const classNames: {
-  readonly group: string;
   readonly icon: string;
   readonly indicator: string;
   readonly inner: string;

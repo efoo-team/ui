@@ -10,18 +10,6 @@
     --radio-size-xl: calc(1.5rem * var(--mantine-scale));
   }
 
-  /* Radio.Group is an Input.Wrapper that holds its options in a div[role='radiogroup'], with the label and the
-     description above it and the error below. Mantine sets an Input apart from its description and error but not this
-     div, so the theme does: xs under what is above, as between a name and its row of options, and half of xs over the
-     error, as Mantine leaves between an input and its error. With nothing above, the options start at the top. */
-  .group > * + [role='radiogroup'] {
-    margin-top: var(--mantine-spacing-xs);
-  }
-
-  .group > [role='radiogroup'] ~ * {
-    margin-top: calc(var(--mantine-spacing-xs) / 2);
-  }
-
   /* Radio.Group does not pass its error to each Radio, so the group root's data-error selects the circles. */
   .group[data-error] .radio:not(:checked, :disabled),
   .radio[data-error]:not(:checked) {

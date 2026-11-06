@@ -112,6 +112,21 @@
     opacity: 0.5;
   }
 
+  /* Radio.Group, Checkbox.Group and Switch.Group are an Input.Wrapper that holds the options in a div with the role
+     radiogroup or group and no class (Mantine's InputsGroupFieldset), with the label and the description above it and
+     the error below. Mantine sets only an Input apart from its description and error, so the theme sets the options
+     apart: xs under what is above, as between a name and its row of options, and half of xs over the error, as Mantine
+     leaves between an input and its error. With nothing above, the options start at the top. Mantine's own parts with
+     these roles (SegmentedControl, PinInput, Button.Group) carry a class, so in an Input.Wrapper they stay where
+     Mantine puts them, like an input. */
+  .inputWrapper > * + :is([role='radiogroup'], [role='group']):not([class]) {
+    margin-top: var(--mantine-spacing-xs);
+  }
+
+  .inputWrapper > :is([role='radiogroup'], [role='group']):not([class]) ~ * {
+    margin-top: calc(var(--mantine-spacing-xs) / 2);
+  }
+
   .label {
     font-size: min(
       var(--input-label-size, var(--mantine-font-size-sm)),
