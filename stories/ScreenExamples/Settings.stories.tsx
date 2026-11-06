@@ -315,7 +315,8 @@ function SettingsPage({
   // What the server holds; the form starts from initialValues, which differ from it in the unsaved story.
   const [saved, setSaved] = useState(SAVED_SETTINGS);
   const [saving, setSaving] = useState(false);
-  const [leaving, setLeaving] = useState<string | null>(null);
+  // The page the user tried to move to, and how to move there after all.
+  const [leaving, setLeaving] = useState<{ label: string; proceed: () => void } | null>(null);
   const saveBarRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   // Controlled, so the save bar and the 未保存 marks follow every keystroke.
@@ -362,10 +363,11 @@ function SettingsPage({
     if (dirty) event.preventDefault();
   });
 
-  // Moving to another page with unsaved changes asks first; the frame calls this before it moves.
-  const confirmLeaving = (label: string) => {
+  // Moving to another page with unsaved changes asks first; the frame calls this before it moves, and proceed moves
+  // after all (it closes the narrow-screen sidebar; in a service it is the router blocker's proceed).
+  const confirmLeaving = (label: string, proceed: () => void) => {
     if (!dirty) return true;
-    setLeaving(label);
+    setLeaving({ label, proceed });
     return false;
   };
 
@@ -767,7 +769,7 @@ function SettingsPage({
       >
         <Stack gap="lg">
           <Text size="sm">
-            {changedSummary}を、まだ保存していません。このまま「{leaving}
+            {changedSummary}を、まだ保存していません。このまま「{leaving?.label}
             」に移動すると、変更は失われます。
           </Text>
           <Group justify="flex-end" gap="sm">
@@ -778,6 +780,7 @@ function SettingsPage({
               color="red"
               onClick={() => {
                 discard();
+                leaving?.proceed();
                 setLeaving(null);
               }}
             >
