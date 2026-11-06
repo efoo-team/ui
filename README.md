@@ -134,7 +134,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-ブラウザだけで描画する SPA（Vite など）では、`MantineProvider` が最初のクライアント側の描画で保存された値を読み、`<html data-mantine-color-scheme>` を描画前に書きます。`ColorSchemeScript` の置き場所は、Mantine の Vite テンプレート（`mantinedev/vite-template`）が `index.html` と `src/` で `ColorSchemeScript` を使っていないため、確認できた範囲では必須ではありません。
+ブラウザだけで描画する SPA（Vite など）では、`ColorSchemeScript` は要りません。`MantineProvider` が最初のクライアント側の描画で保存された値（無ければ `defaultColorScheme`）を読み、`<html data-mantine-color-scheme>` を描画前に書くためです。Mantine の公式ドキュメントも、`ColorSchemeScript` は SSR で誤った配色が一瞬出るのを避けるためのものとし、Vite のような client-only の構成では hydration が無いと書いています。Mantine の Vite テンプレート（`mantinedev/vite-template`）も `ColorSchemeScript` を使っていません。
 
 cookie などに保存する場合は、`MantineColorSchemeManager`（`get(defaultValue)`・`set(value)`・`subscribe(onUpdate)`・`unsubscribe()`・`clear()`）を実装し、`colorSchemeManager` に渡します。`get` は、サーバー側（`window` が無い環境）では `defaultValue` を返します。
 
