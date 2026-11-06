@@ -372,12 +372,13 @@ export interface AppFrameProps {
    */
   counts?: Partial<Record<string, number>>;
   /**
-   * Called with the label of a sidebar link or a page path item before the screen moves to it; return false to stay.
-   * A service does this with its router's navigation blocker (React Router's useBlocker, for example); in Storybook the
-   * links lead nowhere, so a screen that guards unsaved changes uses this instead. Links to the current screen, and
-   * buttons that only open child links or a menu, do not move and do not call it.
+   * Called with the label of a sidebar link or a page path item before the screen moves to it; return false to stay,
+   * and call `proceed` to move after all (once the user has confirmed). A service does this with its router's
+   * navigation blocker (React Router's useBlocker and its proceed, for example); in Storybook the links lead nowhere,
+   * so a screen that guards unsaved changes uses this instead. Links to the current screen, and buttons that only open
+   * child links or a menu, do not move and do not call it.
    */
-  onBeforeNavigate?: (label: string) => boolean;
+  onBeforeNavigate?: (label: string, proceed: () => void) => boolean;
   /** The content of the main area. */
   children: ReactNode;
 }
@@ -418,10 +419,14 @@ export function AppFrame({
     openDesktop();
     setOpenedParents((current) => (current.includes(label) ? current : [...current, label]));
   };
-  // A press that the screen holds back keeps the Drawer open, so the user is where they pressed.
+  /*
+   * Moving closes the Drawer. A press that the screen holds back keeps it open, so the user is where they pressed if
+   * they stay; when they move after all, the screen calls proceed and it closes then. Storybook's links lead nowhere,
+   * so moving is only closing; in a service the router moves, and proceed is its blocker's.
+   */
   const navigate = (label: string, event: MouseEvent<HTMLElement>) => {
     const moves = event.currentTarget.getAttribute('aria-current') !== 'page';
-    if (moves && onBeforeNavigate?.(label) === false) {
+    if (moves && onBeforeNavigate?.(label, close) === false) {
       event.preventDefault();
       return;
     }
