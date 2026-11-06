@@ -106,7 +106,7 @@ const NOTIFICATION_EVENTS: NotificationEvent[] = [
   },
   {
     key: 'cancelled',
-    label: 'キャンセルされた受注',
+    label: 'キャンセル済みの受注',
     description: '発送の準備を止められるように、受注がキャンセルされたときに知らせます。',
     recipients: [ORDER_OWNER, ...STAFF],
   },
@@ -317,6 +317,7 @@ function SettingsPage({
   const [saving, setSaving] = useState(false);
   const [leaving, setLeaving] = useState<string | null>(null);
   const saveBarRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   // Controlled, so the save bar and the 未保存 marks follow every keystroke.
   const form = useForm<SettingsValues>({
     mode: 'controlled',
@@ -368,11 +369,24 @@ function SettingsPage({
     return false;
   };
 
+  /*
+   * The save button is disabled while it saves, and the bar goes away once nothing is unsaved, so focus on either would
+   * fall to the page's body. It moves to the page's heading without scrolling, so Tab starts again from the top of the
+   * page. Focus elsewhere, such as the field where Enter submitted the form, stays where it is.
+   */
+  const keepFocusOnPage = () => {
+    const active = document.activeElement;
+    if (active === document.body || saveBarRef.current?.contains(active)) {
+      titleRef.current?.focus({ preventScroll: true });
+    }
+  };
+
   // Saving is pretended: after a short wait the edited values become the saved ones.
   const save = form.onSubmit(
     (submitted) => {
       setSaving(true);
       window.setTimeout(() => {
+        keepFocusOnPage();
         setSaved(submitted);
         setSaving(false);
         notifications.show({
@@ -393,6 +407,7 @@ function SettingsPage({
   const errorFields = CHECKED_FIELDS.filter(([field]) => form.errors[field]);
 
   const discard = () => {
+    keepFocusOnPage();
     form.setValues(saved);
     form.clearErrors();
   };
@@ -405,7 +420,7 @@ function SettingsPage({
         {/* A narrow column keeps each label next to its field; the settings are read, not scanned like a table. */}
         <Stack gap="lg" maw={720}>
           <Stack gap={4}>
-            <Title order={1} size="h3">
+            <Title ref={titleRef} tabIndex={-1} order={1} size="h3">
               設定
             </Title>
             <Text size="sm" c="dimmed">
