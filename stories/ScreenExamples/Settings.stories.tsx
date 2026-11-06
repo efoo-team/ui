@@ -219,7 +219,12 @@ const SETTING_ITEMS: { section: SectionKey; pick: (values: SettingsValues) => un
   { section: 'notifications', pick: (values) => values.mailTiming },
 ];
 
-const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+// A setting is a single value or, for a notification's people and channels, a set, where the order the items were
+// picked in does not make it differ.
+const same = (a: unknown, b: unknown) =>
+  Array.isArray(a) && Array.isArray(b)
+    ? a.length === b.length && a.every((item) => b.includes(item))
+    : a === b;
 
 const POSTAL_CODE_PATTERN = /^\d{3}-\d{4}$/;
 const PHONE_PATTERN = /^0\d{1,4}-\d{1,4}-\d{3,4}$/;
