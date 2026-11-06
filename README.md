@@ -72,8 +72,10 @@ export function App() {
 }
 ```
 
-`efooCssVariablesResolver` を渡さなくても表示は崩れませんが、次の点が shadcn/ui から外れます。
+`efooCssVariablesResolver` を渡さないと、次のとおり表示が崩れたり、shadcn/ui から外れたりします。
 
+- Tooltip の背景と文字の色が定義されず、背景が透明になる。
+- グラフの系列の色に使う `--efoo-chart-1`〜`--efoo-chart-5` が定義されず、それを `series` の `color` に渡した系列に色が付かない。
 - ダークで primary の zinc が反転せず、暗い塗りに白文字のままになる。
 - ダークのエラー色が `red-8`（`#9f0712`）になり読みにくい。
 - focus の輪郭が primary の色になる。
@@ -239,7 +241,14 @@ export const cssVariablesResolver: CSSVariablesResolver = (theme) =>
 
 独自の `variantColorResolver` を持つ場合は、`efooVariantColorResolver(input)` の結果を起点に差分を足します。
 
-Pagination の `getControlProps`・`attributes` と、Select・MultiSelect・TagsInput・Autocomplete の `clearButtonProps` は、theme が日本語の aria-label を入れた既定値を持っており、サービスでこれらの prop を渡すと既定値ごと置き換わるため、aria-label（Pagination の `…` は `aria-hidden`）も含めて渡してください。
+theme は、次の prop に日本語の aria-label を入れた既定値を持っています。サービスでこれらの prop を渡すと既定値ごと置き換わるため、aria-label（Pagination の `…` は `aria-hidden`）も含めて渡してください。
+
+- Pagination の `getControlProps`・`attributes`。
+- Select・MultiSelect・TagsInput・Autocomplete・DateInput・DatePickerInput・MonthPickerInput・YearPickerInput・DateTimePicker の `clearButtonProps`。
+- DateTimePicker の `submitButtonProps`。
+- PasswordInput の `visibilityToggleButtonProps`。
+- 日付・時刻の部品（Calendar・DatePicker・DateInput など）の `ariaLabels` と `getDayAriaLabel`。
+- TimePicker の `hoursInputLabel`・`minutesInputLabel`・`secondsInputLabel`。
 
 ### 動き
 

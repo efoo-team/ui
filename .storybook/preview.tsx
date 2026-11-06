@@ -163,7 +163,7 @@ const preview: Preview = {
           [
             '表・カード・バッジ（Table, Card, Badge）',
             'アバター（Avatar）',
-            '進捗バー（Progress）',
+            '進捗（Progress, RingProgress）',
             '読み込み表示とツールチップ（Skeleton, Tooltip）',
           ],
           '重ねて表示',
