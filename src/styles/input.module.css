@@ -112,14 +112,11 @@
     opacity: 0.5;
   }
 
-  /* Mantine breaks long words in these with overflow-wrap: break-word, which still leaves a phrase's width as the
-     narrowest the text can be; anywhere lets a long phrase break inside a narrow row too (base.module.css). */
   .label {
     font-size: min(
       var(--input-label-size, var(--mantine-font-size-sm)),
       var(--mantine-font-size-md)
     );
-    overflow-wrap: anywhere;
   }
 
   .description,
@@ -128,7 +125,6 @@
       var(--input-description-size, var(--input-error-size, var(--mantine-font-size-xs))),
       var(--mantine-font-size-sm)
     );
-    overflow-wrap: anywhere;
   }
 
   .visibilityToggle {

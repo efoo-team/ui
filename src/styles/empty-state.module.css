@@ -20,7 +20,7 @@
     font-weight: var(--mantine-font-weight-medium);
     line-height: var(--mantine-line-height-sm);
     word-break: auto-phrase;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
 
   .indicator[data-with-background] {

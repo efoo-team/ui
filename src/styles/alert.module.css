@@ -26,6 +26,6 @@
   .title,
   .message {
     word-break: auto-phrase;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
 }
