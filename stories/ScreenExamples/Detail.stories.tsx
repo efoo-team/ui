@@ -130,10 +130,8 @@ const shortLines = (order: Order) =>
 // When each short product is due in. An order waiting for one is told the day, so the person can tell the customer.
 const RESTOCKS: Record<string, string> = { 'P-1002': '11 月 6 日（金）' };
 
-const DELAY_LABEL = '発送の遅れを顧客へ連絡（メール）';
-
 const isDelayNoticeSent = (order: Order) =>
-  order.history.some((event) => event.label === DELAY_LABEL);
+  order.history.some((event) => event.kind === 'delayNotified');
 
 // Why a paid-for or paid-later order does not wait for money, by payment method.
 const PAYMENT_CLEARANCE: Record<string, string> = {
@@ -151,9 +149,7 @@ type Verdict = { icon: Icon; text: string };
  */
 function shippingVerdict(order: Order): Verdict {
   if (order.status === 'shipped') {
-    const shipped = [...order.history]
-      .reverse()
-      .find((event) => event.label === '発送' || event.label.startsWith('発送（'));
+    const shipped = [...order.history].reverse().find((event) => event.kind === 'shipped');
     const day = shipped ? `${monthDay(shipped.at.split(' ')[0]!)}に` : '';
     return { icon: IconTruckDelivery, text: `${day}発送しました。` };
   }
@@ -707,7 +703,7 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
   };
 
   const ship = ({ carrier, trackingNumber }: ShipmentValues) => {
-    addEvent('shipped', { label: `発送（${carrier} ${trackingNumber.trim()}）` });
+    addEvent('shipped', { kind: 'shipped', label: `発送（${carrier} ${trackingNumber.trim()}）` });
     setShipOpened(false);
     notifications.show({
       title: '発送を記録しました',
@@ -716,7 +712,10 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
   };
 
   const recordPayment = ({ paidOn }: PaymentValues) => {
-    addEvent('notShipped', { label: `入金を確認（${isoMonthDay(paidOn ?? NOW.date)}の振込）` });
+    addEvent('notShipped', {
+      kind: 'paymentConfirmed',
+      label: `入金を確認（${isoMonthDay(paidOn ?? NOW.date)}の振込）`,
+    });
     setPaymentOpened(false);
     notifications.show({
       title: '入金を記録しました',
@@ -725,7 +724,7 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
   };
 
   const notifyDelay = () => {
-    addEvent(order.status, { label: DELAY_LABEL });
+    addEvent(order.status, { kind: 'delayNotified', label: '発送の遅れを顧客へ連絡（メール）' });
     setDelayOpened(false);
     notifications.show({
       title: '発送の遅れを連絡しました',
@@ -734,7 +733,7 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
   };
 
   const cancel = () => {
-    addEvent('cancelled', { label: '受注をキャンセル' });
+    addEvent('cancelled', { kind: 'cancelled', label: '受注をキャンセル' });
     setCancelOpened(false);
     notifications.show({
       title: '受注をキャンセルしました',

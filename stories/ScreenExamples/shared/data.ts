@@ -287,9 +287,15 @@ export interface OrderLine {
   unitPrice: number;
 }
 
+// What happened to an order. A screen tells events apart by this, not by the wording of the label, which can change.
+export type OrderEventKind =
+  'registered' | 'paymentConfirmed' | 'delayNotified' | 'shipped' | 'cancelled';
+
 export interface OrderEvent {
   /** Month/day and time, e.g. '10/31 09:12'. */
   at: string;
+  kind: OrderEventKind;
+  /** What the history shows, with the details of this one event (the carrier, the day of the transfer). */
   label: string;
   by: string;
 }
@@ -333,16 +339,28 @@ function orderHistory(
   staff: string,
 ) {
   const minute = String((index * 7) % 50).padStart(2, '0');
-  const events: OrderEvent[] = [{ at: `${date} 09:${minute}`, label: '受注を登録', by: staff }];
+  const events: OrderEvent[] = [
+    { at: `${date} 09:${minute}`, kind: 'registered', label: '受注を登録', by: staff },
+  ];
   if (status === 'cancelled') {
-    events.push({ at: `${date} 15:${minute}`, label: '受注をキャンセル（顧客の依頼）', by: staff });
+    events.push({
+      at: `${date} 15:${minute}`,
+      kind: 'cancelled',
+      label: '受注をキャンセル（顧客の依頼）',
+      by: staff,
+    });
     return events;
   }
   if (payment === PAYMENT_METHODS[1] && status !== 'paymentPending') {
-    events.push({ at: `${date} 11:${minute}`, label: '入金を確認', by: STAFF[1]! });
+    events.push({
+      at: `${date} 11:${minute}`,
+      kind: 'paymentConfirmed',
+      label: '入金を確認',
+      by: STAFF[1]!,
+    });
   }
   if (status === 'shipped')
-    events.push({ at: `${date} 16:${minute}`, label: '発送', by: STAFF[2]! });
+    events.push({ at: `${date} 16:${minute}`, kind: 'shipped', label: '発送', by: STAFF[2]! });
   return events;
 }
 
