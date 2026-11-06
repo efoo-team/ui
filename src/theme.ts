@@ -6,6 +6,7 @@
 import {
   Accordion,
   ActionIcon,
+  Affix,
   Alert,
   Anchor,
   AppShell,
@@ -25,13 +26,18 @@ import {
   Combobox,
   createTheme,
   Drawer,
+  DrawerOverlay,
+  DrawerRoot,
   EmptyState,
   Indicator,
   Input,
   InputWrapper,
   Menu,
+  MenuRadioItem,
   Loader,
   Modal,
+  ModalOverlay,
+  ModalRoot,
   MultiSelect,
   NavLink,
   Notification,
@@ -45,6 +51,7 @@ import {
   ProgressRoot,
   Radio,
   RadioGroup,
+  RadioIcon,
   RadioIndicator,
   RangeSlider,
   RingProgress,
@@ -62,9 +69,11 @@ import {
   Timeline,
   TreeSelect,
   Tooltip,
+  useMenuContext,
   type MantineTheme,
   type MantineThemeOverride,
 } from '@mantine/core';
+import { createElement } from 'react';
 import {
   blueColors,
   darkColors,
@@ -91,6 +100,7 @@ import {
 import baseClasses from './styles/base.module.css';
 import accordionClasses from './styles/accordion.module.css';
 import actionIconClasses from './styles/action-icon.module.css';
+import affixClasses from './styles/affix.module.css';
 import alertClasses from './styles/alert.module.css';
 import anchorClasses from './styles/anchor.module.css';
 import appShellClasses from './styles/app-shell.module.css';
@@ -130,6 +140,14 @@ import tabsClasses from './styles/tabs.module.css';
 import textClasses from './styles/text.module.css';
 import './text-variants.js';
 import tooltipClasses from './styles/tooltip.module.css';
+
+/**
+ * shadcn/ui marks the chosen radio item with an 8px dot, where Mantine draws a 5px one. A default prop on the radio
+ * item would hide a checkIcon set on Menu, so the dot gives way to it, as Mantine's own does.
+ */
+function MenuRadioDot() {
+  return useMenuContext().checkIcon ?? createElement(RadioIcon, { size: 8 });
+}
 
 interface IconColorProps {
   color?: string;
@@ -307,6 +325,21 @@ const comboboxClassNames = {
 
 const overlayProps = { backgroundOpacity: 0.15, blur: 4 };
 
+/*
+ * Drawer and Modal pass their defaults on to their Root and Overlay parts, but those parts used on their own
+ * (Drawer.Root, Drawer.Overlay, Modal.Root, Modal.Overlay) read only theirs (DrawerRoot, DrawerOverlay, ModalRoot,
+ * ModalOverlay). Both take the same objects, so either way of building one opens the same. Drawer and Modal keep
+ * them too: Mantine's Modal passes its own transition to the Root, which would win over the Root's default.
+ */
+const drawerProps = { transitionProps: drawerTransitionProps, shadow: 'lg' };
+// shadcn/ui's dialog is drawn by its 1px line, with no large shadow, and opens in the middle of the viewport.
+const modalProps = { transitionProps: modalTransitionProps, shadow: 'xs', centered: true };
+
+// Body text and headings share one stack. Latin text stays on Inter or system-ui. Japanese text reaches Hiragino Sans,
+// which has a face for each weight on macOS; without it, Chrome on lang="ja" pages draws Japanese in Hiragino Kaku
+// Gothic ProN, which draws 500 as thin as 400.
+const FONT_FAMILY = 'Inter, system-ui, "Hiragino Sans", sans-serif';
+
 export const efooTheme: MantineThemeOverride = createTheme({
   colors: {
     zinc: zincColors,
@@ -324,7 +357,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
   luminanceThreshold: 0.179,
   respectReducedMotion: true,
   focusClassName: baseClasses.focus,
-  fontFamily: 'Inter, system-ui, sans-serif',
+  fontFamily: FONT_FAMILY,
   fontFamilyMonospace: 'ui-monospace, SFMono-Regular, Menlo, monospace',
   fontWeights: {
     regular: '400',
@@ -363,7 +396,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     xl: '1.4',
   },
   headings: {
-    fontFamily: 'Inter, system-ui, sans-serif',
+    fontFamily: FONT_FAMILY,
     fontWeight: '600',
     sizes: {
       h1: { fontSize: '2.25rem', lineHeight: '2.5rem' },
@@ -397,6 +430,13 @@ export const efooTheme: MantineThemeOverride = createTheme({
       },
     }),
     ActionIcon: ActionIcon.extend({ classNames: { root: actionIconClasses.root } }),
+    // variant="sticky-actions" draws a bar of actions kept at the bottom of the window; see affix.module.css.
+    // Mantine's default zIndex (200) is always written as --affix-z-index; without it the variable comes from a
+    // zIndex prop only, and affix.module.css holds the default for each variant.
+    Affix: Affix.extend({
+      classNames: { root: affixClasses.root },
+      defaultProps: { zIndex: undefined },
+    }),
     Alert: Alert.extend({
       classNames: (theme, props) => ({
         root: `${alertClasses.root} ${!props.color && !props.variant && theme.primaryColor === NEUTRAL_COLOR ? alertClasses.neutral : ''}`,
@@ -472,10 +512,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
     Button: Button.extend({
       classNames: { root: buttonClasses.root, section: buttonClasses.section },
     }),
-    // shadcn/ui's dashboard-01 card: 24px padding and shadow-xs. The corners follow the default radius in card.module.css.
+    // shadcn/ui's dashboard-01 card: 24px padding and shadow-xs. The padding and the corners are in card.module.css.
     Card: Card.extend({
-      classNames: { root: cardClasses.root },
-      defaultProps: { withBorder: true, padding: 'lg', shadow: 'xs' },
+      classNames: { root: cardClasses.root, section: cardClasses.section },
+      defaultProps: { withBorder: true, shadow: 'xs' },
     }),
     Cascader: Cascader.extend({ classNames: { dropdown: popoverClasses.list } }),
     Checkbox: Checkbox.extend({
@@ -522,24 +562,29 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: { dropdown: popoverClasses.list },
       defaultProps: { transitionProps: overlayTransitionProps },
     }),
+    // variant="sidebar" holds a navbar on narrow screens with the navbar's surface and inset; see drawer.module.css.
     Drawer: Drawer.extend({
       classNames: (_theme, props) => ({
+        root: drawerClasses.root,
         inner: drawerClasses.inner,
-        content:
+        content: `${drawerClasses.content} ${
           props.position === 'right'
             ? drawerClasses.contentRight
             : props.position === 'top'
               ? drawerClasses.contentTop
               : props.position === 'bottom'
                 ? drawerClasses.contentBottom
-                : drawerClasses.contentLeft,
+                : drawerClasses.contentLeft
+        }`,
         header: drawerClasses.header,
         title: drawerClasses.title,
         body: drawerClasses.body,
         close: drawerClasses.close,
       }),
-      defaultProps: { transitionProps: drawerTransitionProps, overlayProps, shadow: 'lg' },
+      defaultProps: { ...drawerProps, overlayProps },
     }),
+    DrawerOverlay: DrawerOverlay.extend({ defaultProps: overlayProps }),
+    DrawerRoot: DrawerRoot.extend({ defaultProps: drawerProps }),
     EmptyState: EmptyState.extend({
       classNames: {
         root: emptyStateClasses.root,
@@ -559,6 +604,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     InputWrapper: InputWrapper.extend({
       classNames: {
+        root: inputClasses.inputWrapper,
         label: inputClasses.label,
         description: inputClasses.description,
         error: inputClasses.error,
@@ -569,8 +615,12 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: {
         item: menuClasses.item,
         itemSection: menuClasses.itemSection,
+        itemIndicator: menuClasses.itemIndicator,
         label: menuClasses.label,
       },
+    }),
+    MenuRadioItem: MenuRadioItem.extend({
+      defaultProps: { checkIcon: createElement(MenuRadioDot) },
     }),
     Modal: Modal.extend({
       classNames: {
@@ -582,15 +632,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
         body: modalClasses.body,
         close: modalClasses.close,
       },
-      // shadcn/ui's dialog is drawn by its 1px line, with no large shadow.
-      // shadcn/ui's dialog opens in the middle of the viewport.
-      defaultProps: {
-        transitionProps: modalTransitionProps,
-        overlayProps,
-        shadow: 'xs',
-        centered: true,
-      },
+      defaultProps: { ...modalProps, overlayProps },
     }),
+    ModalOverlay: ModalOverlay.extend({ defaultProps: overlayProps }),
+    ModalRoot: ModalRoot.extend({ defaultProps: modalProps }),
     MultiSelect: MultiSelect.extend({
       classNames: { ...comboboxClassNames, inputField: inputClasses.pillsField },
       defaultProps: { clearButtonProps: clearSelectionProps },
@@ -602,7 +647,6 @@ export const efooTheme: MantineThemeOverride = createTheme({
         body: navLinkClasses.body,
         label: navLinkClasses.label,
         description: navLinkClasses.description,
-        collapse: navLinkClasses.collapse,
         children: navLinkClasses.children,
       },
     }),

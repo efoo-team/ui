@@ -16,6 +16,12 @@
     border-color: var(--efoo-input-error-border);
   }
 
+  /* A circle in error rings in the solid error red, like a text input in error. */
+  .group[data-error] .radio:focus-visible,
+  .radio[data-error]:focus-visible {
+    box-shadow: var(--efoo-focus-ring-error);
+  }
+
   .radio:not(:checked, [data-error]),
   .indicator:not([data-checked], [data-error]) {
     border-color: var(--efoo-input-border);

@@ -1,7 +1,26 @@
 @layer efoo {
-  /* shadcn/ui's card is 4px rounder than its controls (radius-xl = --radius + 4px). Following the default radius
-     lets a service change both with defaultRadius; a radius prop is written inline and still wins. */
   .root {
+    /* The padding is set on the variable Mantine's Card reads, not as a default prop, so a container can set its
+       own (like the sticky-actions Affix) and a padding prop, which Mantine writes inline, still wins. */
+    --card-padding: var(--mantine-spacing-lg);
+    /* shadcn/ui's card is 4px rounder than its controls (radius-xl = --radius + 4px). Following the default radius
+       lets a service change both with defaultRadius; a radius prop is written inline and still wins. */
     --paper-radius: calc(var(--mantine-radius-default) + 4px);
+    /* The side inset the card gives what it holds, for content that has a side inset of its own and should not
+       double it (empty-state.module.css). */
+    --efoo-card-inset-inline: var(--card-padding);
+  }
+
+  /* A Card.Section without inheritPadding reaches the card's edges, like one that holds a table, so the card gives
+     what is in it no side inset. */
+  .section:not([data-inherit-padding]) {
+    --efoo-card-inset-inline: 0px;
+  }
+
+  /* Paper draws no outline, so a dialog shows no ring around itself. A card that a script focuses (tabIndex={-1},
+     like a save bar that lists what to fix) shows the ring of the other such targets (base.module.css). */
+  .root:where([tabindex='-1']):focus-visible {
+    outline: var(--efoo-focus-outline);
+    outline-offset: 0;
   }
 }

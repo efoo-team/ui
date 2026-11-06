@@ -1,6 +1,8 @@
 @layer efoo {
   .root {
-    border-color: color-mix(in srgb, var(--efoo-color-ring) 75%, var(--efoo-input-border));
+    /* The line of the other controls that take input, which keeps 3:1 against the page and a Card in both schemes.
+       Focus turns it to the ring color, a drag to the accept or reject color. */
+    border-color: var(--efoo-input-border);
     transition-duration: calc(var(--efoo-motion-duration-fast) * var(--efoo-motion-scale));
     transition-timing-function: var(--efoo-motion-easing);
   }

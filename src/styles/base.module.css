@@ -9,18 +9,20 @@
      color scheme, which is :root unless a service sets cssVariablesSelector and getRootElement elsewhere. */
   :root,
   [data-mantine-color-scheme] {
-    /* The line of controls that take input. The resolver raises it to shadcn/ui's white 15% in dark;
-       surface lines (Card, Table, Divider) keep --mantine-color-default-border. */
+    /* The line of controls that take input. The resolver raises it to 3:1 against the page, a Card and the input
+       surface in both schemes; surface lines (Card, Table, Divider) keep --mantine-color-default-border. */
     --efoo-input-border: var(--efoo-color-input-border, var(--mantine-color-default-border));
-    /* The error line of the same controls: the full red in light, shadcn/ui's 50% red in dark. */
+    /* The error line of the same controls: the full red in light, the red at 70% in dark (3:1 on a Card too). */
     --efoo-input-error-border: var(--efoo-color-input-error-border, var(--mantine-color-error));
-    --efoo-focus-ring-color: color-mix(
-      in srgb,
-      var(--efoo-color-ring, var(--mantine-primary-color-filled)) 50%,
-      transparent
-    );
-    --efoo-focus-ring: 0 0 0 3px var(--efoo-focus-ring-color);
-    --efoo-error-ring-color: color-mix(in srgb, var(--mantine-color-error) 20%, transparent);
+    /* The focus ring is the solid ring color (zinc-5), 2px wide, so it keeps 3:1 against the page and a Card in both
+       schemes; a translucent ring falls below 2:1. */
+    --efoo-focus-ring-color: var(--efoo-color-ring, var(--mantine-primary-color-filled));
+    --efoo-focus-ring-width: 2px;
+    --efoo-focus-ring: 0 0 0 var(--efoo-focus-ring-width) var(--efoo-focus-ring-color);
+    /* A control in error turns its focused line to the solid error red; its ring takes the same red at the ring width. */
+    --efoo-focus-ring-error: 0 0 0 var(--efoo-focus-ring-width) var(--mantine-color-error);
+    /* The same ring as an outline, for elements whose box-shadow is their own (a card's shadow). */
+    --efoo-focus-outline: var(--efoo-focus-ring-width) solid var(--efoo-focus-ring-color);
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -32,5 +34,38 @@
   .focus:where(:focus-visible) {
     outline: none;
     box-shadow: var(--efoo-focus-ring);
+  }
+}
+
+/* A sublayer of mantine sits under every Mantine rule, so what a Mantine part or a service sets on an element wins
+   over these defaults. */
+@layer mantine.efoo-base {
+  /* Japanese text wraps between phrases (文節), not in the middle of a word such as まとめ／て, and a phrase longer than
+     a line breaks inside it; break-word keeps the longest phrase as the narrowest the text can be. Both properties
+     are inherited, so every element takes them from the root and what is set on a container reaches everything in
+     it. The browser wraps between phrases only in content whose language is Japanese (<html lang="ja">), and only
+     Chrome and Edge 119+ do it. */
+  :root {
+    word-break: auto-phrase;
+    overflow-wrap: break-word;
+  }
+
+  /* Table cells and what they hold go back to the browser's wrapping, so a column takes the width of a figure or a
+     code instead of the longest phrase. */
+  :where(th, td) {
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+
+  /* An element that only a script focuses (tabIndex={-1}: a page heading that takes focus when the control holding it
+     goes away, a section reached from a link) shows the theme's ring instead of the browser's outline, and only when
+     the focus came from the keyboard (:focus-visible), like the theme's controls. The parts that draw their own focus
+     or none at all (dialogs, menus, Paper, tree items) keep it, as the layer is under theirs.
+     The ring is an outline drawn where --efoo-focus-ring's shadow is, so it leaves a card's own shadow in place, with
+     the controls' corners on an element that has none of its own (a heading is as tall as a button). */
+  :where([tabindex='-1']):focus-visible {
+    outline: var(--efoo-focus-outline);
+    outline-offset: 0;
+    border-radius: var(--mantine-radius-default);
   }
 }

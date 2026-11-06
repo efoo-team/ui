@@ -36,7 +36,7 @@
     color: var(--mantine-color-text);
   }
 
-  /* shadcn/ui's dark error line is the destructive red at 50%; light keeps the full red. */
+  /* The error line: the full red in light, the red at 70% in dark (--efoo-input-error-border). */
   .wrapper[data-error]:not([data-variant='unstyled']) {
     --input-bd: var(--efoo-input-error-border);
   }
@@ -80,8 +80,9 @@
     box-shadow: var(--efoo-focus-ring);
   }
 
+  /* Mantine turns the focused error line to the solid error red; the ring takes the same red. */
   .wrapper[data-error] .input:where(:focus, :focus-within) {
-    box-shadow: 0 0 0 3px var(--efoo-error-ring-color);
+    box-shadow: var(--efoo-focus-ring-error);
   }
 
   /* The unstyled text has no padding, so the box grows 4px on each side with a matching negative margin: the text
@@ -109,6 +110,21 @@
 
   .input:where(:disabled, [data-disabled], :has(input:disabled)) {
     opacity: 0.5;
+  }
+
+  /* Radio.Group, Checkbox.Group and Switch.Group are an Input.Wrapper that holds the options in a div with the role
+     radiogroup or group and no class (Mantine's InputsGroupFieldset), with the label and the description above it and
+     the error below. Mantine sets only an Input apart from its description and error, so the theme sets the options
+     apart: xs under what is above, as between a name and its row of options, and half of xs over the error, as Mantine
+     leaves between an input and its error. With nothing above, the options start at the top. Mantine's own parts with
+     these roles (SegmentedControl, PinInput, Button.Group) carry a class, so in an Input.Wrapper they stay where
+     Mantine puts them, like an input. */
+  .inputWrapper > * + :is([role='radiogroup'], [role='group']):not([class]) {
+    margin-top: var(--mantine-spacing-xs);
+  }
+
+  .inputWrapper > :is([role='radiogroup'], [role='group']):not([class]) ~ * {
+    margin-top: calc(var(--mantine-spacing-xs) / 2);
   }
 
   .label {

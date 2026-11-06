@@ -7,7 +7,11 @@
     --empty-state-title-fz-xs: var(--mantine-font-size-xs);
     --empty-state-title-fz-sm: var(--mantine-font-size-sm);
     --empty-state-title-fz-md: var(--mantine-font-size-sm);
-    padding: var(--mantine-spacing-lg);
+    /* Inside a card the empty state adds only what the card's side inset (card.module.css) lacks of its own lg: none
+       with the default padding, all of it with padding={0} or in a Card.Section that reaches the card's edges.
+       Both side paddings together would narrow the text and push a second action onto its own line at phone width. */
+    padding-block: var(--mantine-spacing-lg);
+    padding-inline: max(0px, calc(var(--mantine-spacing-lg) - var(--efoo-card-inset-inline, 0px)));
     gap: calc(var(--empty-state-gap) * 2);
   }
 

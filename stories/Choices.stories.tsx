@@ -39,20 +39,20 @@ export const States: Story = {
         </Group>
       </Stack>
       <Radio.Group label="表示方法" defaultValue="list">
-        <Group mt="xs">
+        <Group>
           <Radio value="list" label="一覧" />
           <Radio value="grid" label="グリッド" />
           <Radio value="disabled" label="変更できません" disabled />
         </Group>
       </Radio.Group>
       <Radio.Group label="入力エラー" error="いずれかを選択してください">
-        <Group mt="xs">
+        <Group>
           <Radio value="a" label="項目 A" />
           <Radio value="b" label="項目 B" />
         </Group>
       </Radio.Group>
       <Radio.Group label="枠線付きの表示" defaultValue="one">
-        <Group mt="xs">
+        <Group>
           <Radio variant="outline" value="one" label="選択済み" />
           <Radio variant="outline" value="two" label="未選択" />
           <Radio size="lg" value="large" label="大" />
@@ -70,6 +70,17 @@ export const States: Story = {
           <Switch label="オンで変更できません" disabled defaultChecked />
         </Group>
       </Stack>
+      <Switch.Group
+        label="通知の受け取り方"
+        description="オンにした方法で通知を受け取ります。"
+        defaultValue={['email']}
+      >
+        <Group>
+          <Switch value="email" label="メール" />
+          <Switch value="push" label="プッシュ通知" />
+          <Switch value="sms" label="SMS" />
+        </Group>
+      </Switch.Group>
     </Stack>
   ),
 };

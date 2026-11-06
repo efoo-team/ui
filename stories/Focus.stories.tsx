@@ -49,7 +49,7 @@ export const KeyboardFocus: Story = {
         <Switch label="スイッチ" />
       </Group>
       <Radio.Group label="ラジオボタン" defaultValue="a">
-        <Group mt="xs">
+        <Group>
           <Radio value="a" label="項目 A" />
           <Radio value="b" label="項目 B" />
         </Group>
