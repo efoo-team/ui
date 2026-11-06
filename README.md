@@ -332,7 +332,7 @@ AppShell の navbar に NavLink を並べると、shadcn/ui の sidebar と同�
 
 パッケージは Text の `variant` の型に `metric`・`emphasis` を足しています（`declare module '@mantine/core'` で `TextProps.variant` を広げる形）。サービスでも `TextProps.variant` を独自の型で広げると TypeScript が TS2717 を出すので、独自の variant は文字列のまま渡してください（型は任意の文字列を受け付けます）。
 
-画面の下に固定する操作の欄（保存の欄など）は、Affix の variant `sticky-actions` で作ります。`<Affix variant="sticky-actions" withinPortal={false} pos="sticky" position={{ bottom: 0 }}><Card>…</Card></Affix>` の形で、重なり順（`app` の 1 つ下）、本文の背景色の帯、下の余白（`md`）、中の Card の padding（`md`）、中のリンクの押せる高さは theme が持ちます。Card に `padding` を渡すと、theme の余白より優先されます。
+画面の下に固定する操作の欄（保存の欄など）は、Affix の variant `sticky-actions` で作ります。`<Affix variant="sticky-actions" withinPortal={false} pos="sticky" position={{ bottom: 0 }}><Card>…</Card></Affix>` の形で、重なり順（`app` の 1 つ下）、本文の背景色の帯、下の余白（`md`）、中の Card の padding（`md`）、中のリンクの押せる高さは theme が持ちます。Card に `padding` を渡すと、theme の余白より優先されます。重なり順は、Affix に `zIndex` を渡すとその値が優先されます。`zIndex` を渡さない `sticky-actions` の Affix は `app` の 1 つ下で、variant の無い Affix は Mantine の既定（`modal` と同じ 200）です。
 
 中の Card と Anchor は Mantine の静的な class（`mantine-Card-root`・`mantine-Anchor-root`）で見分けるので、MantineProvider の `classNamesPrefix` を変えたり、`withStaticClasses={false}` にしたりすると、Card の余白（`md`）とリンクの押せる高さが付きません。
 
