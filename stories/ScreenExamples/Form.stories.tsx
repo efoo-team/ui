@@ -228,10 +228,10 @@ function ProductFormPage({
 
   const saving = savingProp || form.submitting;
   const suffix = unit ? ` ${unit}` : undefined;
-  const priceNote =
-    !isBlank(price) && Number(price) > 0
-      ? `税込 ${yen(Math.floor(Number(price) * (1 + TAX_RATE)))}（1 ${unit ?? '単位'}あたり）`
-      : '税抜の金額を入力します。入力すると、税込の金額もこの行に表示します。';
+  // The line has the same shape before and after a price is typed, so it needs no word on how it works.
+  const priceWithTax =
+    !isBlank(price) && Number(price) > 0 ? yen(Math.floor(Number(price) * (1 + TAX_RATE))) : '—';
+  const priceNote = `税込 ${priceWithTax}（1 ${unit ?? '単位'}あたり）`;
   const reorderNow =
     product !== undefined && !isBlank(reorderPoint) && product.quantity < Number(reorderPoint);
 
@@ -320,7 +320,8 @@ function ProductFormPage({
             {/*
              * While a save is on its way every field is locked the same way: the disabled fieldset disables each
              * control inside it, so nothing can change what was sent. Links to other screens stay usable, like the
-             * sidebar, because leaving does not change what is being saved.
+             * sidebar and the breadcrumbs, because the save goes on after the page is left and its notification shows
+             * on whichever screen is open; the line by the buttons says so.
              */}
             <Fieldset variant="unstyled" m={0} disabled={saving}>
               <Stack gap="lg">
@@ -493,14 +494,24 @@ function ProductFormPage({
                 </SectionCard>
               </Stack>
             </Fieldset>
-            {/* The buttons follow the last field, where the user is when the form is filled in from the top. */}
+            {/*
+             * The buttons follow the last field, where the user is when the form is filled in from the top. The
+             * status line sits on their left and goes above them when the row is too narrow; it is a live region
+             * from the start, so a screen reader reads it when a save begins.
+             */}
             <Group justify="flex-end" gap="sm">
-              <Button variant="default" disabled={saving}>
-                取り消し
-              </Button>
-              <Button type="submit" loading={saving}>
-                {editing ? '保存' : '登録'}
-              </Button>
+              <Text size="sm" c="dimmed" role="status" mr="auto">
+                {saving &&
+                  `${editing ? '保存' : '登録'}しています。ほかの画面に移っても、${editing ? '保存' : '登録'}は続きます。`}
+              </Text>
+              <Group gap="sm">
+                <Button variant="default" disabled={saving}>
+                  取り消し
+                </Button>
+                <Button type="submit" loading={saving}>
+                  {editing ? '保存' : '登録'}
+                </Button>
+              </Group>
             </Group>
           </Stack>
         </form>
@@ -525,8 +536,8 @@ const meta = {
           '**データパターン**　項目は 11 個で、入力が必須の 8 個、任意の 2 個（JAN コード・説明）、常にどちらかが選ばれている販売の状態です。商品名は 6〜20 文字ほど（上限 60 文字）、説明は空から 200 文字まで、単価は ¥90〜¥3,200、在庫の数は 0〜数百で、単位は箱・袋・冊などです。状態は、何も入っていない（story『商品の登録』）、登録済みの値が入っていて在庫が発注点を下回っている（story『商品の編集』）、送信した値に誤りがあり、誤りが 3 つの Card にまたがる（story『入力に誤りがあるとき』）、送信して返事を待っている（story『保存中』）の 4 つです。\n\n' +
           '**情報の流れ**　登録では、手元の仕入れ先の資料を見ながら、何の商品か → いくらで売るか → どれだけ持つか、の順に埋め、最後に登録します。編集では、まず見出しで開いた商品を確かめ、現在の在庫と要発注の印を見てから発注点と適正在庫を決め直す、または単価や販売の状態を変えて保存します。\n\n' +
           '**主役**　流れの順に並べた入力欄と、最後の欄の下にある「登録」（編集では「保存」）です。欄は流れの区切りどおり「基本の情報」「価格と販売」「在庫」の 3 つの Card に分け、単位を価格と在庫より先に選ばせて、単価の税込の金額と在庫の欄の単位がその場で表示されるようにしました。誤りは欄を離れたときと送信したときに、欄の下に日本語の理由で示します。送信で誤りがあれば、見出しの下に件数と直す欄へのリンクを並べたまとめを出し、ページをその位置に戻してフォーカスもまとめに移します。誤りが 3 つの Card にまたがり、390 の幅では最後の誤りが何画面も下にあるため、どこまで直せばよいかを先に知ってから 1 つずつ移れるようにしました。\n\n' +
-          '**抑えたもの・使わなかったもの**　塗りのボタンは「登録」だけにし、「取り消し」は枠のボタンにしました。編集に削除のボタンは置いていません。受注の明細が商品を指しているため、扱いをやめるときは「販売を停止」を選び、これまでの受注と在庫を残します。編集では、変えられない商品コードと在庫数を入力欄にせず文字で出し、在庫数には在庫の画面への道を添えました。入力欄の形のまま読み取り専用にすると、打てそうに見えて迷わせるためです。保存中は、すべての欄を同じように使えなくして（欄を囲む fieldset の disabled）、送った値を変えられないことを見た目でも伝え、ボタンの読み込み表示で待つことを伝えます。在庫の画面へのリンクは、サイドバーと同じくほかの画面への移動で、送った値を変えないので、保存中も使えるまま残しています。誤りのまとめには理由を書かず欄の名前だけを並べ、理由は欄の下の 1 か所に置きました。\n\n' +
-          '**目的が違えば変わるところ**　欄が 3〜4 個なら Card に分けず 1 つにまとめ、Modal の中で登録してもよいです。画像・仕入れ先・複数の価格まで持つ商品なら、右に販売の状態と保存のボタンを置く 2 段組にし、長い画面でもボタンが見える位置に留めます。毎日大量に登録するなら、CSV からの一括の取り込みを別に用意します。',
+          '**抑えたもの・使わなかったもの**　塗りのボタンは「登録」だけにし、「取り消し」は枠のボタンにしました。編集に削除のボタンは置いていません。受注の明細が商品を指しているため、扱いをやめるときは「販売を停止」を選び、これまでの受注と在庫を残します。編集では、変えられない商品コードと在庫数を入力欄にせず文字で出し、在庫数には在庫の画面への道を添えました。入力欄の形のまま読み取り専用にすると、打てそうに見えて迷わせるためです。保存中は、すべての欄を同じように使えなくして（欄を囲む fieldset の disabled）、送った値を変えられないことを見た目でも伝え、ボタンの読み込み表示で待つことを伝えます。在庫の画面と一覧へのリンクは、サイドバーと同じく保存中も使えるまま残し、ボタンの横に、ほかの画面に移っても保存が続くことを書きました。送った値は離れても変わらず、保存の結果の通知はどの画面にも出るので、待たせる理由が無いためです。誤りのまとめには理由を書かず欄の名前だけを並べ、理由は欄の下の 1 か所に置きました。\n\n' +
+          '**目的が違えば変わるところ**　欄が 3〜4 個なら Card に分けず 1 つにまとめ、Modal の中で登録してもよいです。画像・仕入れ先・複数の価格まで持つ商品なら、右に販売の状態と保存のボタンを置く 2 段組にし、長い画面でもボタンが見える位置に留めます。毎日大量に登録するなら、CSV からの一括の取り込みを別に用意します。設定の画面は、項目を変えたときだけ画面の下に「変更を保存」を固定して出す型です。今の値を読むために開くことも多く、変える項目が長いページのあちこちに散るためで、このフォームは登録か編集をするために開き、上から埋めて最後の欄で終えるので、ボタンを最後の欄の下に常に置きました。',
       },
     },
   },
@@ -541,7 +552,7 @@ export const CreateProduct: Story = {
     docs: {
       description: {
         story:
-          'データパターンの「何も入っていない」です。商品コードの欄には次に空いている番号を「例:」を付けて薄く出し、入力済みの値と見分けられるようにしています。単位を選ぶまでは単価の説明と在庫の欄に単位を付けません。',
+          'データパターンの「何も入っていない」です。商品コードの欄には次に空いている番号を「例:」を付けて薄く出し、入力済みの値と見分けられるようにしています。単価の下には、入力する前から「税込 —（1 単位あたり）」の形で行を置き、単価と単位を入れるとその場で金額と単位が入ります。在庫の欄には、単位を選ぶまで単位を付けません。',
       },
     },
   },
@@ -602,7 +613,7 @@ export const SavingProduct: Story = {
     docs: {
       description: {
         story:
-          'データパターンの「送信して返事を待っている」で、編集で単価と発注点を変えて「保存」を押したあとです。欄はすべて同じように使えなくし（数値の欄の上下のボタンも含む）、「保存」は読み込み表示に、「取り消し」は押せなくして、二重の送信と途中の変更を防ぎます。値は薄くなっても読めるまま残します。',
+          'データパターンの「送信して返事を待っている」で、編集で単価と発注点を変えて「保存」を押したあとです。欄はすべて同じように使えなくし（数値の欄の上下のボタンも含む）、「保存」は読み込み表示に、「取り消し」は押せなくして、二重の送信と途中の変更を防ぎます。ボタンの横には、ほかの画面に移っても保存が続くことを書き、リンクとサイドバーは使えるまま残します。',
       },
     },
   },

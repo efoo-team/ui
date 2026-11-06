@@ -4,6 +4,7 @@ import {
   ActionIcon,
   Anchor,
   Badge,
+  Box,
   Button,
   Card,
   DataList,
@@ -17,6 +18,7 @@ import {
   Stack,
   Table,
   Text,
+  Textarea,
   TextInput,
   Timeline,
   Title,
@@ -25,15 +27,20 @@ import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
-  IconArrowLeft,
+  IconAlertCircle,
   IconCash,
+  IconCircleCheck,
+  IconCircleX,
   IconCopy,
   IconDotsVertical,
   IconEdit,
   IconFileSearch,
+  IconList,
+  IconMail,
   IconPrinter,
   IconTruckDelivery,
   IconX,
+  type Icon,
 } from '@tabler/icons-react';
 import { AppFrame, CONTENT_BREAKPOINTS, ICON_SIZE } from './shared/AppFrame';
 import { BackLink } from './shared/BackLink';
@@ -65,13 +72,13 @@ const meta = {
       description: {
         component:
           '架空の販売管理サービスの、受注 1 件の詳細の画面です。\n\n' +
-          '**目的と読み手**　受注の担当者が、一覧やダッシュボードから未発送の受注を開き、中身と届け先を確かめて発送を記録する画面です。1 日に何度も開くので、毎日くり返し使う画面として、見慣れた配置と少ない色で組んでいます。\n\n' +
+          '**目的と読み手**　受注の担当者が、一覧やダッシュボードから未発送の受注を開き、中身と届け先を確かめて、発送を記録する、または発送を止めているものに手を打つ画面です。1 日に何度も開くので、毎日くり返し使う画面として、見慣れた配置と少ない色で組んでいます。\n\n' +
           '**情報構造**　主は 1 件の受注（番号・状態）で、明細・届け先・支払い・履歴はその受注に従います。明細は商品（在庫）に、届け先と請求先は顧客につながっていて、この画面では発送の判断に要る在庫と連絡先だけを受注の側に引いて見せます。\n\n' +
-          '**データパターン**　明細は 1〜3 行（商品名は 9〜15 文字）、履歴は 1〜3 件、住所は 13〜26 文字で狭い幅では折り返します。希望の着日は無い受注もあり、そのときは「指定なし」と出します。状態は、在庫も支払いも発送を止めない未発送の受注（story『受注の詳細』。「発送を記録」を押すと発送済みに変わります）、銀行振込の入金を待っている受注（story『入金を待っているとき』。「入金を記録」を押すと未発送に変わります）、在庫が足りない明細がある受注（story『在庫が足りないとき』）、読み込み中（story『読み込み中』）、受注が見つからない（story『受注が見つからないとき』）です。\n\n' +
-          '**情報の流れ**　担当者は、まずこの受注が何で今どの状態か（番号・状態・顧客）を知り、次に何をいくつ送り在庫が足りるか（明細）、いつまでにどこへ送るか（希望の着日・届け先）、支払いが発送を止めないか（支払い）を確かめ、発送を記録します。履歴は、ほかの人が先に手を付けていないかを確かめたいときにだけ見ます。\n\n' +
-          '**主役**　流れの最初に知る状態と、最後にする操作です。状態の Badge を受注番号の横に置き、塗りのボタンは受注の状態の次の一手（未発送なら「発送を記録」、入金待ちなら「入金を記録」）だけにして見出しの右に置きました。発送できるかの答えは、明細の Card の補足（在庫が足りるか）と支払いの Card の補足（入金を待つか）に文で書き、読み手が在庫の数と数量を見比べたり支払い方法から導いたりしなくて済むようにしています。在庫が足りないときは「発送を記録」を同じ位置のまま押せなくし、そのすぐ下の明細の Card で理由を示します。\n\n' +
-          '**抑えたもの・使わなかったもの**　色は未発送の Badge と、在庫が足りない明細の印にだけ使います。在庫が発注点を下回っている商品（A4 コピー用紙など）の「要発注」は、ダッシュボードと商品の画面では出しますが、ここでは出しません。発注はこの画面の読み手の仕事ではなく、この受注を出せるかは受注の数量と在庫で決まるので、出せる明細に印を付けると在庫不足の印が埋もれるためです。編集・複製・キャンセルはこの場面ではまれな操作なので「その他の操作」のメニューに収め、納品書の印刷は枠線のボタンにしました。金額は明細の下の合計に 1 か所だけ置き、明細の表は 3 列にして、単価を金額の下に、在庫を商品の下に添え、スマホの幅でも横に送らずに読めるようにしました。\n\n' +
-          '**目的が違えば変わるところ**　在庫のある品目だけを先に送る分割の発送を扱うなら、在庫が足りないときにも「発送を記録」を押せるようにし、送る数量を明細ごとに入れる欄を発送の記録に足します。経理の担当者が請求を確かめる画面なら、支払いと金額を主役にして左の列に置きます。明細が数十行になる受注なら、明細を別のタブか別の画面に分け、この画面には品目の数と合計だけを残します。スマホで確かめてから操作するのが主な使い方なら、主な操作を画面の下端に固定します。',
+          '**データパターン**　明細は 1〜3 行（商品名は 9〜15 文字）、履歴は 1〜3 件、住所は 13〜26 文字で狭い幅では折り返します。希望の着日は無い受注もあり、そのときは「指定なし」と出します。状態は、在庫も支払いも発送を止めない未発送の受注（story『受注の詳細』。「発送を記録」を押すと発送済みに変わります）、銀行振込の入金を待っている受注（story『入金を待っているとき』。「入金を記録」を押すと未発送に変わります）、在庫が足りない明細がある受注（story『在庫が足りないとき』。「遅れを連絡」でメールを送ると履歴に残ります）、読み込み中（story『読み込み中』）、受注が見つからない（story『受注が見つからないとき』）です。\n\n' +
+          '**情報の流れ**　担当者は、まずこの受注が何で今どの状態か（番号・状態・顧客）を知り、次に何をいくつ送り在庫が足りるか（明細）、いつまでにどこへ送るか（希望の着日・届け先）、支払いが発送を止めないか（支払い）を確かめ、発送を記録します。発送できないときは、何が止めているかを知り、それに手を打ちます。履歴は、ほかの人が先に手を付けていないかを確かめたいときにだけ見ます。\n\n' +
+          '**主役**　流れの最初に知る状態と発送できるかの答え、最後にする操作です。状態の Badge を受注番号の横に、「発送できます／発送できません」と理由の 1 行をそのすぐ下に置き、どの状態でも答えをこの 1 か所で読めて、スマホの幅でもボタンより先に目に入るようにしました。塗りのボタンは受注を止めているものに対する次の一手だけにして見出しの右に置き、入金待ちなら「入金を記録」、在庫が足りなければ、待たせる顧客への「遅れを連絡」（入荷の予定日と、在庫のある分を先に送れることを書いた下書き入り）、どちらも無ければ「発送を記録」です。\n\n' +
+          '**抑えたもの・使わなかったもの**　発送できるかの答えは見出しの下の 1 行だけに置き、明細と支払いの Card には書いていません。答えが 2 か所にあると、状態によって読む場所が変わるためです。色は未発送の Badge と、在庫が足りない明細の印にだけ使います。在庫が発注点を下回っている商品（A4 コピー用紙など）の「要発注」は、ダッシュボードと商品の画面では出しますが、ここでは出しません。発注はこの画面の読み手の仕事ではなく、この受注を出せるかは受注の数量と在庫で決まるので、出せる明細に印を付けると在庫不足の印が埋もれるためです。編集・複製・キャンセルはこの場面ではまれな操作なので「その他の操作」のメニューに収め、納品書の印刷は枠線のボタンにしました。金額は明細の下の合計に 1 か所だけ置き、明細の表は 3 列にして、単価を金額の下に、在庫を商品の下に添え、スマホの幅でも横に送らずに読めるようにしました。\n\n' +
+          '**目的が違えば変わるところ**　顧客の了解を待たずに在庫のある品目を先に送る取引なら、在庫が足りないときの主な操作を「足りる分を発送」にし、送る数量を明細ごとに入れる欄を発送の記録に足します。経理の担当者が請求を確かめる画面なら、支払いと金額を主役にして左の列に置きます。明細が数十行になる受注なら、明細を別のタブか別の画面に分け、この画面には品目の数と合計だけを残します。スマホで確かめてから操作するのが主な使い方なら、主な操作を画面の下端に固定します。',
       },
     },
   },
@@ -119,34 +126,69 @@ const isUnshipped = (order: Order) =>
 const shortLines = (order: Order) =>
   isUnshipped(order) ? order.lines.filter((line) => line.product.quantity < line.quantity) : [];
 
-// The lines card answers "is there enough stock" in its description, before the person compares each row.
-function stockNote(order: Order) {
-  if (!isUnshipped(order)) return `${order.lines.length} 品目`;
-  const short = shortLines(order);
-  if (short.length > 0) {
-    const missing = short
-      .map(
-        ({ product, quantity }) =>
-          `${product.name}が ${quantity - product.quantity} ${product.unit}`,
-      )
-      .join('、');
-    return `${missing}足りないため、入荷するまで発送できません。`;
-  }
-  return order.lines.length === 1
-    ? '在庫が足りています。'
-    : `在庫は ${order.lines.length} 品目とも足りています。`;
-}
+// When each short product is due in. An order waiting for one is told the day, so the person can tell the customer.
+const RESTOCKS: Record<string, string> = { 'P-1002': '11 月 6 日（金）' };
 
-// What each payment method means for shipping: the payment card answers whether the order may leave now.
-const PAYMENT_NOTES: Record<string, string> = {
-  [PAYMENT_METHODS[0]!]: '後払いのため、入金を待たずに発送できます。',
-  [PAYMENT_METHODS[1]!]: '入金を確認したため、発送できます。',
-  [PAYMENT_METHODS[2]!]: '受注のときにカードの決済が済んでいるため、発送できます。',
+const DELAY_LABEL = '発送の遅れを顧客へ連絡（メール）';
+
+const isDelayNoticeSent = (order: Order) =>
+  order.history.some((event) => event.label === DELAY_LABEL);
+
+// Why a paid-for or paid-later order does not wait for money, by payment method.
+const PAYMENT_CLEARANCE: Record<string, string> = {
+  [PAYMENT_METHODS[0]!]: '後払いのため入金を待ちません',
+  [PAYMENT_METHODS[1]!]: '入金も確認済みです',
+  [PAYMENT_METHODS[2]!]: 'カードの決済も済んでいます',
 };
 
-function paymentNote(order: Order) {
-  if (order.status === 'paymentPending') return '前払いのため、入金を記録するまで発送できません。';
-  return order.status === 'notShipped' ? PAYMENT_NOTES[order.payment] : undefined;
+type Verdict = { icon: Icon; text: string };
+
+/*
+ * The one answer to "can this order ship now, and if not, why", put in the same place under the heading in every
+ * state. The person no longer compares the stock with the quantities or works out the payment rule, and the reason is
+ * read before the button it explains, on a phone too.
+ */
+function shippingVerdict(order: Order): Verdict {
+  if (order.status === 'shipped') {
+    const shipped = [...order.history]
+      .reverse()
+      .find((event) => event.label === '発送' || event.label.startsWith('発送（'));
+    const day = shipped ? `${monthDay(shipped.at.split(' ')[0]!)}に` : '';
+    return { icon: IconTruckDelivery, text: `${day}発送しました。` };
+  }
+  if (order.status === 'cancelled')
+    return { icon: IconCircleX, text: 'キャンセルしたため、発送しません。' };
+  const reasons = shortLines(order).map(({ product, quantity }) => {
+    const restock = RESTOCKS[product.code];
+    const due = restock ? `${restock}に入荷する予定です。` : '入荷の予定はまだありません。';
+    return `${product.name}が ${quantity - product.quantity} ${product.unit}足りません。${due}`;
+  });
+  if (order.status === 'paymentPending') reasons.push('入金をまだ確認していません。');
+  if (reasons.length > 0) {
+    const notice = isDelayNoticeSent(order) ? '顧客へは遅れを連絡済みです。' : '';
+    return { icon: IconAlertCircle, text: `発送できません。${reasons.join('')}${notice}` };
+  }
+  const stock =
+    order.lines.length === 1
+      ? '在庫は足りていて'
+      : `在庫は ${order.lines.length} 品目とも足りていて`;
+  return {
+    icon: IconCircleCheck,
+    text: `発送できます。${stock}、${PAYMENT_CLEARANCE[order.payment]}。`,
+  };
+}
+
+function ShippingVerdict({ order }: { order: Order }) {
+  const { icon: VerdictIcon, text } = shippingVerdict(order);
+  return (
+    <Group gap="xs" wrap="nowrap" align="flex-start">
+      {/* 2px down puts the 16px icon on the middle of the first 20px line when the sentence wraps. */}
+      <Box mt={2} display="flex">
+        <VerdictIcon size={ICON_SIZE} aria-hidden />
+      </Box>
+      <Text size="sm">{text}</Text>
+    </Group>
+  );
 }
 
 // '2026-10-31' -> '10 月 31 日'.
@@ -276,6 +318,91 @@ function PaymentModal({
   );
 }
 
+interface DelayNoticeValues {
+  subject: string;
+  body: string;
+}
+
+// The draft names what is short and when it comes in, so the person only reads it over before sending.
+function delayNoticeDraft(order: Order): DelayNoticeValues {
+  const { customer } = order;
+  const short = shortLines(order);
+  const products = short.map(({ product }) => product.name).join('、');
+  const dates = short.map(({ product }) => RESTOCKS[product.code]).filter(Boolean);
+  const due =
+    dates.length === short.length
+      ? `${dates.join('、')}に入荷する予定で、入荷しだい、ほかの商品とあわせて発送いたします。`
+      : '入荷の予定が決まりしだい、あらためてご連絡いたします。';
+  return {
+    subject: `${order.id} の発送が遅れるお知らせ`,
+    body:
+      `${customer.name}\n${customer.contact} 様\n\n` +
+      `いつもお世話になっております。${monthDay(order.date)}にご注文いただいた ${order.id} のうち、${products}の在庫が足りず、発送が遅れます。${due}\n\n` +
+      '在庫のある商品だけを先にお送りすることもできます。ご希望の場合は、このメールにご返信ください。\n\n' +
+      `${ORGANIZATION.name} ${CURRENT_USER.name}`,
+  };
+}
+
+function DelayNoticeModal({
+  order,
+  opened,
+  onClose,
+  onSubmit,
+}: {
+  order: Order;
+  opened: boolean;
+  onClose: () => void;
+  onSubmit: (values: DelayNoticeValues) => void;
+}) {
+  const form = useForm<DelayNoticeValues>({
+    mode: 'uncontrolled',
+    initialValues: delayNoticeDraft(order),
+    validate: {
+      subject: (value) => (value.trim() ? null : '件名を入力してください。'),
+      body: (value) => (value.trim() ? null : '本文を入力してください。'),
+    },
+    validateInputOnBlur: true,
+  });
+
+  return (
+    <Modal opened={opened} onClose={onClose} title="発送の遅れを連絡" size="lg">
+      <form
+        noValidate
+        onSubmit={form.onSubmit(onSubmit, (errors) => {
+          const first = (['subject', 'body'] as const).find((field) => errors[field]);
+          if (first) form.getInputNode(first)?.focus();
+        })}
+      >
+        <Stack gap="md">
+          <Text size="sm" c="dimmed">
+            {order.customer.email} にメールで送り、送ったことを受注の履歴に残します。
+          </Text>
+          <TextInput
+            label="件名"
+            required
+            key={form.key('subject')}
+            {...form.getInputProps('subject')}
+          />
+          <Textarea
+            label="本文"
+            required
+            autosize
+            minRows={8}
+            key={form.key('body')}
+            {...form.getInputProps('body')}
+          />
+          <Group justify="flex-end" gap="sm">
+            <Button variant="default" onClick={onClose}>
+              戻る
+            </Button>
+            <Button type="submit">送信</Button>
+          </Group>
+        </Stack>
+      </form>
+    </Modal>
+  );
+}
+
 function CancelModal({
   order,
   opened,
@@ -311,31 +438,42 @@ function OrderActions({
   order,
   onShip,
   onRecordPayment,
+  onNotifyDelay,
   onCancel,
 }: {
   order: Order;
   onShip: () => void;
   onRecordPayment: () => void;
+  onNotifyDelay: () => void;
   onCancel: () => void;
 }) {
+  const short = shortLines(order).length > 0;
   return (
     <Group gap="sm" wrap="nowrap">
       <Button variant="outline" leftSection={<IconPrinter size={ICON_SIZE} />}>
         納品書を印刷
       </Button>
-      {/* The one filled button is the next step for the order's state; a shipped order has none. */}
+      {/*
+       * The one filled button is the next step for what holds the order: the payment first, since the customer owes
+       * it; then the stock, which leaves the customer waiting, so they are told; then the shipment. A shipped order
+       * has none. Once the customer has been told, the notice stays at hand for a second one, unfilled.
+       */}
       {order.status === 'paymentPending' && (
         <Button leftSection={<IconCash size={ICON_SIZE} />} onClick={onRecordPayment}>
           入金を記録
         </Button>
       )}
-      {/* Short stock keeps the button where the person expects it, unpressable; the lines card right below says why. */}
-      {order.status === 'notShipped' && (
+      {order.status === 'notShipped' && short && (
         <Button
-          leftSection={<IconTruckDelivery size={ICON_SIZE} />}
-          onClick={onShip}
-          disabled={shortLines(order).length > 0}
+          variant={isDelayNoticeSent(order) ? 'default' : undefined}
+          leftSection={<IconMail size={ICON_SIZE} />}
+          onClick={onNotifyDelay}
         >
+          遅れを連絡
+        </Button>
+      )}
+      {order.status === 'notShipped' && !short && (
+        <Button leftSection={<IconTruckDelivery size={ICON_SIZE} />} onClick={onShip}>
           発送を記録
         </Button>
       )}
@@ -371,7 +509,7 @@ function OrderActions({
 // the product, where the person checking whether the order can ship looks.
 function LinesCard({ order }: { order: Order }) {
   return (
-    <SectionCard title="明細" description={stockNote(order)}>
+    <SectionCard title="明細">
       <Table>
         <Table.Thead>
           <Table.Tr>
@@ -481,7 +619,7 @@ function ShipToCard({ order }: { order: Order }) {
 
 function PaymentCard({ order }: { order: Order }) {
   return (
-    <SectionCard title="支払い" description={paymentNote(order)}>
+    <SectionCard title="支払い">
       <DataList labelWidth={96}>
         <DataList.Item>
           <DataList.ItemLabel>支払い方法</DataList.ItemLabel>
@@ -527,6 +665,7 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
   const [order, setOrder] = useState(initialOrder);
   const [shipOpened, setShipOpened] = useState(false);
   const [paymentOpened, setPaymentOpened] = useState(false);
+  const [delayOpened, setDelayOpened] = useState(false);
   const [cancelOpened, setCancelOpened] = useState(false);
 
   const addEvent = (status: Order['status'], event: Omit<OrderEvent, 'at' | 'by'>) =>
@@ -554,6 +693,15 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
     });
   };
 
+  const notifyDelay = () => {
+    addEvent(order.status, { label: DELAY_LABEL });
+    setDelayOpened(false);
+    notifications.show({
+      title: '発送の遅れを連絡しました',
+      message: `${order.customer.email} にメールを送りました。`,
+    });
+  };
+
   const cancel = () => {
     addEvent('cancelled', { label: 'キャンセル' });
     setCancelOpened(false);
@@ -578,11 +726,13 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
             <Text size="sm" c="dimmed">
               {order.customer.name}・{monthDay(order.date)}に受注・担当 {order.staff}
             </Text>
+            <ShippingVerdict order={order} />
           </Stack>
           <OrderActions
             order={order}
             onShip={() => setShipOpened(true)}
             onRecordPayment={() => setPaymentOpened(true)}
+            onNotifyDelay={() => setDelayOpened(true)}
             onCancel={() => setCancelOpened(true)}
           />
         </Group>
@@ -610,6 +760,12 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
         opened={paymentOpened}
         onClose={() => setPaymentOpened(false)}
         onSubmit={recordPayment}
+      />
+      <DelayNoticeModal
+        order={order}
+        opened={delayOpened}
+        onClose={() => setDelayOpened(false)}
+        onSubmit={notifyDelay}
       />
       <CancelModal
         order={order}
@@ -648,6 +804,8 @@ function LoadingDetail({ id }: { id: string }) {
               <Skeleton height={20} width={56} />
             </Group>
             <Skeleton height={14} my={3} width={260} maw="100%" />
+            {/* The line on whether the order can ship. */}
+            <Skeleton height={14} my={3} width={340} maw="100%" />
           </Stack>
           {/* The sizes of 納品書を印刷, 発送を記録 and その他の操作, so the buttons do not move when they arrive. */}
           <Group gap="sm" wrap="nowrap">
@@ -661,8 +819,6 @@ function LoadingDetail({ id }: { id: string }) {
         <Grid.Col span={{ base: 12, lg: 8 }}>
           <SectionCard title="明細">
             <Stack gap="md">
-              {/* The line on whether the stock is enough, which the loaded card puts under its title. */}
-              <Skeleton height={14} width="45%" />
               {[0, 1, 2].map((row) => (
                 <Group key={row} justify="space-between" wrap="nowrap" gap="md">
                   <Stack gap={6} flex={1}>
@@ -683,8 +839,7 @@ function LoadingDetail({ id }: { id: string }) {
         <Grid.Col span={{ base: 12, lg: 4 }}>
           <Stack gap="md">
             <SkeletonCard title="お届け先" rows={5} />
-            {/* Three items and the line on whether the payment lets the order ship. */}
-            <SkeletonCard title="支払い" rows={4} />
+            <SkeletonCard title="支払い" rows={3} />
             <SkeletonCard title="履歴" rows={2} />
           </Stack>
         </Grid.Col>
@@ -693,18 +848,17 @@ function LoadingDetail({ id }: { id: string }) {
   );
 }
 
-// The heading keeps the number that was opened, so a mistyped number shows, and names the organization looked in.
+/*
+ * The heading keeps the number that was opened, so a mistyped number shows; the card says once what happened, where
+ * the screen looked, and the two ways on: the button for a mistyped number, the switcher for another organization's. The switcher sits at the top of the sidebar at every width (behind the menu
+ * button on a phone), so the card can name the place.
+ */
 function NotFoundContent({ id }: { id: string }) {
   return (
     <Stack gap="lg">
-      <Stack gap={4}>
-        <Title order={1} size="h3">
-          {id}
-        </Title>
-        <Text size="sm" c="dimmed">
-          {ORGANIZATION.name}の受注に、この受注番号はありません。
-        </Text>
-      </Stack>
+      <Title order={1} size="h3">
+        {id}
+      </Title>
       <Card>
         <EmptyState withIndicatorBackground>
           <EmptyState.Indicator>
@@ -712,10 +866,11 @@ function NotFoundContent({ id }: { id: string }) {
           </EmptyState.Indicator>
           <EmptyState.Title order={2}>受注が見つかりません</EmptyState.Title>
           <EmptyState.Description>
-            受注番号が誤っているか、ほかの組織の受注である可能性があります。受注一覧で探すか、組織を切り替えてから開き直してください。
+            {ORGANIZATION.name}
+            の受注に、この受注番号はありません。ほかの組織の受注なら、サイドバーのいちばん上で組織を切り替えてから開き直してください。
           </EmptyState.Description>
           <EmptyState.Actions>
-            <Button leftSection={<IconArrowLeft size={ICON_SIZE} />}>受注一覧に戻る</Button>
+            <Button leftSection={<IconList size={ICON_SIZE} />}>受注一覧で探す</Button>
           </EmptyState.Actions>
         </EmptyState>
       </Card>
@@ -747,7 +902,7 @@ export const Detail: Story = {
     docs: {
       description: {
         story:
-          'データパターンの「未発送の受注」（明細 3 行、希望の着日あり、在庫は足りている）です。「発送を記録」で発送日・配送業者・送り状番号を入れると発送済みに変わり、塗りのボタンが消えて履歴に 1 件増えます。',
+          'データパターンの「未発送の受注」（明細 3 行、希望の着日あり、在庫は足りている）です。見出しの下の 1 行が、在庫も支払いも発送を止めないことを答えます。「発送を記録」で発送日・配送業者・送り状番号を入れると発送済みに変わり、1 行は発送した日に替わって、塗りのボタンが消え、履歴に 1 件増えます。',
       },
     },
   },
@@ -760,7 +915,7 @@ export const PaymentPending: Story = {
     docs: {
       description: {
         story:
-          'データパターンの「入金待ち」（銀行振込の前払い、明細 2 行、希望の着日なし）です。支払いの Card が入金まで発送できないことを答え、塗りのボタンは「発送を記録」の代わりに「入金を記録」になります。入金日を入れて記録すると未発送に変わり、「発送を記録」が出ます。',
+          'データパターンの「入金待ち」（銀行振込の前払い、明細 2 行、希望の着日なし）です。見出しの下の 1 行が入金を確認するまで発送できないことを答え、塗りのボタンは「発送を記録」の代わりに「入金を記録」になります。入金日を入れて記録すると未発送に変わり、1 行は発送できるという答えに、ボタンは「発送を記録」に替わります。',
       },
     },
   },
@@ -773,7 +928,7 @@ export const ShortStock: Story = {
     docs: {
       description: {
         story:
-          'データパターンの「在庫が足りない明細がある」（明細 3 行のうち 1 行、後払い）です。足りない行に在庫不足の印を出し、明細の Card の補足に何がいくつ足りないかと入荷まで発送できないことを書きます。「発送を記録」は同じ位置のまま押せない状態にしました。',
+          'データパターンの「在庫が足りない明細がある」（明細 3 行のうち 1 行、後払い）です。見出しの下の 1 行に何がいくつ足りず、いつ入荷するかを書き、足りない行に在庫不足の印を出します。塗りのボタンは「発送を記録」の代わりに「遅れを連絡」になり、下書きを確かめて送ると履歴に 1 件増え、1 行に連絡済みと出て、ボタンは枠のボタンに替わります。',
       },
     },
   },
@@ -786,7 +941,7 @@ export const Loading: Story = {
     docs: {
       description: {
         story:
-          'データパターンの「読み込み中」です。受注番号は開いたアドレスから分かるので見出しに出し、状態・顧客・明細・操作のボタンは読み込み後と同じ位置に Skeleton で置きます。Card の見出しも先に出して、どこに何が来るかを読み込み中から分かるようにしています。',
+          'データパターンの「読み込み中」です。受注番号は開いたアドレスから分かるので見出しに出し、状態・顧客・発送できるかの 1 行・明細・操作のボタンは読み込み後と同じ位置に Skeleton で置きます。Card の見出しも先に出して、どこに何が来るかを読み込み中から分かるようにしています。',
       },
     },
   },
@@ -799,7 +954,7 @@ export const NotFound: Story = {
     docs: {
       description: {
         story:
-          'データパターンの「受注が見つからない」です。ほかの状態と同じページの見出しに開いた受注番号と探した組織の名前を出して打ち間違いに気づけるようにし、Card に考えられる理由 2 つ（番号の誤り、ほかの組織の受注）と次の行き先を示します。組織の切り替えは幅によってサイドバーの表示が変わるので場所を言わずに操作だけを案内し、一覧へ戻るボタンが狭い幅でも戻る道になるので、画面上部の戻るリンクは出しません。',
+          'データパターンの「受注が見つからない」です。見出しには開いた受注番号だけを出して打ち間違いに気づけるようにし、Card で、探した組織に無いことと、ほかの組織の受注なら組織を切り替えて開き直すことを 1 度だけ書きます。組織の切り替えはどの幅でもサイドバーのいちばん上にある（スマホではメニューのボタンで開く）ので場所を名指しし、「受注一覧で探す」が狭い幅でも戻る道になるので、画面上部の戻るリンクは出しません。',
       },
     },
   },
