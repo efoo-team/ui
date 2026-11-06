@@ -316,14 +316,14 @@ function Navbar({
     </Tooltip>
   );
   if (closeButton) {
-    // In the Drawer the whole body scrolls, so the parts only stack, 16px apart like the navbar sections, with the
-    // settings link at the foot.
+    // In the Drawer the whole body scrolls, so the parts only stack in it, spaced by the theme like the navbar
+    // sections, with the settings link at the foot.
     return (
-      <Stack gap="md" flex={1}>
+      <>
         {top}
         <Box flex={1}>{links}</Box>
         {foot}
-      </Stack>
+      </>
     );
   }
   return (
@@ -462,16 +462,16 @@ export function AppFrame({
         />
       </AppShell.Navbar>
       {/*
-        On narrow screens the same sidebar opens in a Drawer, like shadcn/ui's mobile sidebar in a Sheet (18rem). The
-        Drawer moves focus into it and keeps Tab there, closes on Escape and on the overlay, stops the page behind it
-        from scrolling and returns focus to the Burger. A link that moves to a screen closes it. variant="sidebar"
-        gives it the navbar's surface and inset.
+        On narrow screens the same sidebar opens in a Drawer, like shadcn/ui's mobile sidebar in a Sheet. The Drawer
+        moves focus into it and keeps Tab there, closes on Escape and on the overlay, stops the page behind it from
+        scrolling and returns focus to the Burger. A link that moves to a screen closes it. variant="sidebar" gives it
+        the navbar's surface, inset and spacing, and its width.
       */}
-      <Drawer.Root variant="sidebar" opened={opened && wide === false} onClose={close} size={288}>
+      <Drawer.Root variant="sidebar" opened={opened && wide === false} onClose={close}>
         <Drawer.Overlay />
         <Drawer.Content aria-label="サイドバー">
-          <Drawer.Body mih="100%" display="flex">
-            <Box component="nav" aria-label="サイドバー" display="flex" flex={1}>
+          <Box component="nav" aria-label="サイドバー" mih="100%" display="flex">
+            <Drawer.Body flex={1}>
               <Navbar
                 rail={false}
                 parent={parent}
@@ -485,8 +485,8 @@ export function AppFrame({
                 onNavigate={navigate}
                 closeButton={<Drawer.CloseButton aria-label="サイドバーを閉じる" />}
               />
-            </Box>
-          </Drawer.Body>
+            </Drawer.Body>
+          </Box>
         </Drawer.Content>
       </Drawer.Root>
       <AppShell.Header px="md">

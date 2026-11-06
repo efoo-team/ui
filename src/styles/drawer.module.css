@@ -47,12 +47,22 @@
   }
 
   /* variant="sidebar": the navbar opened in a Drawer on narrow screens. It takes the navbar's surface and its 8px
-     inset (app-shell.module.css), so the same links look the same at every width. A padding prop still wins. */
+     inset (app-shell.module.css), so the same links look the same at every width. It is shadcn/ui's mobile sidebar
+     width (18rem): 32px wider than the 256px navbar, which leaves the organization switcher the navbar's width beside
+     the close button. A padding or size prop still wins. */
   .root[data-variant='sidebar'] {
     --mb-padding: var(--mantine-spacing-xs);
+    --drawer-size: calc(18rem * var(--mantine-scale));
   }
 
   .root[data-variant='sidebar'] :is(.content, .header) {
     background-color: var(--efoo-color-sidebar, var(--mantine-color-body));
+  }
+
+  /* The body stacks the navbar's parts two insets apart, as the navbar sections each carry the inset. */
+  .root[data-variant='sidebar'] .body {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--mb-padding) * 2);
   }
 }
