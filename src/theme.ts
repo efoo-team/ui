@@ -646,7 +646,6 @@ export const efooTheme: MantineThemeOverride = createTheme({
         body: navLinkClasses.body,
         label: navLinkClasses.label,
         description: navLinkClasses.description,
-        collapse: navLinkClasses.collapse,
         children: navLinkClasses.children,
       },
     }),
