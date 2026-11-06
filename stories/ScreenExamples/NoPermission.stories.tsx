@@ -379,7 +379,8 @@ function ProductListPage() {
           <Stack hiddenFrom="sm" gap={0}>
             <ProductsStack rows={rows} onEdit={setEditing} />
           </Stack>
-          <Text size="sm" c="dimmed" mt="md">
+          {/* A status region, so a screen reader hears the new count after each change of the search or the category. */}
+          <Text size="sm" c="dimmed" mt="md" role="status">
             {products.length} 件中 {rows.length} 件を表示
           </Text>
         </Card>
