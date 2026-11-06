@@ -317,7 +317,7 @@ AppShell の navbar に NavLink を並べると、shadcn/ui の sidebar と同�
 - Drawer を開く Burger には、`aria-haspopup="dialog"` と `aria-expanded` を渡します。
 - Drawer は、リンクを押した時点ではなく、location が変わった時点（`useLocation`）で閉じます（移動を止められたときに開いたままにするためです）。
 
-Drawer と Modal の確認と overlayProps:
+Drawer・Modal:
 
 - 保存していない変更がある画面からの移動は、リンクの click handler で止めず、画面が router の blocker（React Router の `useBlocker`。data router か framework mode が要ります）で止めます。
 - blocker の確認は `blocker.state` が `"blocked"` の間に出し、「移動」が選ばれたら `blocker.proceed()`、「残る」が選ばれたら `blocker.reset()` を呼びます（AppFrame の `onBeforeNavigate` は、リンクがどこにも移らない Storybook でこの blocker の代わりを務める prop で、サービスは写しません）。
