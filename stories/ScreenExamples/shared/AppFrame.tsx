@@ -372,11 +372,19 @@ export interface AppFrameProps {
    */
   counts?: Partial<Record<string, number>>;
   /**
-   * Called with the label of a sidebar link or a page path item before the screen moves to it; return false to stay,
-   * and call `proceed` to move after all (once the user has confirmed). A service does this with its router's
-   * navigation blocker (React Router's useBlocker and its proceed, for example); in Storybook the links lead nowhere,
-   * so a screen that guards unsaved changes uses this instead. Links to the current screen, and buttons that only open
-   * child links or a menu, do not move and do not call it.
+   * A stand-in for the router's navigation blocker, for Storybook only: its links lead nowhere, so no router can hold
+   * a move back. Called with the label of a sidebar link or a page path item before the screen moves to it; return
+   * false to stay, and call `proceed` once the user has confirmed. Here `proceed` only closes the narrow-screen Drawer,
+   * as moving would. Links to the current screen, and buttons that only open child links or a menu, do not move and
+   * do not call it.
+   *
+   * A service does not copy this prop. Stopping a router Link in its click handler cancels the move before the router
+   * sees it, so nothing is left for `proceed` to resume: the Drawer closes and the screen stays, with the changes
+   * dropped. Instead the screen holds the router's blocker, e.g. React Router's `useBlocker(dirty)` (it needs a data
+   * router or framework mode), shows the confirmation while `blocker.state === 'blocked'`, and calls
+   * `blocker.proceed()` to move or `blocker.reset()` to stay. The blocker also holds back the browser's back and
+   * forward buttons. The frame closes the Drawer when the location changes (useLocation), not when a link is pressed,
+   * so a move held back leaves it open and a move that goes on closes it.
    */
   onBeforeNavigate?: (label: string, proceed: () => void) => boolean;
   /** The content of the main area. */
@@ -422,7 +430,8 @@ export function AppFrame({
   /*
    * Moving closes the Drawer. A press that the screen holds back keeps it open, so the user is where they pressed if
    * they stay; when they move after all, the screen calls proceed and it closes then. Storybook's links lead nowhere,
-   * so moving is only closing; in a service the router moves, and proceed is its blocker's.
+   * so here moving is only closing and proceed is close. In a service the router moves: the screen's blocker holds the
+   * move, and the frame closes the Drawer on the location change instead of here (see onBeforeNavigate).
    */
   const navigate = (label: string, event: MouseEvent<HTMLElement>) => {
     const moves = event.currentTarget.getAttribute('aria-current') !== 'page';

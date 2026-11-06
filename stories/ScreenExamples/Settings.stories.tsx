@@ -363,8 +363,13 @@ function SettingsPage({
     if (dirty) event.preventDefault();
   });
 
-  // Moving to another page with unsaved changes asks first; the frame calls this before it moves, and proceed moves
-  // after all (it closes the narrow-screen sidebar; in a service it is the router blocker's proceed).
+  /*
+   * Moving to another page with unsaved changes asks first. In Storybook the links lead nowhere, so the frame's
+   * onBeforeNavigate stands in for the router's blocker, and its proceed only closes the narrow-screen sidebar. A
+   * service holds the blocker here instead, e.g. `const blocker = useBlocker(dirty)` from React Router: the dialog is
+   * open while `blocker.state === 'blocked'`, 保存せずに移動 calls `blocker.proceed()` and このページに残る (and closing
+   * the dialog) calls `blocker.reset()`.
+   */
   const confirmLeaving = (label: string, proceed: () => void) => {
     if (!dirty) return true;
     setLeaving({ label, proceed });
