@@ -93,6 +93,87 @@ export function App() {
 - ダークの Skeleton が白 10% になり、Card の上ではほとんど見えない。
 - 通知（`@mantine/notifications`）の出入りの緩急が `ease` になる。
 
+### ライトとダークの決め方
+
+`MantineProvider` の `defaultColorScheme` は `'light'` が既定です。何も渡さないと、保存された値が無い限りライトで表示され、ダークは使われません。サービスごとに次の 3 点を決めて、`MantineProvider` に渡します。
+
+- ダークを持つか。持つ場合は、利用者の OS の設定に従う `'auto'` を出発点にします。ダークを持たないサービスは、何も渡さずライトのままにします。
+- 利用者に切り替えさせて保存するか。切り替えさせない場合は、`forceColorScheme` に `'light'` か `'dark'` を渡して固定します。このとき保存された値、`defaultColorScheme`、`setColorScheme` は無視されます。切り替えさせる場合は、画面に `useMantineColorScheme()` の `setColorScheme`・`toggleColorScheme`・`clearColorScheme` を呼ぶ操作を置きます。`useMantineColorScheme()` の `colorScheme` は `'auto'` を含み、実際に表示している `'light'` か `'dark'` は `useComputedColorScheme('light')` で得られます。
+- 保存先を localStorage にするか、cookie にするか。サーバー側で描画（SSR）し、初回の HTML から正しい色にしたい場合は cookie にします。
+
+どれを選んだかで、efoo-team/skills の screen-design skill の撮影 tool（`shoot.mjs`）がライトとダークを切り替える経路が変わります。`'auto'` なら color scheme のエミュレーションが、localStorage に保存する場合は localStorage の `mantine-color-scheme-value` が効きます。cookie に保存する場合は、`--init-script` で cookie を書く JavaScript を渡す必要があります。
+
+localStorage に保存する場合は、`MantineProvider` に `defaultColorScheme` を渡します。保存先は localStorage の `mantine-color-scheme-value` で、`localStorageColorSchemeManager({ key })` で変えられます（Mantine の公式ドキュメントは既定のキーを `mantine-color-scheme` と書いていますが、実装の既定値は `mantine-color-scheme-value` です）。キーを変えたときは、`ColorSchemeScript` の `localStorageKey` も同じ値にします。
+
+Next.js の App Router では、`<html>` に `mantineHtmlProps` を展開し、`<head>` に `ColorSchemeScript` を置きます。`ColorSchemeScript` は hydration の前に `<html data-mantine-color-scheme>` を書き、初回の描画のちらつきを防ぎます（[Mantine の Next.js ガイド](https://mantine.dev/guides/next/)）。`ColorSchemeScript` にも `MantineProvider` と同じ `defaultColorScheme` を渡します。
+
+```tsx
+// app/layout.tsx
+import { ColorSchemeScript, MantineProvider, mantineHtmlProps } from '@mantine/core';
+import { efooTheme, efooCssVariablesResolver } from '@efoo/ui';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="ja" {...mantineHtmlProps}>
+      <head>
+        <ColorSchemeScript defaultColorScheme="auto" />
+      </head>
+      <body>
+        <MantineProvider
+          theme={efooTheme}
+          cssVariablesResolver={efooCssVariablesResolver}
+          defaultColorScheme="auto"
+        >
+          {children}
+        </MantineProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+ブラウザだけで描画する SPA（Vite など）では、`MantineProvider` が最初のクライアント側の描画で保存された値を読み、`<html data-mantine-color-scheme>` を描画前に書きます。`ColorSchemeScript` の置き場所は、Mantine の Vite テンプレート（`mantinedev/vite-template`）が `index.html` と `src/` で `ColorSchemeScript` を使っていないため、確認できた範囲では必須ではありません。
+
+cookie などに保存する場合は、`MantineColorSchemeManager`（`get(defaultValue)`・`set(value)`・`subscribe(onUpdate)`・`unsubscribe()`・`clear()`）を実装し、`colorSchemeManager` に渡します。`get` は、サーバー側（`window` が無い環境）では `defaultValue` を返します。
+
+```tsx
+import { MantineProvider, type MantineColorSchemeManager } from '@mantine/core';
+import { efooTheme, efooCssVariablesResolver } from '@efoo/ui';
+
+const COOKIE_NAME = 'color-scheme';
+
+const cookieColorSchemeManager: MantineColorSchemeManager = {
+  get: (defaultValue) => {
+    if (typeof document === 'undefined') return defaultValue;
+    const match = document.cookie.match(new RegExp(`(?:^|; )${COOKIE_NAME}=(light|dark|auto)`));
+    return (match?.[1] as 'light' | 'dark' | 'auto' | undefined) ?? defaultValue;
+  },
+  set: (value) => {
+    document.cookie = `${COOKIE_NAME}=${value}; path=/; max-age=31536000; samesite=lax`;
+  },
+  subscribe: () => {},
+  unsubscribe: () => {},
+  clear: () => {
+    document.cookie = `${COOKIE_NAME}=; path=/; max-age=0`;
+  },
+};
+
+export function App() {
+  return (
+    <MantineProvider
+      theme={efooTheme}
+      cssVariablesResolver={efooCssVariablesResolver}
+      defaultColorScheme="auto"
+      colorSchemeManager={cookieColorSchemeManager}
+    >
+      {/* アプリケーション */}
+    </MantineProvider>
+  );
+}
+```
+
+`ColorSchemeScript` は localStorage だけを読み、cookie は読みません。SSR で初回の HTML から正しい色にするには、サーバーで cookie の値を読み、`<html data-mantine-color-scheme>` にその値を出力します（Mantine の実装からの推論で、公式の手順ではありません。`'auto'` はそのまま出力せず、`'light'` か `'dark'` を出力してください）。この手順を入れた構成は、サービスごとに表示を確かめてください。
+
 ### 日付・時刻の日本語設定
 
 日付・時刻を使う場合は、アプリケーションで日本語ロケールを読み込みます。
@@ -288,6 +369,16 @@ Badge の既定は `variant="light"` です。`color` を指定しない Badge �
 | Alert                                            | フィードバック / 注意・お知らせ（Alert）                                      |
 | Notification                                     | フィードバック / 通知（Notification）                                         |
 | Transition                                       | 動き / 開閉の動き（Transition）                                               |
+
+### 画面の例を探す
+
+画面の型（一覧、詳細、作成と編集のフォーム、設定、最初の空の状態、権限が無いとき、ダッシュボード、サインイン）ごとの画面例を、Storybook の「画面例」に置いています。どの型にどの画面例を使うかは、索引 `SCREEN-EXAMPLES.md` に 1 型 1 行の表でまとめています。列は「画面の型」「こういう画面に使う」「story の id」「ソースのパス」「主な判断（1 行）」です。
+
+- `@efoo/ui` を入れたリポジトリでは、`node_modules/@efoo/ui/SCREEN-EXAMPLES.md` を読みます。入っている版の画面例と一致します。ソースは `node_modules/@efoo/ui/stories/ScreenExamples/` に同梱しています。
+- `@efoo/ui` をまだ入れていない段階（土台を選ぶ段階）では、`https://raw.githubusercontent.com/efoo-team/ui/main/SCREEN-EXAMPLES.md` を読みます。
+- 見た目は、公開 Storybook（https://efoo-team.github.io/ui/）の「画面例」で見られます。
+
+各画面例の説明文（Storybook の Docs）には、その画面をそう作った理由として「目的と読み手」「主役」「抑えたもの・使わなかったもの」「目的が違えば変わるところ」を書いています。画面例は、見た目をそのまま写すためのものではありません。どの操作者が AI エージェントに指示しても画面が最初から質が高く、その品質が保たれるように、判断の理由を読んで、作るサービスの目的に合わせて考え方を写すためのものです。
 
 ## 開発
 
