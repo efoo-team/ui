@@ -352,7 +352,9 @@ export const efooTheme: MantineThemeOverride = createTheme({
   luminanceThreshold: 0.179,
   respectReducedMotion: true,
   focusClassName: baseClasses.focus,
-  fontFamily: 'Inter, system-ui, sans-serif',
+  // Latin text stays on Inter or system-ui. Japanese text reaches Hiragino Sans, which has a face for each weight on macOS;
+  // without it, Chrome on lang="ja" pages draws Japanese in Hiragino Kaku Gothic ProN, which draws 500 as thin as 400.
+  fontFamily: 'Inter, system-ui, "Hiragino Sans", sans-serif',
   fontFamilyMonospace: 'ui-monospace, SFMono-Regular, Menlo, monospace',
   fontWeights: {
     regular: '400',
@@ -391,7 +393,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
     xl: '1.4',
   },
   headings: {
-    fontFamily: 'Inter, system-ui, sans-serif',
+    fontFamily: 'Inter, system-ui, "Hiragino Sans", sans-serif',
     fontWeight: '600',
     sizes: {
       h1: { fontSize: '2.25rem', lineHeight: '2.5rem' },

@@ -3,7 +3,7 @@ import { create } from 'storybook/theming';
 
 // Storybook's own frame uses neutral zinc like the theme, so only the stories show color.
 // It follows the OS color scheme when the page loads; the toolbar switch changes the stories only.
-const fontBase = 'Inter, system-ui, sans-serif';
+const fontBase = 'Inter, system-ui, "Hiragino Sans", sans-serif';
 const fontCode = 'ui-monospace, SFMono-Regular, Menlo, monospace';
 
 const light = create({
