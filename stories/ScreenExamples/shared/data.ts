@@ -1,0 +1,294 @@
+// Fictional data shared by the 画面例 of one fictional sales management service. Every name, address and number is
+// fictional. Figures that appear on more than one screen, or twice on one screen, are computed from one source.
+// The screens show the state on October 31, 2026.
+
+// The color for "the user should act on this". Everything else stays neutral.
+export const ATTENTION_COLOR = 'red';
+
+export const yen = (value: number) => `¥${value.toLocaleString('ja-JP')}`;
+export const sum = (values: number[]) => values.reduce((total, value) => total + value, 0);
+
+export interface Organization {
+  name: string;
+  initial: string;
+  note: string;
+}
+
+export const ORGANIZATIONS: Organization[] = [
+  { name: '青葉商店', initial: '青', note: '標準プラン' },
+  { name: '北町センター', initial: '北', note: '標準プラン' },
+  { name: 'みなと通販', initial: 'み', note: 'お試し中' },
+];
+
+// The signed-in user, who is also one of the staff.
+export const CURRENT_USER = { name: '青木 陽', initial: '青', email: 'user@example.com' };
+
+export const STAFF = [CURRENT_USER.name, '石川 舞', '上田 健'];
+
+export interface Customer {
+  name: string;
+  contact: string;
+  postalCode: string;
+  address: string;
+  phone: string;
+  email: string;
+}
+
+// Postal codes, phone numbers and the .example domain are not in use, so they reach no one.
+export const CUSTOMERS: Customer[] = [
+  {
+    name: 'サンプル商事',
+    contact: '加藤 実',
+    postalCode: '000-0001',
+    address: '東京都見本区サンプル町 1-2-3 見本ビル 4 階',
+    phone: '03-0000-0101',
+    email: 'order@sample-shoji.example',
+  },
+  {
+    name: '見本工業',
+    contact: '木村 葵',
+    postalCode: '000-0002',
+    address: '大阪府見本市試験町 2-4-6',
+    phone: '06-0000-0202',
+    email: 'buyer@mihon-kogyo.example',
+  },
+  {
+    name: 'テスト物産',
+    contact: '工藤 誠',
+    postalCode: '000-0003',
+    address: '愛知県見本市例示町 3-1-8',
+    phone: '052-000-0303',
+    email: 'info@test-bussan.example',
+  },
+  {
+    name: '例示デザイン室',
+    contact: '小池 遥',
+    postalCode: '000-0004',
+    address: '福岡県見本市仮名町 5-5-1 202 号',
+    phone: '092-000-0404',
+    email: 'studio@reiji-design.example',
+  },
+  {
+    name: '模型堂',
+    contact: '坂本 匠',
+    postalCode: '000-0005',
+    address: '北海道見本市模型町 7-3',
+    phone: '011-000-0505',
+    email: 'shop@mokei-do.example',
+  },
+  {
+    name: '試作食品',
+    contact: '杉山 恵',
+    postalCode: '000-0006',
+    address: '宮城県見本市試作町 4-12-2',
+    phone: '022-000-0606',
+    email: 'soumu@shisaku-foods.example',
+  },
+  {
+    name: '仮名書店',
+    contact: '高田 進',
+    postalCode: '000-0007',
+    address: '京都府見本市仮名町 1-9',
+    phone: '075-000-0707',
+    email: 'books@kamei-shoten.example',
+  },
+];
+
+export const PRODUCT_CATEGORIES = ['用紙', '筆記具', 'ファイル', '事務用品'];
+
+export interface Product {
+  code: string;
+  name: string;
+  category: string;
+  unit: string;
+  /** Unit price before tax. */
+  price: number;
+  quantity: number;
+  reorderPoint: number;
+  target: number;
+}
+
+export const PRODUCTS: Product[] = [
+  {
+    code: 'P-1001',
+    name: 'A4 コピー用紙（500 枚）',
+    category: '用紙',
+    unit: '箱',
+    price: 2_980,
+    quantity: 18,
+    reorderPoint: 40,
+    target: 200,
+  },
+  {
+    code: 'P-1002',
+    name: 'ボールペン 黒（10 本）',
+    category: '筆記具',
+    unit: '箱',
+    price: 1_200,
+    quantity: 35,
+    reorderPoint: 50,
+    target: 300,
+  },
+  {
+    code: 'P-1003',
+    name: 'クリアファイル（20 枚）',
+    category: 'ファイル',
+    unit: '袋',
+    price: 450,
+    quantity: 120,
+    reorderPoint: 60,
+    target: 250,
+  },
+  {
+    code: 'P-1004',
+    name: '付箋 75mm 角',
+    category: '事務用品',
+    unit: '冊',
+    price: 180,
+    quantity: 160,
+    reorderPoint: 80,
+    target: 240,
+  },
+  {
+    code: 'P-1005',
+    name: 'ホチキス針 No.10',
+    category: '事務用品',
+    unit: '箱',
+    price: 90,
+    quantity: 210,
+    reorderPoint: 50,
+    target: 260,
+  },
+];
+
+export const needsReorder = (product: Product) => product.quantity < product.reorderPoint;
+
+export type OrderStatus = 'paymentPending' | 'notShipped' | 'shipped' | 'cancelled';
+
+// Only "not shipped" asks the user to act; the other states are shown without color.
+export const ORDER_STATUS: Record<OrderStatus, { label: string; attention: boolean }> = {
+  notShipped: { label: '未発送', attention: true },
+  paymentPending: { label: '入金待ち', attention: false },
+  shipped: { label: '発送済み', attention: false },
+  cancelled: { label: 'キャンセル', attention: false },
+};
+
+const STATUS_ORDER: OrderStatus[] = [
+  'notShipped',
+  'shipped',
+  'shipped',
+  'paymentPending',
+  'shipped',
+  'notShipped',
+  'cancelled',
+];
+
+export const PAYMENT_METHODS = [
+  '請求書払い（月末締め翌月末払い）',
+  '銀行振込（前払い）',
+  'クレジットカード',
+];
+
+export const TAX_RATE = 0.1;
+
+export interface OrderLine {
+  product: Product;
+  quantity: number;
+  /** Unit price before tax at the time of the order. */
+  unitPrice: number;
+}
+
+export interface OrderEvent {
+  /** Month/day and time, e.g. '10/31 09:12'. */
+  at: string;
+  label: string;
+  by: string;
+}
+
+export interface Order {
+  /** SO- and six digits, from SO-010240 (newest) down to SO-010205. */
+  id: string;
+  customer: Customer;
+  status: OrderStatus;
+  staff: string;
+  /** Month/day of the order, e.g. '10/31'. */
+  date: string;
+  lines: OrderLine[];
+  /** Sum of the lines before tax. */
+  subtotal: number;
+  tax: number;
+  /** subtotal + tax, the amount the customer pays. */
+  amount: number;
+  payment: string;
+  shipTo: { name: string; contact: string; postalCode: string; address: string };
+  /** Oldest first. */
+  history: OrderEvent[];
+}
+
+const LINE_QUANTITIES = [10, 20, 5, 30, 12, 8, 50, 15];
+
+function orderLines(index: number): OrderLine[] {
+  // One to three lines; the newest order, the one a detail screen opens, has three.
+  return Array.from({ length: 3 - (index % 3) }, (_, line) => {
+    const product = PRODUCTS[(index + line * 2) % PRODUCTS.length]!;
+    const quantity = LINE_QUANTITIES[(index * 3 + line) % LINE_QUANTITIES.length]!;
+    return { product, quantity, unitPrice: product.price };
+  });
+}
+
+function orderHistory(
+  index: number,
+  date: string,
+  status: OrderStatus,
+  payment: string,
+  staff: string,
+) {
+  const minute = String((index * 7) % 50).padStart(2, '0');
+  const events: OrderEvent[] = [{ at: `${date} 09:${minute}`, label: '受注を登録', by: staff }];
+  if (status === 'cancelled') {
+    events.push({ at: `${date} 15:${minute}`, label: '顧客の依頼でキャンセル', by: staff });
+    return events;
+  }
+  if (payment === PAYMENT_METHODS[1] && status !== 'paymentPending') {
+    events.push({ at: `${date} 11:${minute}`, label: '入金を確認', by: STAFF[1]! });
+  }
+  if (status === 'shipped')
+    events.push({ at: `${date} 16:${minute}`, label: '発送', by: STAFF[2]! });
+  return events;
+}
+
+// 36 orders, two a day from October 31 back to October 14.
+export const ORDERS: Order[] = Array.from({ length: 36 }, (_, index) => {
+  const customer = CUSTOMERS[(index * 3) % CUSTOMERS.length]!;
+  const status = STATUS_ORDER[index % STATUS_ORDER.length]!;
+  const staff = STAFF[(index * 2) % STAFF.length]!;
+  const date = `10/${31 - Math.floor(index / 2)}`;
+  // Only bank transfer is paid before shipping, so it is the payment of the orders waiting for it.
+  const payment = status === 'paymentPending' ? PAYMENT_METHODS[1]! : PAYMENT_METHODS[index % 3]!;
+  const lines = orderLines(index);
+  const subtotal = sum(lines.map((line) => line.unitPrice * line.quantity));
+  const tax = Math.floor(subtotal * TAX_RATE);
+  return {
+    id: `SO-${String(10_240 - index).padStart(6, '0')}`,
+    customer,
+    status,
+    staff,
+    date,
+    lines,
+    subtotal,
+    tax,
+    amount: subtotal + tax,
+    payment,
+    shipTo: {
+      name: customer.name,
+      contact: customer.contact,
+      postalCode: customer.postalCode,
+      address: customer.address,
+    },
+    history: orderHistory(index, date, status, payment, staff),
+  };
+});
+
+export const findOrder = (id: string) => ORDERS.find((order) => order.id === id);
+
+export const INQUIRIES = { total: 100, done: 62, inProgress: 24, open: 14, overdue: 3 };
