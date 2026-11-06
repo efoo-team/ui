@@ -20,6 +20,7 @@ import {
   Card,
   Cascader,
   Checkbox,
+  CheckboxGroup,
   CheckboxIndicator,
   Chip,
   Collapse,
@@ -531,6 +532,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
         root: { '--checkbox-icon-color': getCheckboxIconColor(theme, props) },
       }),
     }),
+    CheckboxGroup: CheckboxGroup.extend({ classNames: { root: checkboxClasses.group } }),
     CheckboxIndicator: CheckboxIndicator.extend({
       classNames: { indicator: checkboxClasses.indicator },
       defaultProps: { radius: 'xs' },

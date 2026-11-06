@@ -543,7 +543,7 @@ function SettingsPage({
                           }
                           {...form.getInputProps(`notifications.${event.key}.channels`)}
                         >
-                          <Group gap="lg" mt="xs">
+                          <Group gap="lg">
                             {CHANNELS.map((channel) => (
                               <Checkbox
                                 key={channel.value}
@@ -578,7 +578,7 @@ function SettingsPage({
                     label={<Label changed={isChanged((v) => v.mailTiming)}>送る時刻</Label>}
                     {...form.getInputProps('mailTiming')}
                   >
-                    <Stack gap="xs" mt="xs">
+                    <Stack gap="xs">
                       <Radio value="each" label="知らせることが起きるたびに送る" />
                       <Radio value="morning" label="毎朝 9 時に 1 通にまとめて送る" />
                     </Stack>

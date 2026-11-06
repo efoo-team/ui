@@ -11,6 +11,16 @@
     --checkbox-size-xl: calc(1.5rem * var(--mantine-scale));
   }
 
+  /* Checkbox.Group holds its options in a div[role='group'] and spaces them from its label, description and error as
+     Radio.Group does (radio.module.css). */
+  .group > * + [role='group'] {
+    margin-top: var(--mantine-spacing-xs);
+  }
+
+  .group > [role='group'] ~ * {
+    margin-top: calc(var(--mantine-spacing-xs) / 2);
+  }
+
   .input:not(:checked, [data-indeterminate], [data-error]),
   .indicator:not([data-checked], [data-indeterminate], [data-error]) {
     border-color: var(--efoo-input-border);

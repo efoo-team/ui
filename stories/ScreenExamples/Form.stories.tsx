@@ -463,7 +463,7 @@ function ProductFormPage({
                       key={form.key('status')}
                       {...form.getInputProps('status')}
                     >
-                      <Stack gap="sm" mt="xs">
+                      <Stack gap="sm">
                         <Radio value="onSale" label="販売中" description="受注の登録で選べます。" />
                         <Radio
                           value="stopped"
