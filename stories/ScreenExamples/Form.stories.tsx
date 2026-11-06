@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
   Alert,
   Anchor,
-  Badge,
   Button,
   Fieldset,
   Group,
@@ -32,6 +31,7 @@ import {
   yen,
   type Product,
 } from './shared/data';
+import { ReorderBadge } from './shared/ReorderBadge';
 import { SectionCard } from './shared/SectionCard';
 
 // Units the fictional wholesaler sells by; the first five are the ones ALL_PRODUCTS use.
@@ -463,7 +463,7 @@ function ProductFormPage({
                           <Text size="sm">
                             {product.quantity} {product.unit}
                           </Text>
-                          {reorderNow && <Badge color={ATTENTION_COLOR}>要発注</Badge>}
+                          {reorderNow && <ReorderBadge />}
                           <Anchor href="#" size="sm">
                             在庫の画面で調整
                           </Anchor>

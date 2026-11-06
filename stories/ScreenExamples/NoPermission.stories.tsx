@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect, useRef, useState } from 'react';
 import {
   ActionIcon,
-  Badge,
   Button,
   Card,
   Divider,
@@ -25,13 +24,13 @@ import { IconLock, IconPencil, IconSearch } from '@tabler/icons-react';
 import { AppFrame, ICON_SIZE } from './shared/AppFrame';
 import {
   ALL_PRODUCTS,
-  ATTENTION_COLOR,
   needsReorder,
   ACCOUNTING_STAFF,
   PRODUCT_CATEGORIES,
   yen,
   type Product,
 } from './shared/data';
+import { ReorderBadge } from './shared/ReorderBadge';
 
 const meta = {
   title: '画面例 / 権限が無いとき',
@@ -185,10 +184,6 @@ function EditStockButton({ product, onEdit }: { product: Product; onEdit: () => 
   );
 }
 
-function ReorderBadge({ product }: { product: Product }) {
-  return needsReorder(product) ? <Badge color={ATTENTION_COLOR}>要発注</Badge> : null;
-}
-
 const NO_MATCHES = '条件に合う商品はありません。';
 
 /*
@@ -219,7 +214,7 @@ function ProductsTable({ rows, onEdit }: { rows: Product[]; onEdit: (product: Pr
                   {/* The badge follows the name, as on the dashboard and the order detail. */}
                   <Group gap="xs">
                     <Text size="sm">{product.name}</Text>
-                    <ReorderBadge product={product} />
+                    {needsReorder(product) && <ReorderBadge />}
                   </Group>
                   <Text size="xs" c="dimmed">
                     {product.code}
@@ -285,7 +280,7 @@ function ProductsStack({ rows, onEdit }: { rows: Product[]; onEdit: (product: Pr
             <Group gap={4} wrap="nowrap" align="flex-start" flex="none">
               <Stack gap={2} align="flex-end">
                 <Group gap="xs" wrap="nowrap">
-                  <ReorderBadge product={product} />
+                  {needsReorder(product) && <ReorderBadge />}
                   <Text size="sm">
                     {product.quantity} {product.unit}
                   </Text>

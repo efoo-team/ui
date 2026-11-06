@@ -42,6 +42,7 @@ import {
 import { OrderLink } from './shared/OrderLink';
 import { OrderMenu } from './shared/OrderMenu';
 import { OrderStatusBadge } from './shared/OrderStatusBadge';
+import { ReorderBadge } from './shared/ReorderBadge';
 import { SectionCard } from './shared/SectionCard';
 
 const meta = {
@@ -310,7 +311,7 @@ function StockCard() {
               <Group justify="space-between" wrap="nowrap" gap="xs">
                 <Group gap="xs" wrap="nowrap">
                   <Text size="sm">{item.name}</Text>
-                  {reorder && <Badge color={ATTENTION_COLOR}>要発注</Badge>}
+                  {reorder && <ReorderBadge />}
                 </Group>
                 <Text size="sm">
                   {item.quantity} {item.unit}
