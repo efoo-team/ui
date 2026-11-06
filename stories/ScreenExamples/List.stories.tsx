@@ -539,9 +539,13 @@ function OrdersCard({
             );
           })}
         </Tabs.List>
+        {/*
+         * The fields narrow every state alike, so they sit between the tabs and the panel, not in it: switching the
+         * tab keeps them, and keeps the phone's 絞り込み・並べ替え open or closed as it was.
+         */}
+        <FilterBar filters={filters} disabled={state !== 'ready'} onChange={onChange} />
         {STATUS_TABS.map((tab) => (
           <Tabs.Panel key={tab.value} value={tab.value}>
-            <FilterBar filters={filters} disabled={state !== 'ready'} onChange={onChange} />
             {state === 'error' ? (
               // The conditions stay above, so after the reload the same orders come back without retyping them.
               <Alert title="受注を読み込めませんでした" color="red" icon={<IconAlertCircle />}>
