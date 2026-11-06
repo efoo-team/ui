@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useEffect, useState } from 'react';
 import {
+  Alert,
   Anchor,
   Button,
   Card,
@@ -11,6 +13,9 @@ import {
   Title,
 } from '@mantine/core';
 import { useForm, type FormErrors } from '@mantine/form';
+import { IconAlertCircle } from '@tabler/icons-react';
+import { SERVICE_NAME } from './shared/AppFrame';
+import { ATTENTION_COLOR } from './shared/data';
 
 const meta = {
   title: '画面例 / サインイン',
@@ -25,10 +30,10 @@ const meta = {
           '架空の販売管理サービスのサインインの画面です。\n\n' +
           '**目的と読み手**　このサービスを使う社員が、使い始めるときに開く画面です。毎日使う人も通りますが、初めて使う人も必ず通る画面なので、慣れた人の速さよりも、初めて見る人が迷わず 1 つの行動に進めることを優先しています。\n\n' +
           '**情報構造**　扱う対象は、これから入る利用者のアカウント 1 つだけです。主はメールアドレスとパスワードの組で、シングルサインオン・パスワードの再設定・新規登録は、その組で入れないときの別の道として従に置きます。\n\n' +
-          '**データパターン**　項目はメールアドレスとパスワードの 2 つで、どちらも必須です。状態は、何も入力していないとき（story『サインイン』）と、入力に誤りがあるとき（story『入力に誤りがあるとき』。形式の誤りと未入力）です。認証に失敗したとき（メールアドレスかパスワードが違う）と送信中の story はありません。\n\n' +
-          '**情報の流れ**　利用者は見出しで何の画面かを知り、メールアドレスとパスワードを入れてサインインします。その道で入れないと分かったとき（パスワードを忘れた、シングルサインオンを使う、アカウントが無い）にだけ、主な道のすぐ下にある別の道を探します。\n\n' +
-          '**主役**　流れの中心である 2 つの欄と、塗りの「サインイン」のボタンです。画面の中央に幅を絞ったカードを 1 枚だけ置き、塗りのボタンをこの 1 つに限っています。\n\n' +
-          '**抑えたもの・使わなかったもの**　サインインの前は組織も利用者も決まっておらず、サイドバー・全体検索・アカウントのメニューのどれも使えないため、外枠（AppFrame）は使っていません。見出しはカードの見出しと同じ大きさに抑え、シングルサインオンは枠線のボタン、パスワードの再設定と新規登録は小さなリンクにして、主な道より目立たないようにしています。\n\n' +
+          '**データパターン**　項目はメールアドレスとパスワードの 2 つで、どちらも必須です。状態は、何も入力していないとき（story『サインイン』）、入力に誤りがあるとき（story『入力に誤りがあるとき』。形式の誤りと未入力）、送信して確かめているあいだ（story『送信中』）、送った組がアカウントと合わなかったとき（story『メールアドレスかパスワードが違うとき』）の 4 つです。最後の状態がサインインで最も多い失敗です。\n\n' +
+          '**情報の流れ**　利用者は見出しで、どのサービスのサインインの画面かを知り、メールアドレスとパスワードを入れてサインインします。入れなかったときは、フォームの上の知らせで理由を知り、入力し直します。その道で入れないと分かったとき（パスワードを忘れた、シングルサインオンを使う、アカウントが無い）にだけ、主な道のすぐ下にある別の道を探します。\n\n' +
+          '**主役**　流れの中心である 2 つの欄と、塗りの「サインイン」のボタンです。画面の中央に幅を絞ったカードを 1 枚だけ置き、塗りのボタンをこの 1 つに限っています。見出しにはサービスの名前（架空の「販売管理」）を入れ、初めての人や、期限が切れて戻された人が、正しいサービスに来たかをその場で確かめられるようにしました。\n\n' +
+          '**抑えたもの・使わなかったもの**　サインインの前は組織も利用者も決まっておらず、サイドバー・全体検索・アカウントのメニューのどれも使えないため、外枠（AppFrame）は使っていません。見出しはカードの見出しと同じ大きさに抑え、シングルサインオンは枠線のボタン、パスワードの再設定と新規登録は小さなリンクにして、主な道より目立たないようにしています。欄のラベルと同じことを言うだけの補足の文は置いていません。認証の失敗は、メールアドレスとパスワードのどちらが違うかを書かない 1 件の Alert にしました。どちらかを書くと、登録されたメールアドレスかどうかを他人が確かめられてしまうためです（アカウントの列挙）。\n\n' +
           '**目的が違えば変わるところ**　組織の全員がシングルサインオンで入るサービスなら、パスワードの欄を置かず、シングルサインオンのボタンを塗りにして主役にします。アカウントを管理者だけが発行する社内のサービスなら、新規登録のリンクは置きません。',
       },
     },
@@ -48,21 +53,34 @@ const FIELD_ORDER = ['email', 'password'] as const;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function validateEmail(value: string) {
-  if (value.trim() === '') return 'メールアドレスを入力してください';
-  return EMAIL_PATTERN.test(value) ? null : 'メールアドレスの形式が正しくありません';
+  if (value.trim() === '') return 'メールアドレスを入力してください。';
+  return EMAIL_PATTERN.test(value)
+    ? null
+    : 'メールアドレスの形式が正しくありません。user@example.com の形で入力してください。';
 }
 
 function validatePassword(value: string) {
-  return value === '' ? 'パスワードを入力してください' : null;
+  return value === '' ? 'パスワードを入力してください。' : null;
 }
+
+// How long the fictional check of the account takes, so the waiting state can be seen.
+const CHECK_DELAY = 1200;
 
 function SignInPage({
   initialValues = { email: '', password: '' },
   initialErrors,
+  authFailed: authFailedProp = false,
+  submitting: submittingProp = false,
 }: {
   initialValues?: SignInValues;
   initialErrors?: FormErrors;
+  /** Opens the page with the message that the pair did not match, for the story that shows it. */
+  authFailed?: boolean;
+  /** Holds the page in the waiting state, for the story that shows it. */
+  submitting?: boolean;
 }) {
+  const [authFailed, setAuthFailed] = useState(authFailedProp);
+  const [failures, setFailures] = useState(0);
   const form = useForm<SignInValues>({
     mode: 'uncontrolled',
     initialValues,
@@ -70,24 +88,51 @@ function SignInPage({
     validate: { email: validateEmail, password: validatePassword },
     validateInputOnBlur: true,
   });
+  const submitting = submittingProp || form.submitting;
+
+  // After a failed check the cleared password is where the user types next. A pressed button that showed the wait
+  // was disabled meanwhile and lost focus, so focus moves once the wait is over.
+  useEffect(() => {
+    if (failures > 0 && !form.submitting) form.getInputNode('password')?.focus();
+    // The form object changes on every render, so the focus follows only a new failure and the end of the wait.
+  }, [failures, form.submitting]);
 
   return (
     <Center mih="100dvh" p="md">
       <Card w="100%" maw={384}>
         <Stack gap="lg">
-          <Stack gap={4}>
-            <Title order={1} size="h5">
-              サインイン
-            </Title>
-            <Text size="sm" c="dimmed">
-              メールアドレスとパスワードを入力します
-            </Text>
-          </Stack>
+          {/* The service's name, so someone signing in for the first time, or sent back here when a session ended,
+              can tell they are at the right service. A service puts its own name here, not a logo. */}
+          <Title order={1} size="h5">
+            {SERVICE_NAME}にサインイン
+          </Title>
+          {/*
+           * The most common failure. One message for both fields: telling which of the two is wrong would tell anyone
+           * typing addresses which ones have an account. Mantine's Alert has role="alert", so it is read when it appears.
+           */}
+          {authFailed && (
+            <Alert
+              color={ATTENTION_COLOR}
+              icon={<IconAlertCircle />}
+              title="サインインできませんでした"
+            >
+              メールアドレスかパスワードが違います。確かめて、もう一度入力してください。
+            </Alert>
+          )}
           {/* noValidate replaces the browser's English bubbles with the Japanese messages below each field. */}
           <form
             noValidate
+            aria-busy={submitting || undefined}
             onSubmit={form.onSubmit(
-              () => undefined,
+              // Storybook has no accounts to check, so every complete pair is treated as wrong after the time a check
+              // takes: both the waiting and the failure can be tried. The password is cleared, as it is never shown back.
+              async () => {
+                setAuthFailed(false);
+                await new Promise((resolve) => setTimeout(resolve, CHECK_DELAY));
+                form.setFieldValue('password', '');
+                setAuthFailed(true);
+                setFailures((count) => count + 1);
+              },
               // Move focus to the first field with an error so keyboard users land on it.
               (errors) => {
                 const first = FIELD_ORDER.find((field) => errors[field]);
@@ -119,11 +164,13 @@ function SignInPage({
                   パスワードを忘れた場合
                 </Anchor>
               </Stack>
+              {/* While the pair is checked only the two ways to sign in wait: the fields stay readable as typed, and the
+                  check is short, so locking them would only gray out what the user just entered. */}
               <Stack gap="sm">
-                <Button type="submit" fullWidth>
+                <Button type="submit" fullWidth loading={submitting}>
                   サインイン
                 </Button>
-                <Button variant="outline" fullWidth>
+                <Button variant="outline" fullWidth disabled={submitting}>
                   シングルサインオンでサインイン
                 </Button>
               </Stack>
@@ -160,7 +207,7 @@ export const SignInWithErrors: Story = {
     docs: {
       description: {
         story:
-          'データパターンのうち、送信した入力に誤りがある状態（メールアドレスの形式の誤りと、パスワードの未入力）です。ブラウザの英語の吹き出しを使わず、誤りのある欄の真下に日本語で理由を出し、キーボードで操作する人がそのまま直せるよう、誤りのある最初の欄へフォーカスを移します。',
+          'データパターンのうち、送信した入力に誤りがある状態（メールアドレスの形式の誤りと、パスワードの未入力）です。ブラウザの英語の吹き出しを使わず、誤りのある欄の真下に日本語で、何が違うかと、どう入力すればよいかを出し、キーボードで操作する人がそのまま直せるよう、誤りのある最初の欄へフォーカスを移します。',
       },
     },
   },
@@ -172,5 +219,35 @@ export const SignInWithErrors: Story = {
         password: validatePassword(''),
       }}
     />
+  ),
+};
+
+export const SignInFailed: Story = {
+  name: 'メールアドレスかパスワードが違うとき',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'データパターンのうち、送信した組が登録されたアカウントと合わなかった状態です。どちらが違うかは書かず、フォームの上に 1 件の Alert で知らせます。メールアドレスは残し、パスワードは空に戻して、入力し直す欄へフォーカスを移します。',
+      },
+    },
+  },
+  render: () => (
+    <SignInPage initialValues={{ email: 'user@example.com', password: '' }} authFailed />
+  ),
+};
+
+export const Submitting: Story = {
+  name: '送信中',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'データパターンのうち、送信して確かめているあいだの状態です。「サインイン」を読み込み表示にし、シングルサインオンも押せなくして、二重の送信を防ぎます。欄は入力したとおりに読めるよう、そのまま残します。この画面例では、どの組を送ってもこの状態のあと『メールアドレスかパスワードが違うとき』になります。',
+      },
+    },
+  },
+  render: () => (
+    <SignInPage initialValues={{ email: 'user@example.com', password: 'password' }} submitting />
   ),
 };

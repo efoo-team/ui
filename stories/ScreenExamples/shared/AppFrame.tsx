@@ -52,6 +52,13 @@ import { ATTENTION_COLOR, CURRENT_USER, INQUIRIES, ORGANIZATIONS, type Organizat
 
 export const ICON_SIZE = 16;
 
+/*
+ * The fictional service's name. The sign-in screen shows it, because there the user has not entered yet and needs to
+ * know they are at the right service. The frame does not: the signed-in user is already in it, the top of the sidebar
+ * names the organization, and a service puts its own name in the document title.
+ */
+export const SERVICE_NAME = '販売管理';
+
 // Container breakpoints for the Grids in the main area; Mantine needs exact widths for container queries.
 // lg (66rem = 1056px) is where the four stat cards and the side-by-side chart row start; it stays clear of the main width at
 // common viewports (1440: 1152 open / 1360 rail, 1280: 992 / 1200, 1200: 912 / 1120, 1024: 736 / 944).
@@ -460,7 +467,9 @@ export function AppFrame({
                 opened={opened}
                 onClick={toggle}
                 hiddenFrom="sm"
-                size="lg"
+                // sm draws 18px lines beside the 16px header icons with a similar weight, in a 26px target (WCAG 2.5.8
+                // asks for 24px).
+                size="sm"
                 aria-label="サイドバー"
                 aria-expanded={opened}
                 aria-controls={navbarId}
