@@ -21,6 +21,7 @@ import { notifications } from '@mantine/notifications';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { AppFrame } from './shared/AppFrame';
+import { CONTENT_BREAKPOINTS } from './shared/constants';
 import { BackLink } from './shared/BackLink';
 import {
   ALL_PRODUCTS,
@@ -402,7 +403,7 @@ function ProductFormPage({
                       key={form.key('name')}
                       {...form.getInputProps('name')}
                     />
-                    <SimpleGrid type="container" cols={{ base: 1, '30rem': 2 }}>
+                    <SimpleGrid type="container" cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}>
                       <Select
                         label="分類"
                         placeholder="選んでください"
@@ -496,7 +497,10 @@ function ProductFormPage({
                         </Group>
                       </Input.Wrapper>
                     )}
-                    <SimpleGrid type="container" cols={{ base: 1, '30rem': editing ? 2 : 3 }}>
+                    <SimpleGrid
+                      type="container"
+                      cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: editing ? 2 : 3 }}
+                    >
                       {!editing && (
                         <NumberInput
                           label="在庫数"

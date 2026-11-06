@@ -12,7 +12,9 @@ export const SERVICE_NAME = '販売管理';
 
 // Container breakpoints for the grids on the screens (Grid and SimpleGrid with type="container"), which change their
 // columns by their own width, so an open sidebar and a narrow column are taken into account. Mantine needs exact widths
-// for container queries. xs is where two columns of fields or cards fit side by side.
+// for container queries. xs is where fields and cards start to sit side by side, on every screen alike: two fields
+// each wide enough for a 16-character choice such as a payment method, three short numbers on the product form, or
+// two stat cards on the dashboard.
 // lg (66rem = 1056px) is where the four stat cards and the side-by-side chart row start; it stays clear of the main width at
 // common viewports (1440: 1152 open / 1360 rail, 1280: 992 / 1200, 1200: 912 / 1120, 1024: 736 / 944).
 export const CONTENT_BREAKPOINTS = {
