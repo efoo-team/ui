@@ -63,7 +63,7 @@ export const SHIPPING_STAFF = '上田 健';
 
 export const STAFF = [CURRENT_USER.name, ACCOUNTING_STAFF, SHIPPING_STAFF];
 
-export interface Customer {
+interface Customer {
   name: string;
   contact: string;
   postalCode: string;
@@ -73,7 +73,7 @@ export interface Customer {
 }
 
 // Postal codes, phone numbers and the .example domain are not in use, so they reach no one.
-export const CUSTOMERS: Customer[] = [
+const CUSTOMERS: Customer[] = [
   {
     name: 'サンプル商事',
     contact: '加藤 実',
@@ -304,7 +304,7 @@ export const PAYMENT_METHODS = {
 
 export const TAX_RATE = 0.1;
 
-export interface OrderLine {
+interface OrderLine {
   product: Product;
   quantity: number;
   /** Unit price before tax at the time of the order. */
@@ -312,8 +312,7 @@ export interface OrderLine {
 }
 
 // What happened to an order. A screen tells events apart by this, not by the wording of the label, which can change.
-export type OrderEventKind =
-  'registered' | 'paymentConfirmed' | 'delayNotified' | 'shipped' | 'cancelled';
+type OrderEventKind = 'registered' | 'paymentConfirmed' | 'delayNotified' | 'shipped' | 'cancelled';
 
 export interface OrderEvent {
   /** Tells the event apart from the others in the history, as the row's id in a service's database does. */

@@ -63,7 +63,7 @@ interface NavItem {
 }
 
 // A screen names its place with a parent label and, for a parent with children, a child label.
-export const NAV_ITEMS: NavItem[] = [
+const NAV_ITEMS: NavItem[] = [
   { label: 'ホーム', icon: IconDashboard, children: ['ダッシュボード', 'お知らせ'] },
   { label: '受注', icon: IconReceipt, children: ['受注一覧', '出荷', '返品'] },
   { label: '顧客', icon: IconUsers },
@@ -73,7 +73,7 @@ export const NAV_ITEMS: NavItem[] = [
 ];
 
 // The link at the foot of the sidebar, apart from the work the service is for.
-export const SETTINGS_LABEL = '設定';
+const SETTINGS_LABEL = '設定';
 
 interface NavbarProps {
   rail: boolean;
@@ -345,7 +345,7 @@ function AccountMenu() {
   );
 }
 
-export interface AppFrameProps {
+interface AppFrameProps {
   /** The label in NAV_ITEMS (or SETTINGS_LABEL) that holds the current screen, e.g. '受注'. */
   parent: string;
   /** The child label under `parent` that is the current screen, e.g. '受注一覧'. Omit it for a link without children. */
