@@ -16,7 +16,9 @@
     "dist",
     "README.md",
     "LICENSE",
-    "THIRD_PARTY_NOTICES.md"
+    "THIRD_PARTY_NOTICES.md",
+    "SCREEN-EXAMPLES.md",
+    "stories/ScreenExamples/"
   ],
   "sideEffects": [
     "**/*.css"
