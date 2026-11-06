@@ -250,6 +250,13 @@ theme は、次の prop に日本語の aria-label を入れた既定値を持�
 - 日付・時刻の部品（Calendar・DatePicker・DateInput など）の `ariaLabels` と `getDayAriaLabel`。
 - TimePicker の `hoursInputLabel`・`minutesInputLabel`・`secondsInputLabel`。
 
+theme は、次の Mantine の静的な class に頼って部品を見分けています。MantineProvider の `classNamesPrefix` を変えたり、`withStaticClasses={false}` にしたりすると、これらの class が付かず、theme の指定が効きません。
+
+- `mantine-Avatar-root`: `leftSection` に Avatar を置いた NavLink を、組織の切り替えの行（高さ 48px、rail で Avatar が 32px のアイコンの列に収まる）にします。
+- `mantine-ScrollArea-viewport`・`mantine-ScrollArea-content`・`mantine-ScrollArea-scrollbar`: navbar の余白を、スクロールする領域の内側に置き、rail の縦のスクロールバーを 6px にします。
+- `mantine-Card-root`: `sticky-actions` の Affix の中の Card の padding を `md` にします。
+- `mantine-Anchor-root`: `sticky-actions` の Affix の中のリンクの押せる高さを確保します。
+
 ### 動き
 
 theme の `respectReducedMotion` が `true` です。OS の「視差効果を減らす」を有効にすると、Mantine の Transition とパッケージの CSS の transition が同時に止まります。
@@ -314,8 +321,6 @@ AppShell の navbar に NavLink を並べると、shadcn/ui の sidebar と同�
 - 確認の Modal と Drawer は、Escape で両方とも閉じます（それぞれが window の Escape を聞くためです。1 つの `Modal.Stack` の中の Modal どうし、1 つの `Drawer.Stack` の中の Drawer どうしだけが 1 回の Escape を共有し、Modal と Drawer は同じ stack に入りません）。
 - Drawer と Modal に `overlayProps` の一部（`backgroundOpacity` など）だけを渡すと、theme の `overlayProps` の既定値はまるごと置き換わります。それでも、Drawer・Modal は受け取った値を Overlay の部品に渡し、その部品が渡されていない値（`blur` など）を theme の DrawerOverlay・ModalOverlay の既定値から補うので、背景のぼかしは残ります。
 
-組織の切り替えの起点は Mantine の静的な class（`mantine-Avatar-root`）で見分けるので、MantineProvider の `classNamesPrefix` を変えたり、`withStaticClasses={false}` にしたりすると、48px の行になりません。
-
 ### shadcn/ui の variant との対応
 
 | shadcn/ui の variant | Mantine での指定           |
@@ -332,9 +337,7 @@ AppShell の navbar に NavLink を並べると、shadcn/ui の sidebar と同�
 
 パッケージは Text の `variant` の型に `metric`・`emphasis` を足しています（`declare module '@mantine/core'` で `TextProps.variant` を広げる形）。サービスでも `TextProps.variant` を独自の型で広げると TypeScript が TS2717 を出すので、独自の variant は文字列のまま渡してください（型は任意の文字列を受け付けます）。
 
-画面の下に固定する操作の欄（保存の欄など）は、Affix の variant `sticky-actions` で作ります。`<Affix variant="sticky-actions" withinPortal={false} pos="sticky" position={{ bottom: 0 }}><Card>…</Card></Affix>` の形で、重なり順（`app` の 1 つ下）、本文の背景色の帯、下の余白（`md`）、中の Card の padding（`md`）、中のリンクの押せる高さは theme が持ちます。Card に `padding` を渡すと、theme の余白より優先されます。重なり順は、Affix に `zIndex` を渡すとその値が優先されます。`zIndex` を渡さない `sticky-actions` の Affix は `app` の 1 つ下で、variant の無い Affix は Mantine の既定（`modal` と同じ 200）です。
-
-中の Card と Anchor は Mantine の静的な class（`mantine-Card-root`・`mantine-Anchor-root`）で見分けるので、MantineProvider の `classNamesPrefix` を変えたり、`withStaticClasses={false}` にしたりすると、Card の余白（`md`）とリンクの押せる高さが付きません。
+画面の下に固定する操作の欄（保存の欄など）は、Affix の variant `sticky-actions` で作ります。`<Affix variant="sticky-actions" withinPortal={false} pos="sticky" position={{ bottom: 0 }}><Card>…</Card></Affix>` の形で、本文の背景色の帯、下の余白（`md`）、中の Card の padding（`md`）、中のリンクの押せる高さは theme が持ちます。Card に `padding` を渡すと、theme の余白より優先されます。重なり順は、Affix に `zIndex` を渡すとその値になり、渡さないときは、`sticky-actions` の Affix が `app` の 1 つ下、variant の無い Affix が Mantine の既定（`modal` と同じ 200）です。
 
 Badge の既定は `variant="light"` です。`color` を指定しない Badge は shadcn/ui の secondary（muted の面に本文の色の文字）、状態色の Badge は色の 10% の面に色の文字になります。塗りつぶしにする場合は `variant="filled"` を指定します。
 
