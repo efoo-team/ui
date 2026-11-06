@@ -46,9 +46,8 @@ function FirstRunPage() {
             販売する商品と、その在庫を管理します。
           </Text>
         </Stack>
-        {/* The empty state takes the place of the table, so it sits in the Card the list would. EmptyState has its
-            own padding, so the Card adds only vertical room; at 390px this keeps both actions on one line. */}
-        <Card py="xl" px={0}>
+        {/* The empty state takes the place of the table, so it sits in the Card the list would. */}
+        <Card>
           <EmptyState icon={<IconBox />} withIndicatorBackground>
             {/* The compound Title takes a heading level, so the message sits under the page's h1 in the outline. */}
             <EmptyState.Title order={2}>最初の商品を登録しましょう</EmptyState.Title>
