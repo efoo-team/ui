@@ -573,6 +573,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: {
         item: menuClasses.item,
         itemSection: menuClasses.itemSection,
+        itemIndicator: menuClasses.itemIndicator,
         label: menuClasses.label,
       },
     }),
