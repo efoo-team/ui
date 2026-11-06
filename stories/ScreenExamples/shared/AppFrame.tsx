@@ -1,7 +1,6 @@
 import {
   useEffect,
   useId,
-  useRef,
   useState,
   type MouseEvent,
   type ReactElement,
@@ -16,13 +15,12 @@ import {
   Box,
   Breadcrumbs,
   Burger,
-  CloseButton,
   Divider,
+  Drawer,
   Group,
   Menu,
   Modal,
   NavLink,
-  RemoveScroll,
   ScrollArea,
   Stack,
   Text,
@@ -30,11 +28,10 @@ import {
   Tooltip,
   useMantineTheme,
 } from '@mantine/core';
-import { useDisclosure, useHotkeys, useMediaQuery } from '@mantine/hooks';
+import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import {
   IconBox,
   IconChartBar,
-  IconCheck,
   IconDashboard,
   IconLayoutSidebar,
   IconLogout,
@@ -101,7 +98,8 @@ interface NavbarProps {
   onToggleParent: (label: string) => void;
   onExpandParent: (label: string) => void;
   onNavigate: (label: string, event: MouseEvent<HTMLElement>) => void;
-  onClose: () => void;
+  /** Only the Drawer on narrow screens passes its close button; the top row carries it beside the switcher. */
+  closeButton?: ReactNode;
 }
 
 /*
@@ -128,7 +126,14 @@ function MenuLink({
 }) {
   const [opened, setOpened] = useState(false);
   return (
-    <Menu opened={opened} onChange={setOpened} position={position} width={width}>
+    // alignItemsLabels="all" keeps the indicator slot on plain items too, so they line up with the radio items.
+    <Menu
+      opened={opened}
+      onChange={setOpened}
+      position={position}
+      width={width}
+      alignItemsLabels="all"
+    >
       <Tooltip label={name} position="right" disabled={!rail || opened}>
         <Menu.Target>{link}</Menu.Target>
       </Tooltip>
@@ -163,21 +168,26 @@ function OrganizationMenu({
       dropdown={
         <Menu.Dropdown>
           <Menu.Label>組織</Menu.Label>
-          {ORGANIZATIONS.map((item) => (
-            <Menu.Item
-              key={item.name}
-              leftSection={
-                <Avatar size="sm" aria-hidden>
-                  {item.initial}
-                </Avatar>
-              }
-              rightSection={item.name === organization.name ? <IconCheck size={16} /> : undefined}
-              aria-current={item.name === organization.name ? 'true' : undefined}
-              onClick={() => onOrganizationChange(item)}
-            >
-              {item.name}
-            </Menu.Item>
-          ))}
+          {/* The organizations are one choice: Menu.RadioItem is a menuitemradio with aria-checked and draws the
+              theme's indicator on the selected one. Choosing switches the whole screen, so the menu closes. */}
+          <Menu.RadioGroup
+            value={organization.name}
+            onChange={(name) => {
+              const chosen = ORGANIZATIONS.find((item) => item.name === name);
+              if (chosen) onOrganizationChange(chosen);
+            }}
+          >
+            {ORGANIZATIONS.map((item) => (
+              <Menu.RadioItem key={item.name} value={item.name} closeMenuOnClick>
+                <Group gap="xs" wrap="nowrap">
+                  <Avatar size="sm" aria-hidden>
+                    {item.initial}
+                  </Avatar>
+                  {item.name}
+                </Group>
+              </Menu.RadioItem>
+            ))}
+          </Menu.RadioGroup>
           <Menu.Divider />
           <Menu.Item leftSection={<IconPlus size={16} />}>組織を追加</Menu.Item>
         </Menu.Dropdown>
@@ -191,6 +201,10 @@ function OrganizationMenu({
  * labels at the edge and hide them at the end. With <AppShell.Navbar mod={{ rail }}> the theme folds the links into
  * icons, so each link carries its name in aria-label and a Tooltip. The theme hides child links in the rail, so
  * pressing a parent there widens the sidebar with that parent open; only the organization switcher opens a Menu.
+ *
+ * Links that move to a screen are anchors: in a service, pass the router's Link as `component` and the path as its
+ * `to` (or `href`), so a link opens in a new tab and reads as a link. A parent that only opens its child links stays
+ * a button.
  */
 function Navbar({
   rail,
@@ -203,107 +217,122 @@ function Navbar({
   onToggleParent,
   onExpandParent,
   onNavigate,
-  onClose,
+  closeButton,
 }: NavbarProps) {
+  const top = (
+    <Group gap="xs" wrap="nowrap">
+      <Stack flex={1} miw={0}>
+        <OrganizationMenu
+          rail={rail}
+          organization={organization}
+          onOrganizationChange={onOrganizationChange}
+        />
+      </Stack>
+      {closeButton}
+    </Group>
+  );
+  const links = (
+    <Stack gap={4}>
+      {NAV_ITEMS.map(({ label, icon: ItemIcon, count: defaultCount, children }) => {
+        const count = counts ? counts[label] : defaultCount;
+        const name = count ? `${label}（未対応 ${count} 件）` : label;
+        const icon = <ItemIcon size={ICON_SIZE} />;
+        if (children) {
+          const opened = openedParents.includes(label);
+          return (
+            // A parent keeps one NavLink at both widths. Its opened state is controlled, so every way of pressing
+            // it (click, Enter, Space) reaches onChange: in the rail it widens the sidebar and opens this parent,
+            // in the full sidebar it opens or closes the children. The rail hides the children, so aria-expanded
+            // follows what is shown there.
+            <Tooltip key={label} label={label} position="right" disabled={!rail}>
+              <NavLink
+                component="button"
+                type="button"
+                label={label}
+                aria-label={label}
+                leftSection={icon}
+                // In the rail the open child is not visible, so its parent shows the current place.
+                active={rail && label === parent}
+                opened={opened}
+                onChange={() => (rail ? onExpandParent(label) : onToggleParent(label))}
+                aria-expanded={rail ? false : opened}
+              >
+                {children.map((child) => {
+                  const current = label === parent && child === page;
+                  return (
+                    <NavLink
+                      key={child}
+                      component="a"
+                      href="#"
+                      label={child}
+                      active={current}
+                      aria-current={current ? 'page' : undefined}
+                      onClick={(event) => onNavigate(child, event)}
+                    />
+                  );
+                })}
+              </NavLink>
+            </Tooltip>
+          );
+        }
+        const current = label === parent;
+        return (
+          // In the rail the theme hides the count badge, so the Tooltip carries the count.
+          <Tooltip key={label} label={name} position="right" disabled={!rail}>
+            <NavLink
+              component="a"
+              href="#"
+              label={label}
+              aria-label={name}
+              active={current}
+              aria-current={current ? 'page' : undefined}
+              onClick={(event) => onNavigate(label, event)}
+              leftSection={icon}
+              rightSection={
+                count ? (
+                  <Badge color={ATTENTION_COLOR} aria-hidden>
+                    {count}
+                  </Badge>
+                ) : undefined
+              }
+            />
+          </Tooltip>
+        );
+      })}
+    </Stack>
+  );
+  const foot = (
+    <Tooltip label={SETTINGS_LABEL} position="right" disabled={!rail}>
+      <NavLink
+        component="a"
+        href="#"
+        label={SETTINGS_LABEL}
+        aria-label={SETTINGS_LABEL}
+        active={parent === SETTINGS_LABEL}
+        aria-current={parent === SETTINGS_LABEL ? 'page' : undefined}
+        onClick={(event) => onNavigate(SETTINGS_LABEL, event)}
+        leftSection={<IconSettings size={ICON_SIZE} />}
+      />
+    </Tooltip>
+  );
+  if (closeButton) {
+    // In the Drawer the whole body scrolls, so the parts only stack, 16px apart like the navbar sections, with the
+    // settings link at the foot.
+    return (
+      <Stack gap="md" flex={1}>
+        {top}
+        <Box flex={1}>{links}</Box>
+        {foot}
+      </Stack>
+    );
+  }
   return (
     <>
-      <AppShell.Section>
-        <Group gap="xs" wrap="nowrap">
-          <Stack flex={1} miw={0}>
-            <OrganizationMenu
-              rail={rail}
-              organization={organization}
-              onOrganizationChange={onOrganizationChange}
-            />
-          </Stack>
-          {/* With layout="alt" the open navbar covers the header on narrow screens, so it carries its own close button. */}
-          <CloseButton hiddenFrom="sm" onClick={onClose} aria-label="サイドバーを閉じる" />
-        </Group>
-      </AppShell.Section>
+      <AppShell.Section>{top}</AppShell.Section>
       <AppShell.Section grow component={ScrollArea} scrollbars="y">
-        <Stack gap={4}>
-          {NAV_ITEMS.map(({ label, icon: ItemIcon, count: defaultCount, children }) => {
-            const count = counts ? counts[label] : defaultCount;
-            const name = count ? `${label}（未対応 ${count} 件）` : label;
-            const icon = <ItemIcon size={ICON_SIZE} />;
-            if (children) {
-              const opened = openedParents.includes(label);
-              return (
-                // A parent keeps one NavLink at both widths. Its opened state is controlled, so every way of pressing
-                // it (click, Enter, Space) reaches onChange: in the rail it widens the sidebar and opens this parent,
-                // in the full sidebar it opens or closes the children. The rail hides the children, so aria-expanded
-                // follows what is shown there.
-                <Tooltip key={label} label={label} position="right" disabled={!rail}>
-                  <NavLink
-                    component="button"
-                    type="button"
-                    label={label}
-                    aria-label={label}
-                    leftSection={icon}
-                    // In the rail the open child is not visible, so its parent shows the current place.
-                    active={rail && label === parent}
-                    opened={opened}
-                    onChange={() => (rail ? onExpandParent(label) : onToggleParent(label))}
-                    aria-expanded={rail ? false : opened}
-                  >
-                    {children.map((child) => {
-                      const current = label === parent && child === page;
-                      return (
-                        <NavLink
-                          key={child}
-                          component="button"
-                          type="button"
-                          label={child}
-                          active={current}
-                          aria-current={current ? 'page' : undefined}
-                          onClick={(event) => onNavigate(child, event)}
-                        />
-                      );
-                    })}
-                  </NavLink>
-                </Tooltip>
-              );
-            }
-            const current = label === parent;
-            return (
-              // In the rail the theme hides the count badge, so the Tooltip carries the count.
-              <Tooltip key={label} label={name} position="right" disabled={!rail}>
-                <NavLink
-                  component="button"
-                  type="button"
-                  label={label}
-                  aria-label={name}
-                  active={current}
-                  aria-current={current ? 'page' : undefined}
-                  onClick={(event) => onNavigate(label, event)}
-                  leftSection={icon}
-                  rightSection={
-                    count ? (
-                      <Badge color={ATTENTION_COLOR} aria-hidden>
-                        {count}
-                      </Badge>
-                    ) : undefined
-                  }
-                />
-              </Tooltip>
-            );
-          })}
-        </Stack>
+        {links}
       </AppShell.Section>
-      <AppShell.Section>
-        <Tooltip label={SETTINGS_LABEL} position="right" disabled={!rail}>
-          <NavLink
-            component="button"
-            type="button"
-            label={SETTINGS_LABEL}
-            aria-label={SETTINGS_LABEL}
-            active={parent === SETTINGS_LABEL}
-            aria-current={parent === SETTINGS_LABEL ? 'page' : undefined}
-            onClick={(event) => onNavigate(SETTINGS_LABEL, event)}
-            leftSection={<IconSettings size={ICON_SIZE} />}
-          />
-        </Tooltip>
-      </AppShell.Section>
+      <AppShell.Section>{foot}</AppShell.Section>
     </>
   );
 }
@@ -369,7 +398,6 @@ export function AppFrame({
 }: AppFrameProps) {
   const path = breadcrumbs ?? (page ? [parent, page] : [parent]);
   const [opened, { toggle, close }] = useDisclosure(false);
-  const burgerRef = useRef<HTMLButtonElement>(null);
   const [desktopOpened, { toggle: toggleDesktop, open: openDesktop }] = useDisclosure(true);
   const [searchOpened, { open: openSearch, close: closeSearch }] = useDisclosure(false);
   const [organization, setOrganization] = useState<Organization>(
@@ -379,36 +407,18 @@ export function AppFrame({
   const navbarId = useId();
   const theme = useMantineTheme();
   const wide = useMediaQuery(`(min-width: ${theme.breakpoints.sm})`);
-  // On narrow screens the navbar always opens in full; the icon rail exists only on wide screens.
+  // The icon rail exists only on wide screens; on narrow screens the sidebar opens in full in the Drawer.
   const rail = wide === true && !desktopOpened;
-  // Escape anywhere closes the narrow-screen navbar, except while a menu or dialog is open: their own Escape closes
-  // them first, and the navbar stays.
-  useHotkeys([
-    [
-      'Escape',
-      () => {
-        if (!opened || document.querySelector('[role="menu"], [role="dialog"]')) return;
-        close();
-      },
-    ],
-  ]);
-  const narrowOpen = wide === false && opened;
-  // On narrow screens the open navbar covers the page like a dialog: focus moves into it when it opens and back to
-  // the Burger when it closes.
-  const wasOpen = useRef(false);
+  // The Drawer belongs to narrow screens: widening the window closes it, so it does not come back on narrowing.
   useEffect(() => {
-    if (wide !== false) return;
-    // RemoveScroll takes the navbar's ref, so the navbar is found by its id.
-    if (opened) document.getElementById(navbarId)?.querySelector<HTMLElement>('button')?.focus();
-    else if (wasOpen.current) burgerRef.current?.focus();
-    wasOpen.current = opened;
-  }, [opened, wide, navbarId]);
+    if (wide) close();
+  }, [wide, close]);
   // Pressing a parent in the rail widens the sidebar with that parent open, like shadcn/ui's sidebar-07.
   const expandParent = (label: string) => {
     openDesktop();
     setOpenedParents((current) => (current.includes(label) ? current : [...current, label]));
   };
-  // A press that the screen holds back keeps the narrow-screen navbar open, so the user is where they pressed.
+  // A press that the screen holds back keeps the Drawer open, so the user is where they pressed.
   const navigate = (label: string, event: MouseEvent<HTMLElement>) => {
     const moves = event.currentTarget.getAttribute('aria-current') !== 'page';
     if (moves && onBeforeNavigate?.(label) === false) {
@@ -427,43 +437,58 @@ export function AppFrame({
       layout="alt"
       // 64px puts the header's center on the organization row's center (8px inset + 48px row).
       header={{ height: 64 }}
-      navbar={{ width: rail ? 48 : 256, breakpoint: 'sm', collapsed: { mobile: !opened } }}
+      // Below sm the AppShell navbar stays collapsed and hidden; the Drawer shows the sidebar there instead.
+      navbar={{ width: rail ? 48 : 256, breakpoint: 'sm', collapsed: { mobile: true } }}
       padding="md"
     >
       {/* The navbar comes first in the DOM, so Tab reaches the sidebar before the header, as it reads on screen. */}
-      {/* While the narrow-screen navbar is open the page behind it does not scroll; while it is closed it is inert. */}
-      <RemoveScroll enabled={narrowOpen} forwardProps>
-        <AppShell.Navbar
-          mod={{ rail }}
-          id={navbarId}
-          aria-label="サイドバー"
-          inert={wide === false && !opened ? true : undefined}
-          // The full-width navbar on narrow screens has nothing beside it to separate from.
-          withBorder={wide !== false}
-        >
-          <Navbar
-            rail={rail}
-            parent={parent}
-            page={page}
-            organization={organization}
-            onOrganizationChange={setOrganization}
-            openedParents={openedParents}
-            onToggleParent={toggleParent}
-            counts={counts}
-            onExpandParent={expandParent}
-            onNavigate={navigate}
-            onClose={close}
-          />
-        </AppShell.Navbar>
-      </RemoveScroll>
-      {/* The open narrow-screen navbar covers the header and main, so they leave the Tab order meanwhile. */}
-      <AppShell.Header px="md" inert={narrowOpen ? true : undefined}>
+      <AppShell.Navbar mod={{ rail }} id={navbarId} aria-label="サイドバー" visibleFrom="sm">
+        <Navbar
+          rail={rail}
+          parent={parent}
+          page={page}
+          organization={organization}
+          onOrganizationChange={setOrganization}
+          openedParents={openedParents}
+          onToggleParent={toggleParent}
+          counts={counts}
+          onExpandParent={expandParent}
+          onNavigate={navigate}
+        />
+      </AppShell.Navbar>
+      {/*
+        On narrow screens the same sidebar opens in a Drawer, like shadcn/ui's mobile sidebar in a Sheet (18rem). The
+        Drawer moves focus into it and keeps Tab there, closes on Escape and on the overlay, stops the page behind it
+        from scrolling and returns focus to the Burger. A link that moves to a screen closes it.
+      */}
+      <Drawer.Root opened={opened && wide === false} onClose={close} size={288}>
+        <Drawer.Overlay />
+        <Drawer.Content aria-label="サイドバー">
+          <Drawer.Body mih="100%" display="flex">
+            <Box component="nav" aria-label="サイドバー" display="flex" flex={1}>
+              <Navbar
+                rail={false}
+                parent={parent}
+                page={page}
+                organization={organization}
+                onOrganizationChange={setOrganization}
+                openedParents={openedParents}
+                onToggleParent={toggleParent}
+                counts={counts}
+                onExpandParent={expandParent}
+                onNavigate={navigate}
+                closeButton={<Drawer.CloseButton aria-label="サイドバーを閉じる" />}
+              />
+            </Box>
+          </Drawer.Body>
+        </Drawer.Content>
+      </Drawer.Root>
+      <AppShell.Header px="md">
         <Group h="100%" justify="space-between" wrap="nowrap">
           {/* Like shadcn/ui: 8px from the toggle to the divider, 16px from the divider to the page path. */}
           <Group gap="md" wrap="nowrap" miw={0}>
             <Group gap="xs" wrap="nowrap">
               <Burger
-                ref={burgerRef}
                 opened={opened}
                 onClick={toggle}
                 hiddenFrom="sm"
@@ -471,8 +496,8 @@ export function AppFrame({
                 // asks for 24px).
                 size="sm"
                 aria-label="サイドバー"
+                aria-haspopup="dialog"
                 aria-expanded={opened}
-                aria-controls={navbarId}
               />
               <ActionIcon
                 variant="subtle"
@@ -535,7 +560,7 @@ export function AppFrame({
           aria-label="検索する言葉"
         />
       </Modal>
-      <AppShell.Main inert={narrowOpen ? true : undefined}>{children}</AppShell.Main>
+      <AppShell.Main>{children}</AppShell.Main>
     </AppShell>
   );
 }
