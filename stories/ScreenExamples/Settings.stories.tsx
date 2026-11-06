@@ -28,6 +28,7 @@ import { useForm, type FormErrors } from '@mantine/form';
 import { useWindowEvent } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { AppFrame } from './shared/AppFrame';
+import { CONTENT_BREAKPOINTS } from './shared/constants';
 import {
   ACCOUNTING_STAFF,
   ATTENTION_COLOR,
@@ -496,7 +497,7 @@ function SettingsPage({
                     {index > 0 && <Divider />}
                     <SimpleGrid
                       type="container"
-                      cols={{ base: 1, '36rem': 2 }}
+                      cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}
                       spacing="lg"
                       verticalSpacing="sm"
                     >
@@ -561,7 +562,7 @@ function SettingsPage({
                     line on what it does and the control on the right, so a reader going down the left names meets it. */}
                 <SimpleGrid
                   type="container"
-                  cols={{ base: 1, '36rem': 2 }}
+                  cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}
                   spacing="lg"
                   verticalSpacing="sm"
                 >
@@ -593,7 +594,7 @@ function SettingsPage({
               description="受注を登録するときに、最初から入っている値です。受注ごとに変えられます。"
             >
               <Stack gap="md">
-                <SimpleGrid type="container" cols={{ base: 1, '36rem': 2 }}>
+                <SimpleGrid type="container" cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}>
                   <Select
                     label={
                       <Label changed={isChanged((v) => v.orderDefaults.payment)}>支払い方法</Label>
@@ -651,7 +652,7 @@ function SettingsPage({
                   id={fieldId('organization.name')}
                   {...form.getInputProps('organization.name')}
                 />
-                <SimpleGrid type="container" cols={{ base: 1, '36rem': 2 }}>
+                <SimpleGrid type="container" cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}>
                   <TextInput
                     label={
                       <Label changed={isChanged((v) => v.organization.postalCode)} required>
@@ -690,7 +691,7 @@ function SettingsPage({
                   id={fieldId('organization.address')}
                   {...form.getInputProps('organization.address')}
                 />
-                <SimpleGrid type="container" cols={{ base: 1, '36rem': 2 }}>
+                <SimpleGrid type="container" cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}>
                   <TextInput
                     type="email"
                     label={
@@ -804,7 +805,7 @@ function SettingsPage({
               このページに残る
             </Button>
             <Button
-              color="red"
+              color={ATTENTION_COLOR}
               onClick={() => {
                 discard();
                 leaving?.proceed();

@@ -553,7 +553,10 @@ function DashboardPage() {
           </Text>
         </Stack>
         {/* Columns follow the width of the main area, not the viewport, so an open sidebar is taken into account. */}
-        <SimpleGrid type="container" cols={{ base: 1, '36rem': 2, [CONTENT_BREAKPOINTS.lg]: 4 }}>
+        <SimpleGrid
+          type="container"
+          cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2, [CONTENT_BREAKPOINTS.lg]: 4 }}
+        >
           {STATS.map((stat) => (
             <StatCard key={stat.label} stat={stat} />
           ))}

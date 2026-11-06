@@ -2,7 +2,8 @@
 // fictional. Figures that appear on more than one screen, or twice on one screen, are computed from one source.
 // The screens show the state on October 31, 2026.
 
-// The color for "the user should act on this". Everything else stays neutral.
+// The color for "the user should act on this or take care": a state to act on, an error, and an action that cannot be
+// undone. Everything else stays neutral.
 export const ATTENTION_COLOR = 'red';
 
 export const yen = (value: number) => `¥${value.toLocaleString('ja-JP')}`;

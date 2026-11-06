@@ -550,7 +550,11 @@ function OrdersCard({
           <Tabs.Panel key={tab.value} value={tab.value}>
             {state === 'error' ? (
               // The conditions stay above, so after the reload the same orders come back without retyping them.
-              <Alert title="受注を読み込めませんでした" color="red" icon={<IconAlertCircle />}>
+              <Alert
+                title="受注を読み込めませんでした"
+                color={ATTENTION_COLOR}
+                icon={<IconAlertCircle />}
+              >
                 <Stack gap="sm" align="flex-start">
                   <Text size="sm">
                     再読み込みしても読み込めないときは時間をおいてもう一度試し、それでも続くときは情報システムの担当者に連絡してください。

@@ -1,7 +1,7 @@
 import { ActionIcon, Menu } from '@mantine/core';
 import { IconDotsVertical } from '@tabler/icons-react';
 import { ICON_SIZE } from './constants';
-import { awaitsShipment, type Order } from './data';
+import { ATTENTION_COLOR, awaitsShipment, type Order } from './data';
 
 /*
  * The menu at the end of an order's row. It has no item that opens the order: the order number is the link to it
@@ -18,7 +18,7 @@ export function OrderMenu({ order }: { order: Order }) {
       <Menu.Dropdown>
         <Menu.Item>納品書を印刷</Menu.Item>
         <Menu.Divider />
-        <Menu.Item color="red" disabled={!awaitsShipment(order)}>
+        <Menu.Item color={ATTENTION_COLOR} disabled={!awaitsShipment(order)}>
           受注をキャンセル
         </Menu.Item>
       </Menu.Dropdown>

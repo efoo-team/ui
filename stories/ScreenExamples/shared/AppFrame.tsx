@@ -149,7 +149,7 @@ function OrganizationMenu({
           label={organization.name}
           description={organization.note}
           leftSection={<Avatar aria-hidden>{organization.initial}</Avatar>}
-          rightSection={<IconSelector size={16} />}
+          rightSection={<IconSelector size={ICON_SIZE} />}
           aria-label={`組織を切り替える（現在：${organization.name}）`}
         />
       }
@@ -177,7 +177,7 @@ function OrganizationMenu({
             ))}
           </Menu.RadioGroup>
           <Menu.Divider />
-          <Menu.Item leftSection={<IconPlus size={16} />}>組織を追加</Menu.Item>
+          <Menu.Item leftSection={<IconPlus size={ICON_SIZE} />}>組織を追加</Menu.Item>
         </Menu.Dropdown>
       }
     />
@@ -541,7 +541,7 @@ export function AppFrame({
             <TextInput
               visibleFrom="sm"
               w={280}
-              leftSection={<IconSearch size={16} />}
+              leftSection={<IconSearch size={ICON_SIZE} />}
               placeholder="受注・顧客・商品を検索"
               aria-label="全体を検索"
             />
@@ -560,7 +560,7 @@ export function AppFrame({
       <Modal opened={searchOpened} onClose={closeSearch} title="全体を検索">
         <TextInput
           data-autofocus
-          leftSection={<IconSearch size={16} />}
+          leftSection={<IconSearch size={ICON_SIZE} />}
           placeholder="受注・顧客・商品を検索"
           aria-label="検索する言葉"
         />
