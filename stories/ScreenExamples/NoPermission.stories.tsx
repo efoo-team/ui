@@ -212,7 +212,7 @@ function ProductsTable({ rows, onEdit }: { rows: Product[]; onEdit: (product: Pr
             <Table.Tr key={product.code}>
               <Table.Td>
                 <Stack gap={2}>
-                  {/* The badge follows the name, as on the dashboard and the order detail. */}
+                  {/* The badge follows the name of the product it marks. */}
                   <Group gap="xs">
                     <Text size="sm">{product.name}</Text>
                     {needsReorder(product) && <ReorderBadge />}

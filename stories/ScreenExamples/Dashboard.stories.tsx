@@ -97,7 +97,7 @@ const salesOfPeriod = (period: string) =>
 const NOT_SHIPPED = ORDERS.filter((order) => order.status === 'notShipped');
 const NOT_SHIPPED_LATE = NOT_SHIPPED.filter((order) => lateDays(order) !== undefined).length;
 
-// The count covers every product, as the product list and the stock screen do, not only the ones the card shows.
+// The count covers every product, not only the ones the card shows: it is how many products need ordering.
 const REORDER_COUNT = ALL_PRODUCTS.filter(needsReorder).length;
 // The card shows the products nearest their reorder point, so every product below it comes first; at least five,
 // so a product about to fall below it shows too.
@@ -387,7 +387,7 @@ function OrdersTable({ orders }: { orders: Order[] }) {
 
 /*
  * On a phone the table would leave the state, the red "未発送", behind a horizontal scroll. Each order becomes a
- * short block, as on the order list, with the number and the state on the first line.
+ * short block, with the number and the state on the first line.
  */
 function OrdersStack({ orders }: { orders: Order[] }) {
   return (
@@ -495,7 +495,7 @@ function InquiriesCard() {
 }
 
 /*
- * Waiting is said the same way on every screen: the skeletons hold the place for the eye, and a status line that only a
+ * Waiting is said in two ways: the skeletons hold the place for the eye, and a status line that only a
  * screen reader reads says what is on its way, since the skeletons say nothing to it. The line stays in place empty
  * once the products are shown, so a screen reader reads it when the card starts waiting again, and sits outside the
  * aria-busy part, where a screen reader may hold back what changes until the wait is over.

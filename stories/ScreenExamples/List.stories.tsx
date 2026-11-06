@@ -131,8 +131,8 @@ function itemsSummary(order: Order) {
 }
 
 /*
- * The dashboard says how many unshipped orders are two days old or more, in the same words as this badge, so those
- * orders are picked out here without working out dates. It sits with the state it qualifies and takes the attention
+ * An unshipped order that has waited two days or more is late (lateDays), and the badge says how long it has waited,
+ * so late orders are picked out without working out dates. It sits with the state it qualifies and takes the attention
  * color as an outline: it asks for action like the state, and stays apart from the state's own badge.
  */
 function LateBadge({ order }: { order: Order }) {

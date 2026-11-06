@@ -286,7 +286,7 @@ function jumpToField(event: MouseEvent<HTMLAnchorElement>, field: CheckedField) 
  * A changed setting carries 未保存 next to its label, so the user can find each unsaved change on the page. Mantine
  * draws a required field's asterisk last inside the label, which would put the mark between the name and the asterisk.
  * A required field turns its own asterisk off (withAsterisk={false}) and the label draws it with Input.Label, the part
- * Mantine draws it with, so the order is the form's 名前 * followed by the mark.
+ * Mantine draws it with, so the label reads 名前 * as any required label does, followed by the mark.
  */
 function Label({
   children,
@@ -487,9 +487,8 @@ function SettingsPage({
           </Stack>
 
           {/*
-           * While a save is on its way every field is locked the same way, as on the product form: the disabled
-           * fieldset disables each control inside it, so nothing can change what was sent. The links to the parts
-           * above stay usable.
+           * While a save is on its way every field is locked the same way: the disabled fieldset disables each
+           * control inside it, so nothing can change what was sent. The links to the parts above stay usable.
            */}
           <Fieldset variant="unstyled" m={0} disabled={saving}>
             <Stack gap="lg">
