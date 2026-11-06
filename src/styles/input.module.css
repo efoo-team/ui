@@ -80,9 +80,9 @@
     box-shadow: var(--efoo-focus-ring);
   }
 
-  /* Mantine turns the focused error line to the solid error red; the ring takes the same red at the ring width. */
+  /* Mantine turns the focused error line to the solid error red; the ring takes the same red. */
   .wrapper[data-error] .input:where(:focus, :focus-within) {
-    box-shadow: 0 0 0 var(--efoo-focus-ring-width) var(--mantine-color-error);
+    box-shadow: var(--efoo-focus-ring-error);
   }
 
   /* The unstyled text has no padding, so the box grows 4px on each side with a matching negative margin: the text
