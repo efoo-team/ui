@@ -33,26 +33,28 @@
   }
 }
 
-/* Japanese text in headings, labels, buttons, paragraphs and the terms and values of a definition list wraps between
-   phrases (文節), not in the middle of a word such as まとめ／て or くださ／い. overflow-wrap: break-word breaks a phrase
-   longer than a line inside it. It leaves the longest phrase as the narrowest the text can be, so a short label
-   beside a long sentence in a row that does not wrap keeps its width; overflow-wrap: anywhere would let it shrink to
-   one character. A phrase longer than the width a flex item, a start-aligned Stack child or a grid's auto column can
-   take (a long company name in katakana in a Group) still overflows; the service sets overflow-wrap: anywhere on that
-   element.
-   Table cells keep the browser's wrapping, so a column takes the width of a figure or a code instead of the longest
-   phrase, and a long name no longer widens a 280px table to 623px.
-   The rules sit in a layer under every Mantine rule and are set on each element, not inherited, so a part or a
-   service overrides them on the element itself; a word-break or overflow-wrap set on a container does not reach the
-   p, button or label inside it. The browser wraps between phrases only for content whose language is known to be
-   Japanese (<html lang="ja">), and only Chrome and Edge 119+ do it; Safari and Firefox wrap as before. */
+/* Japanese text wraps between phrases (文節), not in the middle of a word such as まとめ／て or くださ／い, in headings,
+   buttons, labels and paragraphs alike: every element inherits it from the root. overflow-wrap: break-word breaks a
+   phrase longer than a line inside it, and leaves the longest phrase as the narrowest the text can be, so a short
+   label beside a long sentence in a row that does not wrap keeps its width (overflow-wrap: anywhere would let it
+   shrink to one character). A phrase longer than the width a flex item, a start-aligned Stack child or a grid's auto
+   column can take (a long company name in katakana in a Group) still overflows; the service sets
+   overflow-wrap: anywhere on that element or on a container around it.
+   Table cells and everything in them go back to the browser's wrapping, so a column takes the width of a figure or a
+   code instead of the longest phrase, and a long name no longer widens a 280px table to 623px. Mantine sets
+   overflow-wrap: break-word on an input's label, description and error itself; it keeps that in a cell, and it does
+   not widen the column.
+   The rules sit in a layer under every Mantine rule, and both properties are inherited, so what a part or a service
+   sets on an element or a container reaches everything inside it. The browser wraps between phrases only for content
+   whose language is known to be Japanese (<html lang="ja">), and only Chrome and Edge 119+ do it; Safari and Firefox
+   wrap as before. */
 @layer mantine.efoo-base {
-  :where(h1, h2, h3, h4, h5, h6, p, label, legend, dt, dd, button) {
+  :root {
     word-break: auto-phrase;
     overflow-wrap: break-word;
   }
 
-  :where(th, td) :where(h1, h2, h3, h4, h5, h6, p, label, legend, dt, dd, button) {
+  :where(th, td) {
     word-break: normal;
     overflow-wrap: normal;
   }

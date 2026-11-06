@@ -20,12 +20,4 @@
   .title {
     font-weight: var(--mantine-font-weight-medium);
   }
-
-  /* The title and the message are divs, so they take the phrase wrapping of headings and paragraphs here
-     (base.module.css). */
-  .title,
-  .message {
-    word-break: auto-phrase;
-    overflow-wrap: break-word;
-  }
 }
