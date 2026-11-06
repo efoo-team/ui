@@ -348,7 +348,7 @@ function OrganizationMenu({ rail }) {
 
 組織の切り替えの起点は Mantine の静的な class（`mantine-Avatar-root`）で見分けるので、MantineProvider の `classNamesPrefix` を変えたり、`withStaticClasses={false}` にしたりすると、48px の行になりません。
 
-狭い幅では、広い幅と同じ navbar の中身を Drawer に入れて開きます。Drawer に `variant="sidebar"` を渡すと、theme が navbar と同じ面の色（`--efoo-color-sidebar`）と内側の余白（8px）、shadcn/ui のモバイルのサイドバーと同じ幅（18rem）を付け、`Drawer.Body` の直下に置いた部品（組織の切り替え・項目・設定）を navbar の Section どうしと同じ 16px の間隔で縦に並べるので、同じ NavLink が幅によって別の見た目になりません。`padding` と `size` を渡すと、theme の値より優先されます。
+狭い幅では、広い幅と同じ navbar の中身を Drawer に入れて開きます。Drawer に `variant="sidebar"` を渡すと、theme が navbar と同じ面の色（`--efoo-color-sidebar`）と内側の余白（8px）、shadcn/ui のモバイルのサイドバーと同じ幅（18rem）を付け、`Drawer.Body` の直下に置いた部品（組織の切り替え・項目・設定）を navbar の Section どうしと同じ 16px の間隔で縦に並べるので、同じ NavLink が幅によって別の見た目になりません。`padding` と `size` を渡すと、theme の値より優先されます。Drawer と Modal に `overlayProps` の一部（`backgroundOpacity` など）だけを渡すと、theme の Drawer・Modal の `overlayProps` の既定値はまるごと置き換わります。それでも、Drawer・Modal は受け取った値を Overlay の部品に渡し、その部品が渡されていない値（`blur` など）を theme の DrawerOverlay・ModalOverlay の既定値から補うので、背景のぼかしは残ります。
 
 ### shadcn/ui の variant との対応
 

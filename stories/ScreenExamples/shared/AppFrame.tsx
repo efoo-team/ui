@@ -432,6 +432,10 @@ export function AppFrame({
    * they stay; when they move after all, the screen calls proceed and it closes then. Storybook's links lead nowhere,
    * so here moving is only closing and proceed is close. In a service the router moves: the screen's blocker holds the
    * move, and the frame closes the Drawer on the location change instead of here (see onBeforeNavigate).
+   *
+   * Escape in the confirmation closes both it and the Drawer. A Mantine Modal and Drawer each listen for Escape on
+   * window and close themselves; only Modals in one Modal.Stack (or Drawers in one Drawer.Stack) share one Escape,
+   * and a Modal and a Drawer cannot share a stack.
    */
   const navigate = (label: string, event: MouseEvent<HTMLElement>) => {
     const moves = event.currentTarget.getAttribute('aria-current') !== 'page';
