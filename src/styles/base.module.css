@@ -19,7 +19,6 @@
     --efoo-focus-ring-color: var(--efoo-color-ring, var(--mantine-primary-color-filled));
     --efoo-focus-ring-width: 2px;
     --efoo-focus-ring: 0 0 0 var(--efoo-focus-ring-width) var(--efoo-focus-ring-color);
-    --efoo-error-ring-color: color-mix(in srgb, var(--mantine-color-error) 20%, transparent);
   }
 
   @media (prefers-reduced-motion: reduce) {
