@@ -33,7 +33,6 @@ import { AppFrame, ICON_SIZE } from './shared/AppFrame';
 import {
   ATTENTION_COLOR,
   isoDate,
-  monthDay,
   NOW,
   ORDER_STATUS,
   ORDERS,
@@ -61,8 +60,8 @@ const meta = {
           '**情報構造**　主は受注で、1 件ごとに顧客（1 社）、明細（1〜3 品目）、担当者、状態、金額、受注日が従います。状態（未発送・入金待ち・発送済み・キャンセル）は受注を仕事のまとまりに分ける軸で、明細の中身や配送先・履歴は詳細の画面に任せます。\n\n' +
           '**データパターン**　項目は受注番号・顧客・品目・金額・状態・担当者・受注日の 7 つです。件数は 10 月 14 日〜31 日の 36 件（未発送 5・入金待ち 4・発送済み 24・キャンセル 3）で、未発送と入金待ちのほとんどは直近の数日の受注、古い受注はほとんどが発送済みです。1 社の受注に複数の状態が混ざり、絞り込むと 0〜36 件になります。値の長さは、顧客名が 3〜7 字、品目が「付箋 75mm 角」から「A4 コピー用紙（500 枚） ほか 2 品目」まで、金額が 4〜6 桁です。状態は、読み込み後（story『受注一覧』）、0 件（story『絞り込みに当たる受注が無いとき』）、読み込み中（story『読み込み中』）、取得の失敗（story『読み込みに失敗したとき』）です。\n\n' +
           '**情報の流れ**　開いた担当者は、まず状態ごとの件数で今日の仕事の量（未発送が何件か）を知ります。次に状態のタブ・検索・担当者・受注日で対象を絞り、行の状態・顧客・金額を見比べて目当ての受注を決め、受注番号から詳細へ移ります。受注の登録は電話や FAX を受けたときに始まる別の流れです。\n\n' +
-          '**主役**　流れの順に、件数付きの状態のタブ、絞り込みの欄、表を上から並べ、詳細への道である受注番号を行の左端のリンクにしました。色は未発送の件数と未発送の状態にだけ使い、最初に目に入るのが対応の要る受注になるようにしています。ページ全体の操作である「受注を登録」だけを塗りのボタンにし、見出しの右に置きました。\n\n' +
-          '**抑えたもの・使わなかったもの**　絞り込みの条件は欄そのものが見せるので、条件のチップの列は重ねず、条件があるときだけ「絞り込みを解除」を出します。並べ替えは列の見出しではなく欄の 1 つにし、行の操作のメニューには詳細を開く項目を置かず、受注番号のリンクに一本化しました。スマホの幅では、横スクロールで状態と金額が隠れないよう表を 1 件ずつの短いまとまりに組み替え、3 段に折り返す 5 つのタブも状態の選択欄に替えています。\n\n' +
+          '**主役**　流れの順に、件数付きの状態のタブ、絞り込みの欄、表を上から並べ、詳細への道である受注番号を行の左端のリンクにしました。状態のタブは、どの幅でも 5 つの状態の件数が並んで見える pills にし、スマホの幅では 2 段に折り返します。色は未発送の件数と未発送の状態にだけ使い、最初に目に入るのが対応の要る受注になるようにしています。ページ全体の操作である「受注を登録」だけを塗りのボタンにし、見出しの右に置きました。\n\n' +
+          '**抑えたもの・使わなかったもの**　絞り込みの条件は欄そのものが見せるので、条件のチップの列は重ねず、欄に条件があるときだけ「検索と絞り込みを解除」を出します。状態はタブの「すべて」で戻せるので、このボタンは欄の条件だけを消します。見出しの補足には期間を書かず、表示する受注は条件で決まることにしました。並べ替えは列の見出しではなく欄の 1 つにし、行の操作のメニューには詳細を開く項目を置かず、受注番号のリンクに一本化しました。スマホの幅では、横スクロールで状態と金額が隠れないよう表を 1 件ずつの短いまとまりに組み替えています。状態のタブを選択欄に替えると件数と色が開くまで見えず、横スクロールにすると後ろの状態の件数が隠れるので、どちらも使いませんでした。\n\n' +
           '**目的が違えば変わるところ**　件数が数百件を超えるなら、件数の表示とページ送りに加えて CSV の書き出しや表示件数の切り替えを置きます。絞り込みの条件が 5 つを超えるなら、欄を折りたたみの中に移し、選んだ条件をチップの列で見せます。項目が 3〜4 つと少なく、スマホで使うことが多いなら、表ではなく 1 件ずつのまとまりの並びを全幅で使ってよいです。',
       },
     },
@@ -115,10 +114,6 @@ const PAGE_SIZE = 20;
 
 const SKELETON_ROWS = 8;
 
-// The heading names the period the orders cover, read from the orders, so it stays true when they change.
-const NEWEST_DATE = ORDERS[0]?.date ?? '';
-const OLDEST_DATE = ORDERS[ORDERS.length - 1]?.date ?? '';
-
 // People remember an order by what was in it as often as by its number, so the list names the items.
 function itemsSummary(order: Order) {
   const [first, ...rest] = order.lines;
@@ -155,12 +150,16 @@ function sortOrders(orders: Order[], sort: SortKey) {
   }
 }
 
-const isNarrowed = ({ status, query, staff, dates }: OrderFilters) =>
-  status !== 'all' ||
-  query.trim() !== '' ||
-  staff !== null ||
-  dates[0] !== null ||
-  dates[1] !== null;
+// The tab is not counted: it has its own way back ("すべて"), and the button clears only the fields it sits with.
+const hasFieldConditions = ({ query, staff, dates }: OrderFilters) =>
+  query.trim() !== '' || staff !== null || dates[0] !== null || dates[1] !== null;
+
+const CLEARED_FIELDS: Partial<OrderFilters> = {
+  query: '',
+  staff: null,
+  dates: [null, null],
+  page: 1,
+};
 
 function ariaSort(column: 'date' | 'amount', sort: SortKey) {
   if (column === 'date' && sort.startsWith('date'))
@@ -305,21 +304,16 @@ function OrdersStack({ orders }: { orders: Order[] | null }) {
 
 function FilterBar({
   filters,
-  statusOptions,
   disabled,
   onChange,
-  onClear,
 }: {
   filters: OrderFilters;
-  statusOptions: { value: StatusTab; label: string }[];
   disabled: boolean;
   onChange: (next: Partial<OrderFilters>) => void;
-  onClear: () => void;
 }) {
   return (
     // The bases put the search on its own row on a phone and two short fields side by side under it.
-    // On a phone the tabs are hidden, so nothing above needs the gap.
-    <Group mt={{ base: 0, sm: 'md' }} mb="md" gap="sm" wrap="wrap">
+    <Group my="md" gap="sm" wrap="wrap">
       <TextInput
         flex="2 1 240px"
         leftSection={<IconSearch size={ICON_SIZE} />}
@@ -328,17 +322,6 @@ function FilterBar({
         value={filters.query}
         disabled={disabled}
         onChange={(event) => onChange({ query: event.currentTarget.value, page: 1 })}
-      />
-      {/* Five tabs wrap into three uneven rows on a phone, so the state is chosen here there instead. */}
-      <Select
-        hiddenFrom="sm"
-        flex="1 1 140px"
-        aria-label="状態で絞り込み"
-        data={statusOptions}
-        value={filters.status}
-        disabled={disabled}
-        onChange={(value) => onChange({ status: (value as StatusTab | null) ?? 'all', page: 1 })}
-        allowDeselect={false}
       />
       <Select
         flex="1 1 140px"
@@ -375,25 +358,34 @@ function FilterBar({
         onChange={(value) => onChange({ sort: (value as SortKey | null) ?? 'dateDesc', page: 1 })}
         allowDeselect={false}
       />
-      {isNarrowed(filters) && (
-        <Button variant="subtle" leftSection={<IconX size={ICON_SIZE} />} onClick={onClear}>
-          絞り込みを解除
+      {hasFieldConditions(filters) && (
+        <Button
+          variant="subtle"
+          leftSection={<IconX size={ICON_SIZE} />}
+          disabled={disabled}
+          onClick={() => onChange(CLEARED_FIELDS)}
+        >
+          検索と絞り込みを解除
         </Button>
       )}
     </Group>
   );
 }
 
+type ListState = 'ready' | 'loading' | 'error';
+
 function OrdersCard({
-  loading,
+  state,
   filters,
   onChange,
+  onReload,
 }: {
-  loading: boolean;
+  state: ListState;
   filters: OrderFilters;
   onChange: (next: Partial<OrderFilters>) => void;
+  onReload: () => void;
 }) {
-  const clear = () => onChange(DEFAULT_FILTERS);
+  const loading = state === 'loading';
   // The tab counts follow the search and the other filters, so they tell in which state the matches are.
   const matching = ORDERS.filter((order) => matchesConditions(order, filters));
   const countOf = (status: StatusTab) =>
@@ -410,12 +402,17 @@ function OrdersCard({
 
   return (
     <Card aria-busy={loading || undefined}>
+      {/*
+       * Pills wrap into two even rows on a phone, so every state keeps its count there, the red one included; the
+       * underlined tabs took three rows, and a scrolling row would hide the later states' counts.
+       */}
       <Tabs
+        variant="pills"
         value={filters.status}
         onChange={(value) => onChange({ status: (value as StatusTab | null) ?? 'all', page: 1 })}
         keepMounted={false}
       >
-        <Tabs.List visibleFrom="sm">
+        <Tabs.List>
           {STATUS_TABS.map((tab) => {
             const count = countOf(tab.value);
             const attention = tab.value !== 'all' && ORDER_STATUS[tab.value].attention && count > 0;
@@ -423,14 +420,14 @@ function OrdersCard({
               <Tabs.Tab
                 key={tab.value}
                 value={tab.value}
-                disabled={loading}
+                disabled={state !== 'ready'}
                 rightSection={
-                  // A badge-sized skeleton keeps the tabs at their loaded height.
-                  loading ? (
+                  // A badge-sized skeleton keeps the tabs at their loaded size; after a failure there is no count to show.
+                  state === 'loading' ? (
                     <Skeleton height={20} width={24} />
-                  ) : (
+                  ) : state === 'ready' ? (
                     <Badge color={attention ? ATTENTION_COLOR : undefined}>{count}</Badge>
-                  )
+                  ) : undefined
                 }
               >
                 {tab.label}
@@ -440,30 +437,40 @@ function OrdersCard({
         </Tabs.List>
         {STATUS_TABS.map((tab) => (
           <Tabs.Panel key={tab.value} value={tab.value}>
-            <FilterBar
-              filters={filters}
-              statusOptions={STATUS_TABS.map((item) => ({
-                value: item.value,
-                label: loading ? item.label : `${item.label}（${countOf(item.value)} 件）`,
-              }))}
-              disabled={loading}
-              onChange={onChange}
-              onClear={clear}
-            />
-            {!loading && rows.length === 0 ? (
+            <FilterBar filters={filters} disabled={state !== 'ready'} onChange={onChange} />
+            {state === 'error' ? (
+              // The conditions stay above, so after the reload the same orders come back without retyping them.
+              <Alert title="受注を読み込めませんでした" color="red" icon={<IconAlertCircle />}>
+                <Stack gap="sm" align="flex-start">
+                  <Text size="sm">
+                    再読み込みしても読み込めないときは、時間をおいてからもう一度試してください。
+                  </Text>
+                  <Button variant="default" onClick={onReload}>
+                    再読み込み
+                  </Button>
+                </Stack>
+              </Alert>
+            ) : !loading && rows.length === 0 ? (
               // Not the first-run empty state: orders exist, the conditions exclude them, so the way out is to loosen them.
               <EmptyState
                 icon={<IconSearch />}
                 title="条件に合う受注はありません"
-                description="検索の言葉や条件を変えてください。"
+                description={
+                  // When other states hold matches, the way out is the tab; otherwise it is the fields above.
+                  filters.status !== 'all' && matching.length > 0
+                    ? `ほかの状態に ${matching.length} 件あります。`
+                    : '検索の言葉や条件を変えてください。'
+                }
                 withIndicatorBackground
                 py="xl"
               >
-                <EmptyState.Actions>
-                  <Button variant="default" onClick={clear}>
-                    絞り込みを解除
-                  </Button>
-                </EmptyState.Actions>
+                {filters.status !== 'all' && matching.length > 0 && (
+                  <EmptyState.Actions>
+                    <Button variant="default" onClick={() => onChange({ status: 'all', page: 1 })}>
+                      すべての状態で探す
+                    </Button>
+                  </EmptyState.Actions>
+                )}
               </EmptyState>
             ) : (
               <>
@@ -502,8 +509,6 @@ function OrdersCard({
   );
 }
 
-type ListState = 'ready' | 'loading' | 'error';
-
 function OrderListPage({
   state: initialState = 'ready',
   initialFilters,
@@ -540,24 +545,14 @@ function OrderListPage({
             <Title order={1} size="h3">
               受注一覧
             </Title>
+            {/* No period here: the orders shown are set by the conditions, and the date field says when it narrows them. */}
             <Text size="sm" c="dimmed">
-              {monthDay(OLDEST_DATE)}〜{monthDay(NEWEST_DATE)}の受注です
+              受注を状態ごとに分けて表示します。
             </Text>
           </Stack>
           <Button leftSection={<IconPlus size={ICON_SIZE} />}>受注を登録</Button>
         </Group>
-        {state === 'error' ? (
-          <Alert title="受注を読み込めませんでした" color="red" icon={<IconAlertCircle />}>
-            <Stack gap="sm" align="flex-start">
-              <Text size="sm">時間をおいて再読み込みしてください。</Text>
-              <Button variant="default" onClick={reload}>
-                再読み込み
-              </Button>
-            </Stack>
-          </Alert>
-        ) : (
-          <OrdersCard loading={state === 'loading'} filters={filters} onChange={updateFilters} />
-        )}
+        <OrdersCard state={state} filters={filters} onChange={updateFilters} onReload={reload} />
       </Stack>
     </AppFrame>
   );
@@ -587,7 +582,7 @@ export const NoMatches: Story = {
     docs: {
       description: {
         story:
-          '0 件（データパターンの「絞り込みの結果が無い」）です。電話で問い合わせを受けたテスト物産の受注を未発送のタブで探し、当たらなかった場面です。受注そのものはあるので、まだ 1 件も無いときの登録への案内ではなく、条件を緩める道として「絞り込みを解除」を出し、タブの件数でテスト物産の受注が入金待ちと発送済みにあることも見せます。表とページ送りは消しています。',
+          '0 件（データパターンの「絞り込みの結果が無い」）です。電話で問い合わせを受けたテスト物産の受注を未発送のタブで探し、当たらなかった場面です。受注そのものはあるので、登録への案内ではなく、ほかの状態に当たる件数と「すべての状態で探す」を出し、検索の言葉を残したまま状態だけを広げられるようにしました。どの状態に何件あるかはタブの件数でも分かります。表とページ送りは消しています。',
       },
     },
   },
@@ -600,9 +595,14 @@ export const LoadFailed: Story = {
     docs: {
       description: {
         story:
-          '取得の失敗（データパターンの「取得の失敗」）です。何が起きて次に何をするかを 1 文ずつ書いた Alert と「再読み込み」を、表のあった場所に置きました。使えないタブと絞り込みの欄は消し、受注の登録は一覧の取得と関係なく使えるので残しています。',
+          '取得の失敗（データパターンの「取得の失敗」）です。自分の担当の未発送を開いたときに失敗した場面で、何が起きたかを見出しに、まず再読み込みし、直らなければ時間をおくことを 1 文にした Alert を、表のあった場所に置きました。タブと絞り込みの欄は選んだ条件を見せたまま無効にし、再読み込みで同じ条件の受注が戻るようにしています。件数・表・ページ送りは消し、受注の登録は一覧の取得と関係なく使えるので残しています。',
       },
     },
   },
-  render: () => <OrderListPage state="error" />,
+  render: () => (
+    <OrderListPage
+      state="error"
+      initialFilters={{ status: 'notShipped', staff: STAFF[0] ?? null }}
+    />
+  ),
 };

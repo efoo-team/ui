@@ -34,6 +34,7 @@ import {
   isoDate,
   needsReorder,
   NOW,
+  ORDER_STATUS,
   ORDERS,
   STAFF,
   sum,
@@ -58,10 +59,10 @@ const meta = {
           '架空の販売管理サービスのダッシュボードです。\n\n' +
           '**目的と読み手**　受注・在庫・問い合わせを扱う社員が、サイドバーの「ホーム」から毎日くり返し開く画面です。今月の実績と、いま対応が要るものを開いてすぐに確かめ、対応する画面へ進むことを目的にしています。\n\n' +
           '**情報構造**　受注・商品（在庫）・問い合わせの 3 つの対象を、それぞれの画面へ入る前の要約として扱います。主は最上段の 4 つの数字（今月の受注額と、対応が要る未発送の受注・発注が必要な品目・未対応の問い合わせの件数）で、受注の推移・品目ごとの在庫・最近の受注・問い合わせの内訳は、その数字の中身を示す従の情報です。受注は顧客と担当者に、商品は在庫数・発注点・適正在庫に結び付きます。\n\n' +
-          '**データパターン**　数字は 4 つで、金額は 7 桁、件数は 0〜2 桁です。受注の推移は 1 日 1 点で 7・31・90 日、在庫は全 12 品目（うち 4 品目が発注点割れ）のうち発注点に近い 5 品目、受注は 10 月 14 日〜31 日の 36 件（うち未発送 5 件、そのうち受注から 2 日以上は 2 件。金額は 1 件 ¥495〜¥171,325、顧客名は 3〜7 文字）を 8 件ずつ表示します。対応が要る件数は 0 になることがあり、そのときは「要発送」などの Badge を出さず、補足を「未発送の受注はありません」のように替えます。状態は story『ダッシュボード』の 1 つにまとめ、その中に、集計中の部分（「今週の売れ筋」の読み込み中の表示）と、検索・絞り込みに当たる受注が無いとき（受注の表で操作すると出る「条件に合う受注はありません」）を含みます。画面全体の読み込み中と取得の失敗、件数が 0 のときの story はありません。\n\n' +
-          '**情報の流れ**　利用者はまず最上段の左端で今月の受注額をつかみ、続く 3 枚（未発送の受注、発注が必要な品目、未対応の問い合わせ）の件数から、今日対応が要るものがあるかを判断します。対応が要れば、そのカードのリンクから受注一覧の未発送・在庫・問い合わせの画面へ進んで対応します。どの品目や受注かをこの画面で先に確かめたいときは、下の在庫の残りと最近の受注を見ます。\n\n' +
-          '**主役**　流れの起点で、判断の場でもある最上段の 4 つの数字です。対応が要る 3 つの件数を受注額と同じ段に並べ、件数が 1 以上のものにだけ色の Badge を付けて、数字を見渡した目が対応の要るカードに留まるようにしました。そのカードの下の端に行き先を言葉にしたリンク（「未発送の受注を見る」など）を置き、判断した場所からそのまま対応へ進めるようにしています。\n\n' +
-          '**抑えたもの・使わなかったもの**　カード全体はリンクにせず、行き先を名前にしたリンクを置きました。カード全体だと、読み上げでカードの文がすべてリンクの名前になり、行き先が伝わりにくいためです。対応の判断に使わない新規顧客の数は最上段に置かず、増えた受注額は良い知らせでも対応は要らないので枠線だけの Badge にし、どの問い合わせに対応するかを示さない問い合わせの内訳は、未対応の数字の近くに上げず下の段に置いています。最近の受注は要約なので、受注一覧の画面例とは受注番号のリンク・行のメニュー・件数の表示の言い方・スマホの幅での 1 件ずつのまとまりだけを揃え、品目の列や並べ替えは持たせていません。\n\n' +
+          '**データパターン**　数字は 4 つで、金額は 7 桁、件数は 0〜2 桁です。受注の推移は 1 日 1 点で 7・31・90 日、在庫は全 12 品目（うち 4 品目が発注点割れ）のうち発注点に近い 5 品目、受注は 10 月 14 日〜31 日の 36 件（うち未発送 5 件、そのうち受注から 2 日以上は 2 件。金額は 1 件 ¥495〜¥171,325、顧客名は 3〜7 文字）を 8 件ずつ表示します。対応が要る件数は 0 になることがあり、そのときは「要発送」などの Badge を出さず、補足を「未発送の受注はありません。」のように替えます。状態は story『ダッシュボード』の 1 つにまとめ、その中に、集計中の部分（「今週の売れ筋」の読み込み中の表示）と、検索・絞り込みに当たる受注が無いとき（受注の表で操作すると出る「条件に合う受注はありません」）を含みます。画面全体の読み込み中と取得の失敗、件数が 0 のときの story はありません。\n\n' +
+          '**情報の流れ**　利用者はまず最上段の左端で今月の受注額をつかみ、続く 3 枚（未発送の受注、発注が必要な品目、未対応の問い合わせ）の件数から、今日対応が要るものがあるかを判断します。対応が要れば、そのカードのリンクから、受注一覧の未発送・発注が必要な品目・未対応の問い合わせの画面へ進んで対応します。どの品目や受注かをこの画面で先に確かめたいときは、下の在庫の残りと最近の受注を見ます。\n\n' +
+          '**主役**　流れの起点で、判断の場でもある最上段の 4 つの数字です。対応が要る 3 つの件数を受注額と同じ段に並べ、件数が 1 以上のものにだけ色の Badge を付けて、数字を見渡した目が対応の要るカードに留まるようにしました。そのカードの下の端に、数字と同じ対象を名前にしたリンク（「未発送の受注を見る」「発注が必要な品目を見る」「未対応の問い合わせを見る」）を置き、判断した場所からそのまま対応へ進めるようにしています。スマホの幅では 4 枚を 1 列に並べたまま数字をラベルの右に上げ、4 つの数字とリンクが最初の 1 画面に収まるようにしました。2 列にすると受注額の 7 桁が数字の大きさのまま入らないためです。\n\n' +
+          '**抑えたもの・使わなかったもの**　カード全体はリンクにせず、行き先を名前にしたリンクを置きました。カード全体だと、読み上げでカードの文がすべてリンクの名前になり、行き先が伝わりにくいためです。対応の判断に使わない新規顧客の数は最上段に置かず、増えた受注額は良い知らせでも対応は要らないので枠線だけの Badge にし、どの問い合わせに対応するかを示さない問い合わせの内訳は、未対応の数字の近くに上げず下の段に置いています。最近の受注は要約なので、受注一覧の画面例とは状態のタブ（同じ 5 つの状態と件数、スマホの幅で 2 段に折り返す pills）・受注番号のリンク・行のメニュー・件数の表示の言い方・スマホの幅での 1 件ずつのまとまりだけを揃え、品目の列や並べ替えは持たせていません。タブの件数を一覧と揃えたのは、ここで見た件数が一覧に移っても同じであるためです。\n\n' +
           '**目的が違えば変わるところ**　管理者が月に 1 度、前月と比べるために見る画面なら、対応を促す色とリンクよりも推移のグラフと前月比を主役にします。対応すべきものが受注の発送だけのサービスなら、最上段の数字よりも未発送の受注の一覧を最上段に置きます。',
       },
     },
@@ -178,39 +179,44 @@ const STATS: Stat[] = [
   {
     label: '受注額',
     value: yen(sum(OCTOBER)),
-    note: `9 月より ${OCTOBER_GROWTH.toFixed(1)}% 多い`,
+    note: `9 月より ${OCTOBER_GROWTH.toFixed(1)}% 多いです。`,
     trend: `+${OCTOBER_GROWTH.toFixed(1)}%`,
   },
   actionStat({
     label: '未発送の受注',
     count: NOT_SHIPPED.length,
     attention: '要発送',
-    note: `${NOT_SHIPPED_LATE} 件は受注から 2 日以上`,
-    noneNote: '未発送の受注はありません',
+    note: `${NOT_SHIPPED_LATE} 件は受注から 2 日以上です。`,
+    noneNote: '未発送の受注はありません。',
     link: '未発送の受注を見る',
   }),
   actionStat({
     label: '発注が必要な品目',
     count: REORDER_COUNT,
     attention: '要発注',
-    note: '発注点を下回っています',
-    noneNote: '発注点を下回る品目はありません',
-    link: '在庫を見る',
+    note: '発注点を下回っています。',
+    noneNote: '発注点を下回る品目はありません。',
+    link: '発注が必要な品目を見る',
   }),
   actionStat({
     label: '未対応の問い合わせ',
     count: INQUIRIES.open,
     attention: '要対応',
-    note: `${INQUIRIES.overdue} 件は受付から 2 日以上`,
-    noneNote: '未対応の問い合わせはありません',
-    link: '問い合わせを見る',
+    note: `${INQUIRIES.overdue} 件は受付から 2 日以上です。`,
+    noneNote: '未対応の問い合わせはありません。',
+    link: '未対応の問い合わせを見る',
   }),
 ];
 
-const ORDER_TABS: { value: 'all' | OrderStatus; label: string }[] = [
+type StatusTab = 'all' | OrderStatus;
+
+// The same states, order and counts as the order list's tabs, so a count read here is the one found there.
+const STATUS_TABS: { value: StatusTab; label: string }[] = [
   { value: 'all', label: 'すべて' },
-  { value: 'notShipped', label: '未発送' },
-  { value: 'shipped', label: '発送済み' },
+  ...(['notShipped', 'paymentPending', 'shipped', 'cancelled'] as const).map((value) => ({
+    value,
+    label: ORDER_STATUS[value].label,
+  })),
 ];
 
 const PAGE_SIZE = 8;
@@ -220,33 +226,57 @@ const PAGE_SIZE = 8;
  * named after its destination is one Tab stop that says what pressing it does.
  */
 function StatCard({ stat }: { stat: Stat }) {
+  const label = (
+    <Text size="sm" c="dimmed">
+      {stat.label}
+    </Text>
+  );
+  const badge = stat.attention ? (
+    <Badge color={ATTENTION_COLOR}>{stat.attention}</Badge>
+  ) : stat.trend ? (
+    <Badge variant="outline" leftSection={<IconTrendingUp size={12} />}>
+      {stat.trend}
+    </Badge>
+  ) : null;
+  const value = <Text variant="metric">{stat.value}</Text>;
+  const details = (
+    <Stack gap="xs">
+      <Text size="sm" c="dimmed">
+        {stat.note}
+      </Text>
+      {stat.link && (
+        <Anchor href="#" size="sm">
+          {stat.link}
+        </Anchor>
+      )}
+    </Stack>
+  );
+
   return (
     <Card>
-      <Stack gap="lg">
+      {/*
+       * On a phone the four cards stack in one column, so the figure moves up beside its label and the four fit on the
+       * first screen. Two columns would not hold the amount at the metric size.
+       */}
+      <Stack gap="xs" hiddenFrom="xs">
+        <Group justify="space-between" wrap="nowrap" gap="sm">
+          <Group gap="xs" wrap="nowrap">
+            {label}
+            {badge}
+          </Group>
+          {value}
+        </Group>
+        {details}
+      </Stack>
+      <Stack gap="lg" visibleFrom="xs">
         <Stack gap="xs">
           <Group justify="space-between" wrap="nowrap">
-            <Text size="sm" c="dimmed">
-              {stat.label}
-            </Text>
-            {stat.attention && <Badge color={ATTENTION_COLOR}>{stat.attention}</Badge>}
-            {stat.trend && (
-              <Badge variant="outline" leftSection={<IconTrendingUp size={12} />}>
-                {stat.trend}
-              </Badge>
-            )}
+            {label}
+            {badge}
           </Group>
-          <Text variant="metric">{stat.value}</Text>
+          {value}
         </Stack>
-        <Stack gap="xs">
-          <Text size="sm" c="dimmed">
-            {stat.note}
-          </Text>
-          {stat.link && (
-            <Anchor href="#" size="sm">
-              {stat.link}
-            </Anchor>
-          )}
-        </Stack>
+        {details}
       </Stack>
     </Card>
   );
@@ -283,7 +313,8 @@ function SalesCard() {
         series={[{ name: 'amount', label: '受注額', color: 'var(--efoo-chart-1)' }]}
         valueFormatter={yen}
         yAxisProps={{ width: 80 }}
-        xAxisProps={{ minTickGap: 24 }}
+        // Equal steps between the dates, so the last label does not jump closer than the others on a narrow chart.
+        xAxisProps={{ minTickGap: 24, interval: 'equidistantPreserveStart' }}
       />
     </Card>
   );
@@ -297,7 +328,7 @@ function StockCard() {
           在庫の残り
         </Title>
         <Text size="sm" c="dimmed">
-          発注点に近い {STOCK_ROWS.length} 品目（全 {ALL_PRODUCTS.length} 品目）の在庫数 / 適正在庫
+          発注点に近い {STOCK_ROWS.length} 品目の在庫数と適正在庫です。
         </Text>
       </Stack>
       <Stack gap="md">
@@ -415,25 +446,26 @@ function OrdersStack({ orders }: { orders: Order[] }) {
   );
 }
 
+const matchesConditions = (order: Order, { query, staff }: OrderFilters) => {
+  const keyword = query.trim().toUpperCase();
+  return (
+    (!staff || order.staff === staff) &&
+    (keyword === '' || order.id.includes(keyword) || order.customer.name.includes(keyword))
+  );
+};
+
 function OrdersPanel({
-  status,
+  orders,
   filters,
   onChange,
 }: {
-  status: 'all' | OrderStatus;
+  orders: Order[];
   filters: OrderFilters;
   onChange: (next: Partial<OrderFilters>) => void;
 }) {
   const { staff, page } = filters;
-  const keyword = filters.query.trim().toUpperCase();
-  const filtered = ORDERS.filter(
-    (order) =>
-      (status === 'all' || order.status === status) &&
-      (!staff || order.staff === staff) &&
-      (keyword === '' || order.id.includes(keyword) || order.customer.name.includes(keyword)),
-  );
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const rows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(orders.length / PAGE_SIZE));
+  const rows = orders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const first = (page - 1) * PAGE_SIZE + 1;
   const last = first + rows.length - 1;
 
@@ -461,7 +493,7 @@ function OrdersPanel({
       {rows.length === 0 ? (
         // A status region, so a screen reader hears that the conditions left nothing.
         <Text size="sm" c="dimmed" ta="center" py="lg" role="status">
-          条件に合う受注はありません
+          条件に合う受注はありません。
         </Text>
       ) : (
         <>
@@ -474,7 +506,7 @@ function OrdersPanel({
           <Group justify="space-between" mt="md" gap="sm">
             {/* A status region, so a screen reader hears the new count after each change of the conditions. */}
             <Text size="sm" c="dimmed" role="status">
-              {filtered.length} 件中 {first}〜{last} 件を表示
+              {orders.length} 件中 {first}〜{last} 件を表示
             </Text>
             <Pagination
               total={totalPages}
@@ -490,10 +522,14 @@ function OrdersPanel({
 
 function OrdersCard() {
   // The search and staff filter live outside the tabs so switching tabs keeps them.
-  const [tab, setTab] = useState<string>('all');
+  const [tab, setTab] = useState<StatusTab>('all');
   const [filters, setFilters] = useState<OrderFilters>({ query: '', staff: null, page: 1 });
   const updateFilters = (next: Partial<OrderFilters>) =>
     setFilters((current) => ({ ...current, ...next }));
+  // The tab counts follow the search and the staff filter, as on the order list.
+  const matching = ORDERS.filter((order) => matchesConditions(order, filters));
+  const ordersOf = (status: StatusTab) =>
+    status === 'all' ? matching : matching.filter((order) => order.status === status);
 
   return (
     <Card>
@@ -505,24 +541,37 @@ function OrdersCard() {
           受注を登録
         </Button>
       </Group>
+      {/* Pills, as on the order list: on a phone they wrap into two rows and every count stays in view. */}
       <Tabs
+        variant="pills"
         value={tab}
         onChange={(value) => {
-          setTab(value ?? 'all');
+          setTab((value as StatusTab | null) ?? 'all');
           updateFilters({ page: 1 });
         }}
         keepMounted={false}
       >
         <Tabs.List>
-          {ORDER_TABS.map((item) => (
-            <Tabs.Tab key={item.value} value={item.value}>
-              {item.label}
-            </Tabs.Tab>
-          ))}
+          {STATUS_TABS.map((item) => {
+            const count = ordersOf(item.value).length;
+            const attention =
+              item.value !== 'all' && ORDER_STATUS[item.value].attention && count > 0;
+            return (
+              <Tabs.Tab
+                key={item.value}
+                value={item.value}
+                rightSection={
+                  <Badge color={attention ? ATTENTION_COLOR : undefined}>{count}</Badge>
+                }
+              >
+                {item.label}
+              </Tabs.Tab>
+            );
+          })}
         </Tabs.List>
-        {ORDER_TABS.map((item) => (
+        {STATUS_TABS.map((item) => (
           <Tabs.Panel key={item.value} value={item.value}>
-            <OrdersPanel status={item.value} filters={filters} onChange={updateFilters} />
+            <OrdersPanel orders={ordersOf(item.value)} filters={filters} onChange={updateFilters} />
           </Tabs.Panel>
         ))}
       </Tabs>
@@ -544,7 +593,7 @@ function InquiriesCard() {
           問い合わせの対応状況
         </Title>
         <Text size="sm" c="dimmed">
-          10 月に受け付けた {INQUIRIES.total} 件のうち、対応済みは {INQUIRIES.done} 件です
+          10 月に受け付けた {INQUIRIES.total} 件の対応状況です。
         </Text>
       </Stack>
       <Progress
@@ -574,7 +623,7 @@ function BestSellersCard() {
           今週の売れ筋
         </Title>
         <Text size="sm" c="dimmed">
-          集計しています
+          集計しています。
         </Text>
       </Stack>
       <Stack gap="sm">
