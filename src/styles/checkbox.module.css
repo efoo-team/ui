@@ -24,6 +24,11 @@
     border-color: var(--efoo-input-error-border);
   }
 
+  /* A box in error rings in the solid error red at the ring width, like a text input in error. */
+  .input[data-error]:focus-visible {
+    box-shadow: 0 0 0 var(--efoo-focus-ring-width) var(--mantine-color-error);
+  }
+
   .input:disabled {
     background-color: var(--mantine-color-default);
   }
