@@ -121,6 +121,9 @@ const PAGE_SIZE = 20;
 
 const SKELETON_ROWS = 8;
 
+// The empty state's title, which the status line also says to a screen reader.
+const NO_MATCHES = '条件に合う受注はありません';
+
 // People remember an order by what was in it as often as by its number, so the list names the items.
 function itemsSummary(order: Order) {
   const [first, ...rest] = order.lines;
@@ -502,6 +505,12 @@ function OrdersCard({
   const rows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const first = (page - 1) * PAGE_SIZE + 1;
   const last = first + rows.length - 1;
+  const noMatches = !loading && rows.length === 0;
+  // When other states hold matches, the way out is the tab; otherwise it is the fields above.
+  const otherStatesMatch = filters.status !== 'all' && matching.length > 0;
+  const noMatchesWayOut = otherStatesMatch
+    ? `ほかの状態に ${matching.length} 件あります。`
+    : '検索の言葉や条件を変えてください。';
 
   return (
     <Card aria-busy={loading || undefined}>
@@ -564,51 +573,66 @@ function OrdersCard({
                   </Button>
                 </Stack>
               </Alert>
-            ) : !loading && rows.length === 0 ? (
-              // Not the first-run empty state: orders exist, the conditions exclude them, so the way out is to loosen them.
-              <EmptyState icon={<IconSearch />} withIndicatorBackground>
-                {/* The compound Title takes a heading level, so the message sits under the page's h1 in the outline. */}
-                <EmptyState.Title order={2}>条件に合う受注はありません</EmptyState.Title>
-                {/* When other states hold matches, the way out is the tab; otherwise it is the fields above. */}
-                <EmptyState.Description>
-                  {filters.status !== 'all' && matching.length > 0
-                    ? `ほかの状態に ${matching.length} 件あります。`
-                    : '検索の言葉や条件を変えてください。'}
-                </EmptyState.Description>
-                {filters.status !== 'all' && matching.length > 0 && (
-                  <EmptyState.Actions>
-                    <Button variant="default" onClick={() => onChange({ status: 'all', page: 1 })}>
-                      すべての状態で探す
-                    </Button>
-                  </EmptyState.Actions>
-                )}
-              </EmptyState>
             ) : (
               <>
-                <Stack visibleFrom="sm" gap={0}>
-                  <OrdersTable orders={loading ? null : rows} sort={filters.sort} />
-                </Stack>
-                <Stack hiddenFrom="sm" gap={0}>
-                  <OrdersStack orders={loading ? null : rows} />
-                </Stack>
-                <Group justify="space-between" mt="md" gap="sm">
+                {noMatches ? (
+                  // Not the first-run empty state: orders exist, the conditions exclude them, so the way out is to loosen them.
+                  <EmptyState icon={<IconSearch />} withIndicatorBackground>
+                    {/* The compound Title takes a heading level, so the message sits under the page's h1 in the outline. */}
+                    <EmptyState.Title order={2}>{NO_MATCHES}</EmptyState.Title>
+                    <EmptyState.Description>{noMatchesWayOut}</EmptyState.Description>
+                    {otherStatesMatch && (
+                      <EmptyState.Actions>
+                        <Button
+                          variant="default"
+                          onClick={() => onChange({ status: 'all', page: 1 })}
+                        >
+                          すべての状態で探す
+                        </Button>
+                      </EmptyState.Actions>
+                    )}
+                  </EmptyState>
+                ) : (
+                  <>
+                    <Stack visibleFrom="sm" gap={0}>
+                      <OrdersTable orders={loading ? null : rows} sort={filters.sort} />
+                    </Stack>
+                    <Stack hiddenFrom="sm" gap={0}>
+                      <OrdersStack orders={loading ? null : rows} />
+                    </Stack>
+                  </>
+                )}
+                {/* With nothing to page through, the row holds only the hidden line and takes no space. */}
+                <Group justify="space-between" mt={noMatches ? 0 : 'md'} gap="sm">
                   {loading ? (
                     <Skeleton height={12} width={160} />
                   ) : (
-                    // A status region, so a screen reader hears the new count after each change of the conditions.
+                    /*
+                     * A status region, so a screen reader hears the result after each change of the conditions. It
+                     * stays in place when nothing matches, so that change is heard too; the empty state above says it
+                     * on screen, so then the line says it only to a screen reader.
+                     */
                     <Text size="sm" c="dimmed" role="status">
-                      {filtered.length} 件中 {first}〜{last} 件を表示
+                      {noMatches ? (
+                        <VisuallyHidden component="span">
+                          {NO_MATCHES}。{noMatchesWayOut}
+                        </VisuallyHidden>
+                      ) : (
+                        `${filtered.length} 件中 ${first}〜${last} 件を表示`
+                      )}
                     </Text>
                   )}
                   {/* The number of pages is unknown until the orders arrive, so no page numbers are shown meanwhile. */}
                   {loading ? (
                     <Skeleton height={32} width={120} />
                   ) : (
-                    <Pagination
-                      total={totalPages}
-                      value={page}
-                      onChange={(next) => onChange({ page: next })}
-                    />
+                    !noMatches && (
+                      <Pagination
+                        total={totalPages}
+                        value={page}
+                        onChange={(next) => onChange({ page: next })}
+                      />
+                    )
                   )}
                 </Group>
               </>
