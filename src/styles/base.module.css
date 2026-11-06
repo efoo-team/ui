@@ -19,7 +19,8 @@
       var(--efoo-color-ring, var(--mantine-primary-color-filled)) 50%,
       transparent
     );
-    --efoo-focus-ring: 0 0 0 3px var(--efoo-focus-ring-color);
+    --efoo-focus-ring-width: 3px;
+    --efoo-focus-ring: 0 0 0 var(--efoo-focus-ring-width) var(--efoo-focus-ring-color);
     --efoo-error-ring-color: color-mix(in srgb, var(--mantine-color-error) 20%, transparent);
   }
 
@@ -32,5 +33,19 @@
   .focus:where(:focus-visible) {
     outline: none;
     box-shadow: var(--efoo-focus-ring);
+  }
+}
+
+/* An element that only a script focuses (tabIndex={-1}: a page heading that takes focus when the control holding it
+   goes away, a section reached from a link) shows the theme's ring instead of the browser's outline, and only when
+   the focus came from the keyboard (:focus-visible), like the theme's controls. The rule sits in a layer under every
+   Mantine rule, so the parts that draw their own focus or none at all (dialogs, menus, Paper, tree items) keep it.
+   The ring is an outline drawn where --efoo-focus-ring's shadow is, so it leaves a card's own shadow in place, with
+   the controls' corners on an element that has none of its own (a heading is as tall as a button). */
+@layer mantine.efoo-base {
+  :where([tabindex='-1']):focus-visible {
+    outline: var(--efoo-focus-ring-width) solid var(--efoo-focus-ring-color);
+    outline-offset: 0;
+    border-radius: var(--mantine-radius-default);
   }
 }

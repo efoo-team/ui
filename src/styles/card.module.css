@@ -6,4 +6,11 @@
     /* The card's padding is the side inset of what it holds; an empty state inside it adds none of its own. */
     --efoo-empty-state-padding-inline: 0px;
   }
+
+  /* Paper draws no outline, so a dialog shows no ring around itself. A card that a script focuses (tabIndex={-1},
+     like a save bar that lists what to fix) shows the ring of the other such targets (base.module.css). */
+  .root:where([tabindex='-1']):focus-visible {
+    outline: var(--efoo-focus-ring-width) solid var(--efoo-focus-ring-color);
+    outline-offset: 0;
+  }
 }
