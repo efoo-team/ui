@@ -305,10 +305,14 @@ function ProductListPage() {
   const [category, setCategory] = useState<string | null>(null);
   const [editing, setEditing] = useState<Product | null>(null);
 
+  // Typed codes and product names match whatever their case and surrounding spaces, as 'p-1001 ' finds P-1001.
+  const keyword = query.trim().toUpperCase();
   const rows = products.filter(
     (product) =>
       (!category || product.category === category) &&
-      (query === '' || product.name.includes(query) || product.code.includes(query)),
+      (keyword === '' ||
+        product.name.toUpperCase().includes(keyword) ||
+        product.code.toUpperCase().includes(keyword)),
   );
 
   const saveQuantity = (product: Product, quantity: number) => {
