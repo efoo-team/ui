@@ -9,6 +9,7 @@ import {
   Card,
   Checkbox,
   Divider,
+  Fieldset,
   Flex,
   Group,
   Input,
@@ -389,10 +390,10 @@ function SettingsPage({
   };
 
   /*
-   * Saving disables the save button, so focus on it falls to the page's body. Once the save ends, focus goes back to
-   * the element that had it, or to the page's heading when that element has gone with the save bar, which shows only
-   * while something is unsaved, so Tab goes on from where the user was. Focus elsewhere, such as the field where Enter
-   * submitted the form or where the user moved during the save, stays where it is.
+   * Saving disables the fieldset and the save button, so the field or the button that had focus loses it to the
+   * page's body. Once the save ends, focus goes back to that element, or to the page's heading when it has gone with
+   * the save bar, which shows only while something is unsaved, so Tab goes on from where the user was. Focus the user
+   * moved during the save, such as to a link, stays where it is.
    */
   const focusBeforeSave = useRef<HTMLElement | null>(null);
   useEffect(() => {
@@ -446,7 +447,7 @@ function SettingsPage({
       defaultOrganization={DEFAULT_ORGANIZATION}
       onBeforeNavigate={confirmLeaving}
     >
-      <form noValidate onSubmit={save}>
+      <form noValidate onSubmit={save} aria-busy={saving || undefined}>
         {/* A narrow column keeps each label next to its field; the settings are read, not scanned like a table. */}
         <Stack gap="lg" maw={720}>
           <Stack gap={4}>
@@ -486,15 +487,89 @@ function SettingsPage({
             ))}
           </Stack>
 
-          <Box id={sectionId('notifications')} tabIndex={-1}>
-            <SectionCard
-              title="通知"
-              description="対応が必要になったときに、誰にどの手段で知らせるかを決めます。手段を選ばない通知は送りません。"
-            >
-              <Stack gap="md">
-                {NOTIFICATION_EVENTS.map((event, index) => (
-                  <Stack key={event.key} gap="md">
-                    {index > 0 && <Divider />}
+          {/*
+           * While a save is on its way every field is locked the same way, as on the product form: the disabled
+           * fieldset disables each control inside it, so nothing can change what was sent. The links to the parts
+           * above stay usable.
+           */}
+          <Fieldset variant="unstyled" m={0} disabled={saving}>
+            <Stack gap="lg">
+              <Box id={sectionId('notifications')} tabIndex={-1}>
+                <SectionCard
+                  title="通知"
+                  description="対応が必要になったときに、誰にどの手段で知らせるかを決めます。手段を選ばない通知は送りません。"
+                >
+                  <Stack gap="md">
+                    {NOTIFICATION_EVENTS.map((event, index) => (
+                      <Stack key={event.key} gap="md">
+                        {index > 0 && <Divider />}
+                        <SimpleGrid
+                          type="container"
+                          cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}
+                          spacing="lg"
+                          verticalSpacing="sm"
+                        >
+                          <Stack gap={4}>
+                            <Text size="sm" variant="emphasis">
+                              {event.label}
+                            </Text>
+                            <Text size="sm" c="dimmed">
+                              {event.description}
+                            </Text>
+                          </Stack>
+                          <Stack gap="sm">
+                            <MultiSelect
+                              label={
+                                <Label
+                                  changed={isChanged((v) => v.notifications[event.key].recipients)}
+                                >
+                                  宛先
+                                </Label>
+                              }
+                              aria-label={`${event.label}の宛先`}
+                              data={event.recipients}
+                              // Mantine keeps the placeholder beside the chosen names; it is only needed while empty.
+                              placeholder={
+                                values.notifications[event.key].recipients.length === 0
+                                  ? '宛先を選ぶ'
+                                  : undefined
+                              }
+                              {...form.getInputProps(`notifications.${event.key}.recipients`)}
+                            />
+                            <Checkbox.Group
+                              label={
+                                <Label
+                                  changed={isChanged((v) => v.notifications[event.key].channels)}
+                                >
+                                  {/*
+                                   * Mantine names the group by this label and ignores aria-label, so the name that tells the
+                                   * five groups apart is read from here; the visible words stay as they are.
+                                   */}
+                                  <span aria-hidden>知らせる手段</span>
+                                  <VisuallyHidden component="span">
+                                    {event.label}の知らせる手段
+                                  </VisuallyHidden>
+                                </Label>
+                              }
+                              {...form.getInputProps(`notifications.${event.key}.channels`)}
+                            >
+                              <Group gap="lg">
+                                {CHANNELS.map((channel) => (
+                                  <Checkbox
+                                    key={channel.value}
+                                    value={channel.value}
+                                    label={channel.label}
+                                  />
+                                ))}
+                              </Group>
+                            </Checkbox.Group>
+                          </Stack>
+                        </SimpleGrid>
+                      </Stack>
+                    ))}
+                    <Divider />
+                    {/* The one setting that is not an event still takes the row of the events above, a bold name with a
+                    line on what it does and the control on the right, so a reader going down the left names meets it. */}
                     <SimpleGrid
                       type="container"
                       cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}
@@ -503,225 +578,171 @@ function SettingsPage({
                     >
                       <Stack gap={4}>
                         <Text size="sm" variant="emphasis">
-                          {event.label}
+                          メールを送る時刻
                         </Text>
                         <Text size="sm" c="dimmed">
-                          {event.description}
+                          上の通知のうち、手段にメールを選んだものを送る時刻です。お知らせには、いつもその場で表示します。
                         </Text>
                       </Stack>
-                      <Stack gap="sm">
-                        <MultiSelect
-                          label={
-                            <Label
-                              changed={isChanged((v) => v.notifications[event.key].recipients)}
-                            >
-                              宛先
-                            </Label>
-                          }
-                          aria-label={`${event.label}の宛先`}
-                          data={event.recipients}
-                          // Mantine keeps the placeholder beside the chosen names; it is only needed while empty.
-                          placeholder={
-                            values.notifications[event.key].recipients.length === 0
-                              ? '宛先を選ぶ'
-                              : undefined
-                          }
-                          {...form.getInputProps(`notifications.${event.key}.recipients`)}
-                        />
-                        <Checkbox.Group
-                          label={
-                            <Label changed={isChanged((v) => v.notifications[event.key].channels)}>
-                              {/*
-                               * Mantine names the group by this label and ignores aria-label, so the name that tells the
-                               * five groups apart is read from here; the visible words stay as they are.
-                               */}
-                              <span aria-hidden>知らせる手段</span>
-                              <VisuallyHidden component="span">
-                                {event.label}の知らせる手段
-                              </VisuallyHidden>
-                            </Label>
-                          }
-                          {...form.getInputProps(`notifications.${event.key}.channels`)}
-                        >
-                          <Group gap="lg">
-                            {CHANNELS.map((channel) => (
-                              <Checkbox
-                                key={channel.value}
-                                value={channel.value}
-                                label={channel.label}
-                              />
-                            ))}
-                          </Group>
-                        </Checkbox.Group>
-                      </Stack>
+                      <Radio.Group
+                        label={<Label changed={isChanged((v) => v.mailTiming)}>送る時刻</Label>}
+                        {...form.getInputProps('mailTiming')}
+                      >
+                        <Stack gap="xs">
+                          <Radio value="each" label="知らせることが起きるたびに送る" />
+                          <Radio value="morning" label="毎朝 9 時に 1 通にまとめて送る" />
+                        </Stack>
+                      </Radio.Group>
                     </SimpleGrid>
                   </Stack>
-                ))}
-                <Divider />
-                {/* The one setting that is not an event still takes the row of the events above, a bold name with a
-                    line on what it does and the control on the right, so a reader going down the left names meets it. */}
-                <SimpleGrid
-                  type="container"
-                  cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}
-                  spacing="lg"
-                  verticalSpacing="sm"
+                </SectionCard>
+              </Box>
+
+              <Box id={sectionId('orderDefaults')} tabIndex={-1}>
+                <SectionCard
+                  title="受注の既定値"
+                  description="受注を登録するときに、最初から入っている値です。受注ごとに変えられます。"
                 >
-                  <Stack gap={4}>
-                    <Text size="sm" variant="emphasis">
-                      メールを送る時刻
-                    </Text>
-                    <Text size="sm" c="dimmed">
-                      上の通知のうち、手段にメールを選んだものを送る時刻です。お知らせには、いつもその場で表示します。
-                    </Text>
+                  <Stack gap="md">
+                    <SimpleGrid type="container" cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}>
+                      <Select
+                        label={
+                          <Label changed={isChanged((v) => v.orderDefaults.payment)}>
+                            支払い方法
+                          </Label>
+                        }
+                        data={Object.values(PAYMENT_METHODS)}
+                        allowDeselect={false}
+                        {...form.getInputProps('orderDefaults.payment')}
+                      />
+                      <Select
+                        label={
+                          <Label changed={isChanged((v) => v.orderDefaults.staff)}>担当者</Label>
+                        }
+                        data={[ORDER_CREATOR, ...STAFF]}
+                        allowDeselect={false}
+                        {...form.getInputProps('orderDefaults.staff')}
+                      />
+                      <NumberInput
+                        label={
+                          <Label changed={isChanged((v) => v.orderDefaults.shipAfterDays)}>
+                            出荷予定日
+                          </Label>
+                        }
+                        description="受注日から数えて、何営業日後を出荷予定日にするかです。"
+                        suffix=" 営業日後"
+                        min={0}
+                        max={30}
+                        allowDecimal={false}
+                        id={fieldId('orderDefaults.shipAfterDays')}
+                        {...form.getInputProps('orderDefaults.shipAfterDays')}
+                      />
+                    </SimpleGrid>
+                    <Checkbox
+                      label={
+                        <Label changed={isChanged((v) => v.orderDefaults.confirmationMail)}>
+                          受注を登録したら、顧客に確認のメールを送る
+                        </Label>
+                      }
+                      description="受注の登録画面で、このチェックを最初から入れておきます。"
+                      {...form.getInputProps('orderDefaults.confirmationMail', {
+                        type: 'checkbox',
+                      })}
+                    />
                   </Stack>
-                  <Radio.Group
-                    label={<Label changed={isChanged((v) => v.mailTiming)}>送る時刻</Label>}
-                    {...form.getInputProps('mailTiming')}
-                  >
-                    <Stack gap="xs">
-                      <Radio value="each" label="知らせることが起きるたびに送る" />
-                      <Radio value="morning" label="毎朝 9 時に 1 通にまとめて送る" />
-                    </Stack>
-                  </Radio.Group>
-                </SimpleGrid>
-              </Stack>
-            </SectionCard>
-          </Box>
+                </SectionCard>
+              </Box>
 
-          <Box id={sectionId('orderDefaults')} tabIndex={-1}>
-            <SectionCard
-              title="受注の既定値"
-              description="受注を登録するときに、最初から入っている値です。受注ごとに変えられます。"
-            >
-              <Stack gap="md">
-                <SimpleGrid type="container" cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}>
-                  <Select
-                    label={
-                      <Label changed={isChanged((v) => v.orderDefaults.payment)}>支払い方法</Label>
-                    }
-                    data={Object.values(PAYMENT_METHODS)}
-                    allowDeselect={false}
-                    {...form.getInputProps('orderDefaults.payment')}
-                  />
-                  <Select
-                    label={<Label changed={isChanged((v) => v.orderDefaults.staff)}>担当者</Label>}
-                    data={[ORDER_CREATOR, ...STAFF]}
-                    allowDeselect={false}
-                    {...form.getInputProps('orderDefaults.staff')}
-                  />
-                  <NumberInput
-                    label={
-                      <Label changed={isChanged((v) => v.orderDefaults.shipAfterDays)}>
-                        出荷予定日
-                      </Label>
-                    }
-                    description="受注日から数えて、何営業日後を出荷予定日にするかです。"
-                    suffix=" 営業日後"
-                    min={0}
-                    max={30}
-                    allowDecimal={false}
-                    id={fieldId('orderDefaults.shipAfterDays')}
-                    {...form.getInputProps('orderDefaults.shipAfterDays')}
-                  />
-                </SimpleGrid>
-                <Checkbox
-                  label={
-                    <Label changed={isChanged((v) => v.orderDefaults.confirmationMail)}>
-                      受注を登録したら、顧客に確認のメールを送る
-                    </Label>
-                  }
-                  description="受注の登録画面で、このチェックを最初から入れておきます。"
-                  {...form.getInputProps('orderDefaults.confirmationMail', { type: 'checkbox' })}
-                />
-              </Stack>
-            </SectionCard>
-          </Box>
-
-          <Box id={sectionId('organization')} tabIndex={-1}>
-            <SectionCard title="組織の情報" description="請求書と納品書の差出人に印字します。">
-              <Stack gap="md">
-                <TextInput
-                  label={
-                    <Label changed={isChanged((v) => v.organization.name)} required>
-                      組織名
-                    </Label>
-                  }
-                  description="サイドバーの組織の切り替えにも表示します。"
-                  required
-                  withAsterisk={false}
-                  id={fieldId('organization.name')}
-                  {...form.getInputProps('organization.name')}
-                />
-                <SimpleGrid type="container" cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}>
-                  <TextInput
-                    label={
-                      <Label changed={isChanged((v) => v.organization.postalCode)} required>
-                        郵便番号
-                      </Label>
-                    }
-                    placeholder="000-0000"
-                    required
-                    withAsterisk={false}
-                    id={fieldId('organization.postalCode')}
-                    {...form.getInputProps('organization.postalCode')}
-                  />
-                  <TextInput
-                    type="tel"
-                    label={
-                      <Label changed={isChanged((v) => v.organization.phone)} required>
-                        電話番号
-                      </Label>
-                    }
-                    placeholder="03-0000-0000"
-                    autoComplete="off"
-                    required
-                    withAsterisk={false}
-                    id={fieldId('organization.phone')}
-                    {...form.getInputProps('organization.phone')}
-                  />
-                </SimpleGrid>
-                <TextInput
-                  label={
-                    <Label changed={isChanged((v) => v.organization.address)} required>
-                      住所
-                    </Label>
-                  }
-                  required
-                  withAsterisk={false}
-                  id={fieldId('organization.address')}
-                  {...form.getInputProps('organization.address')}
-                />
-                <SimpleGrid type="container" cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}>
-                  <TextInput
-                    type="email"
-                    label={
-                      <Label changed={isChanged((v) => v.organization.billingEmail)} required>
-                        請求書の問い合わせ先
-                      </Label>
-                    }
-                    description="請求書に載せるメールアドレスです。"
-                    required
-                    withAsterisk={false}
-                    id={fieldId('organization.billingEmail')}
-                    {...form.getInputProps('organization.billingEmail')}
-                  />
-                  <TextInput
-                    label={
-                      <Label changed={isChanged((v) => v.organization.registrationNumber)} required>
-                        登録番号
-                      </Label>
-                    }
-                    description="適格請求書発行事業者の登録番号です。"
-                    placeholder="T0000000000000"
-                    required
-                    withAsterisk={false}
-                    id={fieldId('organization.registrationNumber')}
-                    {...form.getInputProps('organization.registrationNumber')}
-                  />
-                </SimpleGrid>
-              </Stack>
-            </SectionCard>
-          </Box>
+              <Box id={sectionId('organization')} tabIndex={-1}>
+                <SectionCard title="組織の情報" description="請求書と納品書の差出人に印字します。">
+                  <Stack gap="md">
+                    <TextInput
+                      label={
+                        <Label changed={isChanged((v) => v.organization.name)} required>
+                          組織名
+                        </Label>
+                      }
+                      description="サイドバーの組織の切り替えにも表示します。"
+                      required
+                      withAsterisk={false}
+                      id={fieldId('organization.name')}
+                      {...form.getInputProps('organization.name')}
+                    />
+                    <SimpleGrid type="container" cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}>
+                      <TextInput
+                        label={
+                          <Label changed={isChanged((v) => v.organization.postalCode)} required>
+                            郵便番号
+                          </Label>
+                        }
+                        placeholder="000-0000"
+                        required
+                        withAsterisk={false}
+                        id={fieldId('organization.postalCode')}
+                        {...form.getInputProps('organization.postalCode')}
+                      />
+                      <TextInput
+                        type="tel"
+                        label={
+                          <Label changed={isChanged((v) => v.organization.phone)} required>
+                            電話番号
+                          </Label>
+                        }
+                        placeholder="03-0000-0000"
+                        autoComplete="off"
+                        required
+                        withAsterisk={false}
+                        id={fieldId('organization.phone')}
+                        {...form.getInputProps('organization.phone')}
+                      />
+                    </SimpleGrid>
+                    <TextInput
+                      label={
+                        <Label changed={isChanged((v) => v.organization.address)} required>
+                          住所
+                        </Label>
+                      }
+                      required
+                      withAsterisk={false}
+                      id={fieldId('organization.address')}
+                      {...form.getInputProps('organization.address')}
+                    />
+                    <SimpleGrid type="container" cols={{ base: 1, [CONTENT_BREAKPOINTS.xs]: 2 }}>
+                      <TextInput
+                        type="email"
+                        label={
+                          <Label changed={isChanged((v) => v.organization.billingEmail)} required>
+                            請求書の問い合わせ先
+                          </Label>
+                        }
+                        description="請求書に載せるメールアドレスです。"
+                        required
+                        withAsterisk={false}
+                        id={fieldId('organization.billingEmail')}
+                        {...form.getInputProps('organization.billingEmail')}
+                      />
+                      <TextInput
+                        label={
+                          <Label
+                            changed={isChanged((v) => v.organization.registrationNumber)}
+                            required
+                          >
+                            登録番号
+                          </Label>
+                        }
+                        description="適格請求書発行事業者の登録番号です。"
+                        placeholder="T0000000000000"
+                        required
+                        withAsterisk={false}
+                        id={fieldId('organization.registrationNumber')}
+                        {...form.getInputProps('organization.registrationNumber')}
+                      />
+                    </SimpleGrid>
+                  </Stack>
+                </SectionCard>
+              </Box>
+            </Stack>
+          </Fieldset>
 
           {/*
            * The save bar exists only while something is unsaved. It stays in the content column and sticks to the
