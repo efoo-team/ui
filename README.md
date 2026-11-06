@@ -342,38 +342,7 @@ Badge の既定は `variant="light"` です。`color` を指定しない Badge �
 
 ## 表示例
 
-部品ごとの表示例は、Storybook のサイドバーで「日本語名（Mantine の部品名）」から探せます。サイドバーの検索欄に Mantine の部品名（例: `Radio`）を入れても見つかります。
-
-| 部品                                             | サイドバーの場所                                                              |
-| ------------------------------------------------ | ----------------------------------------------------------------------------- |
-| AppShell, NavLink                                | 構造 / 画面の枠組みとナビゲーション（AppShell, NavLink）                      |
-| Button                                           | 操作 / ボタン（Button）                                                       |
-| Tabs                                             | 操作 / タブ（Tabs）                                                           |
-| ActionIcon                                       | 操作 / アイコンボタン（ActionIcon）                                           |
-| SegmentedControl                                 | 操作 / 切り替え（SegmentedControl）                                           |
-| Pagination                                       | 操作 / ページ送り（Pagination）                                               |
-| Accordion                                        | 操作 / 折りたたみ（Accordion）                                                |
-| TextInput, Textarea, NumberInput, PasswordInput  | 入力 / テキスト入力欄（TextInput, Textarea, NumberInput, PasswordInput）      |
-| Select, MultiSelect                              | 入力 / 選択欄（Select, MultiSelect）                                          |
-| DateInput, DatePicker, DateTimePicker, TimeInput | 入力 / 日付と時刻（DateInput, DatePicker, DateTimePicker, TimeInput）         |
-| Dropzone                                         | 入力 / ファイルの選択（Dropzone）                                             |
-| Checkbox, Radio, Switch                          | 入力 / チェック・選択・切り替え（Checkbox, Radio, Switch）                    |
-| Button, TextInput, Checkbox, Radio, Switch, Tabs | 入力 / フォーカスの見え方（Button, TextInput, Checkbox, Radio, Switch, Tabs） |
-| Slider, RangeSlider                              | 入力 / スライダー（Slider, RangeSlider）                                      |
-| Chip                                             | 入力 / チップによる選択（Chip）                                               |
-| TagsInput                                        | 入力 / タグ入力（TagsInput）                                                  |
-| Table, Card, Badge                               | 表示 / 表・カード・バッジ（Table, Card, Badge）                               |
-| Avatar                                           | 表示 / アバター（Avatar）                                                     |
-| Progress, RingProgress                           | 表示 / 進捗（Progress, RingProgress）                                         |
-| EmptyState                                       | 表示 / 空の状態（EmptyState）                                                 |
-| DataList                                         | 表示 / 定義の並び（DataList）                                                 |
-| Timeline                                         | 表示 / 履歴（Timeline）                                                       |
-| Skeleton, Tooltip                                | 表示 / 読み込み表示とツールチップ（Skeleton, Tooltip）                        |
-| Menu, Popover, Modal, Drawer                     | 重ねて表示 / メニュー・モーダルほか（Menu, Popover, Modal, Drawer）           |
-| Loader                                           | フィードバック / 読み込み中（Loader）                                         |
-| Alert                                            | フィードバック / 注意・お知らせ（Alert）                                      |
-| Notification                                     | フィードバック / 通知（Notification）                                         |
-| Transition                                       | 動き / 開閉の動き（Transition）                                               |
+部品ごとの表示例は、[公開 Storybook](https://efoo-team.github.io/ui/) のサイドバーで「日本語名（Mantine の部品名）」から探せます。サイドバーの検索欄に Mantine の部品名（例: `Radio`）を入れても見つかります。部品とサイドバーの場所の対応表は、Storybook の「はじめに」にあります。
 
 ### 画面の例を探す
 
