@@ -53,4 +53,20 @@
   .item:focus-visible {
     box-shadow: none;
   }
+
+  /* shadcn/ui's radio and checkbox items keep a 14px slot for the indicator, 8px from the edge, and start the label at
+     32px; Mantine's slot is 12px with 8px after it. Items without an indicator keep the same slot with
+     alignItemsLabels="all". */
+  .itemIndicator {
+    width: calc(0.875rem * var(--mantine-scale));
+    height: calc(0.875rem * var(--mantine-scale));
+    margin-inline-end: calc(0.625rem * var(--mantine-scale));
+  }
+
+  /* shadcn/ui marks the chosen radio item with an 8px dot; Mantine draws a 5px one and sets its size inline, so only
+     !important reaches it. A checkIcon passed to radio items takes the same size. */
+  .item[role='menuitemradio'] > .itemIndicator > svg {
+    width: calc(0.5rem * var(--mantine-scale)) !important;
+    height: calc(0.5rem * var(--mantine-scale)) !important;
+  }
 }
