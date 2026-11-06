@@ -311,7 +311,9 @@ function SettingsPage({
             ? null
             : '電話番号は 03-0000-0000 のように、ハイフンを入れて入力してください。',
         billingEmail: (value) =>
-          EMAIL_PATTERN.test(value) ? null : 'メールアドレスの形式が正しくありません。',
+          EMAIL_PATTERN.test(value)
+            ? null
+            : 'メールアドレスの形式が正しくありません。user@example.com の形で入力してください。',
         registrationNumber: (value) =>
           REGISTRATION_PATTERN.test(value) ? null : REGISTRATION_MESSAGE,
       },
