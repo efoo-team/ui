@@ -7,9 +7,9 @@
     --empty-state-title-fz-xs: var(--mantine-font-size-xs);
     --empty-state-title-fz-sm: var(--mantine-font-size-sm);
     --empty-state-title-fz-md: var(--mantine-font-size-sm);
-    /* A card already insets its content from the sides (card.module.css), so inside one the empty state keeps only
-       its room above and below; doubled side padding narrowed the text and pushed a second action to its own line
-       at phone width. */
+    /* A card already insets its content from the sides, so inside one the empty state adds only what the card's
+       padding lacks, and in a Card.Section that reaches the card's edges it keeps its own (card.module.css); doubled
+       side padding narrowed the text and pushed a second action to its own line at phone width. */
     padding-block: var(--mantine-spacing-lg);
     padding-inline: var(--efoo-empty-state-padding-inline, var(--mantine-spacing-lg));
     gap: calc(var(--empty-state-gap) * 2);
