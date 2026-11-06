@@ -6,6 +6,7 @@
 import {
   Accordion,
   ActionIcon,
+  Affix,
   Alert,
   Anchor,
   AppShell,
@@ -91,6 +92,7 @@ import {
 import baseClasses from './styles/base.module.css';
 import accordionClasses from './styles/accordion.module.css';
 import actionIconClasses from './styles/action-icon.module.css';
+import affixClasses from './styles/affix.module.css';
 import alertClasses from './styles/alert.module.css';
 import anchorClasses from './styles/anchor.module.css';
 import appShellClasses from './styles/app-shell.module.css';
@@ -397,6 +399,8 @@ export const efooTheme: MantineThemeOverride = createTheme({
       },
     }),
     ActionIcon: ActionIcon.extend({ classNames: { root: actionIconClasses.root } }),
+    // variant="action-bar" draws a bar of actions kept at the bottom of the window; see affix.module.css.
+    Affix: Affix.extend({ classNames: { root: affixClasses.root } }),
     Alert: Alert.extend({
       classNames: (theme, props) => ({
         root: `${alertClasses.root} ${!props.color && !props.variant && theme.primaryColor === NEUTRAL_COLOR ? alertClasses.neutral : ''}`,

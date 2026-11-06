@@ -10,7 +10,6 @@ import {
   Checkbox,
   Divider,
   Flex,
-  getDefaultZIndex,
   Group,
   Input,
   Modal,
@@ -681,28 +680,12 @@ function SettingsPage({
 
           {/*
            * The save bar exists only while something is unsaved. It stays in the content column and sticks to the
-           * bottom of the window, so the save button is in reach at any scroll position and at phone width. Affix is
-           * used for its z-index: inputs stack their sections above plain positioned boxes. It stays below the header
-           * and the narrow-screen sidebar.
+           * bottom of the window, so the save button is in reach at any scroll position and at phone width. The
+           * theme's action-bar variant draws it over the page, under the header and the narrow-screen sidebar.
            */}
           {dirty && (
-            <Affix
-              withinPortal={false}
-              pos="sticky"
-              position={{ bottom: 0 }}
-              zIndex={getDefaultZIndex('app') - 1}
-              // The strip under the bar is the page's background down to the window's bottom edge, so the content
-              // scrolling under the bar does not show through below it. The bar's own top edge is where content is cut.
-              bg="var(--mantine-color-body)"
-              pb="md"
-            >
-              <Card
-                ref={saveBarRef}
-                tabIndex={-1}
-                padding="md"
-                role="region"
-                aria-label="保存していない変更"
-              >
+            <Affix variant="action-bar" withinPortal={false} pos="sticky" position={{ bottom: 0 }}>
+              <Card ref={saveBarRef} tabIndex={-1} role="region" aria-label="保存していない変更">
                 <Group justify="space-between" gap="sm">
                   {/* Errors exist only after a save has failed; the field clears its own as soon as it changes. */}
                   {errorFields.length > 0 ? (
@@ -722,12 +705,9 @@ function SettingsPage({
                         {errorFields.map(([field, label], index) => (
                           <span key={field}>
                             {index > 0 && '、'}
-                            {/* Taller than the line, so a finger hits the link at phone width. */}
                             <Anchor
                               href={`#${fieldId(field)}`}
                               onClick={(event) => jumpToField(event, field)}
-                              display="inline-block"
-                              py={4}
                             >
                               {label}
                             </Anchor>
