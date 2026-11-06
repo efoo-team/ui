@@ -49,6 +49,7 @@ import {
   ATTENTION_COLOR,
   CURRENT_USER,
   findOrder,
+  fromIsoDate,
   isCancellable,
   monthDay,
   NOW,
@@ -149,8 +150,7 @@ type Verdict = { icon: Icon; text: string };
  */
 function shippingVerdict(order: Order): Verdict {
   if (order.status === 'shipped') {
-    const shipped = [...order.history].reverse().find((event) => event.kind === 'shipped');
-    const day = shipped ? `${monthDay(shipped.at.split(' ')[0]!)}に` : '';
+    const day = order.shippedOn ? `${monthDay(order.shippedOn)}に` : '';
     return { icon: IconTruckDelivery, text: `${day}発送しました。` };
   }
   if (order.status === 'cancelled')
@@ -693,17 +693,28 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
     (nextStepRef.current ?? headingRef.current)?.focus();
   }, [order]);
 
-  const addEvent = (status: Order['status'], event: Omit<OrderEvent, 'at' | 'by'>) => {
+  // The history records when the step was recorded (NOW); what the step was about, such as the day the order left,
+  // is kept apart from it.
+  const addEvent = (
+    status: Order['status'],
+    event: Omit<OrderEvent, 'at' | 'by'>,
+    changes: Partial<Order> = {},
+  ) => {
     stepRecorded.current = true;
     setOrder((current) => ({
       ...current,
+      ...changes,
       status,
       history: [...current.history, { at: NOW.at, by: CURRENT_USER.name, ...event }],
     }));
   };
 
-  const ship = ({ carrier, trackingNumber }: ShipmentValues) => {
-    addEvent('shipped', { kind: 'shipped', label: `発送（${carrier} ${trackingNumber.trim()}）` });
+  const ship = ({ shippedOn, carrier, trackingNumber }: ShipmentValues) => {
+    addEvent(
+      'shipped',
+      { kind: 'shipped', label: `発送（${carrier} ${trackingNumber.trim()}）` },
+      { shippedOn: fromIsoDate(shippedOn ?? NOW.date) },
+    );
     setShipOpened(false);
     notifications.show({
       title: '発送を記録しました',

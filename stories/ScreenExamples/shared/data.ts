@@ -27,6 +27,12 @@ export const isoDate = (date: string) => {
   return `${NOW.date.slice(0, 4)}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
 };
 
+// '2026-10-31' -> '10/31', so a date picked in a date input is kept in the form the data uses.
+export const fromIsoDate = (date: string) => {
+  const [, month, day] = date.split('-');
+  return `${Number(month)}/${Number(day)}`;
+};
+
 export interface Organization {
   name: string;
   initial: string;
@@ -308,6 +314,8 @@ export interface Order {
   staff: string;
   /** Month/day of the order, e.g. '10/31'. */
   date: string;
+  /** Month/day the order left, for a shipped order; the day the shipment was recorded is in its history. */
+  shippedOn?: string;
   lines: OrderLine[];
   /** Sum of the lines before tax. */
   subtotal: number;
@@ -410,6 +418,8 @@ export const ORDERS: Order[] = Array.from({ length: 36 }, (_, index) => {
     status,
     staff,
     date,
+    // Orders leave on the day they come in, as the history records.
+    shippedOn: status === 'shipped' ? date : undefined,
     lines,
     subtotal,
     tax,
