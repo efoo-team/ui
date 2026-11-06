@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from 'react';
+import { useEffect, useRef, useState, type Ref } from 'react';
 import {
   ActionIcon,
   Anchor,
@@ -77,7 +77,7 @@ const meta = {
           '**情報構造**　主は 1 件の受注（番号・状態）で、明細・届け先・支払い・履歴はその受注に従います。明細は商品（在庫）に、届け先と請求先は顧客につながっていて、この画面では発送の判断に要る在庫と連絡先だけを受注の側に引いて見せます。\n\n' +
           '**データパターン**　明細は 1〜3 行（商品名は 9〜15 文字）、履歴は 1〜3 件、住所は 13〜26 文字で狭い幅では折り返します。希望の着日は無い受注もあり、そのときは「指定なし」と出します。状態は、在庫も支払いも発送を止めない未発送の受注（story『受注の詳細』。「発送を記録」を押すと発送済みに変わります）、銀行振込の入金を待っている受注（story『入金を待っているとき』。「入金を記録」を押すと未発送に変わります）、在庫が足りない明細がある受注（story『在庫が足りないとき』。「遅れを連絡」でメールを送ると履歴に残ります）、読み込み中（story『読み込み中』）、受注が見つからない（story『受注が見つからないとき』）です。\n\n' +
           '**情報の流れ**　担当者は、まずこの受注が何で今どの状態か（番号・状態・顧客）を知り、次に何をいくつ送り在庫が足りるか（明細）、いつまでにどこへ送るか（希望の着日・届け先）、支払いが発送を止めないか（支払い）を確かめ、発送を記録します。発送できないときは、何が止めているかを知り、それに手を打ちます。履歴は、ほかの人が先に手を付けていないかを確かめたいときにだけ見ます。\n\n' +
-          '**主役**　流れの最初に知る状態と発送できるかの答え、最後にする操作です。状態の Badge を受注番号の横に、「発送できます／発送できません」と理由の 1 行をそのすぐ下に置き、どの状態でも答えをこの 1 か所で読めて、スマホの幅でもボタンより先に目に入るようにしました。塗りのボタンは受注を止めているものに対する次の一手だけにして見出しの右に置き、入金待ちなら「入金を記録」、在庫が足りなければ、待たせる顧客への「遅れを連絡」（入荷の予定日と、在庫のある分を先に送れることを書いた下書き入り）、どちらも無ければ「発送を記録」です。\n\n' +
+          '**主役**　流れの最初に知る状態と発送できるかの答え、最後にする操作です。状態の Badge を受注番号の横に、「発送できます／発送できません」と理由の 1 行をそのすぐ下に置き、どの状態でも答えをこの 1 か所で読めて、スマホの幅でもボタンより先に目に入るようにしました。塗りのボタンは受注を止めているものに対する次の一手だけにして見出しの右に置き、入金待ちなら「入金を記録」、在庫が足りなければ、待たせる顧客への「遅れを連絡」（入荷の予定日と、在庫のある分を先に送れることを書いた下書き入り）、どちらも無ければ「発送を記録」です。記録すると押したボタンは状態とともに消えるので、フォーカスは次の一手の塗りのボタンへ、次の一手が無ければ見出しの受注番号へ移し、新しい状態と発送できるかの 1 行をそこから読めるようにしています。\n\n' +
           '**抑えたもの・使わなかったもの**　発送できるかの答えは見出しの下の 1 行だけに置き、明細と支払いの Card には書いていません。答えが 2 か所にあると、状態によって読む場所が変わるためです。色は未発送の Badge と、在庫が足りない明細の印にだけ使います。在庫が発注点を下回っている商品（A4 コピー用紙など）の「要発注」は、ダッシュボードと商品の画面では出しますが、ここでは出しません。発注はこの画面の読み手の仕事ではなく、この受注を出せるかは受注の数量と在庫で決まるので、出せる明細に印を付けると在庫不足の印が埋もれるためです。編集・複製・キャンセルはこの場面ではまれな操作なので「その他の操作」のメニューに収め、納品書の印刷は枠線のボタンにしました。金額は明細の下の合計に 1 か所だけ置き、明細の表は 3 列にして、単価を金額の下に、在庫を商品の下に添え、スマホの幅でも横に送らずに読めるようにしました。\n\n' +
           '**目的が違えば変わるところ**　顧客の了解を待たずに在庫のある品目を先に送る取引なら、在庫が足りないときの主な操作を「足りる分を発送」にし、送る数量を明細ごとに入れる欄を発送の記録に足します。経理の担当者が請求を確かめる画面なら、支払いと金額を主役にして左の列に置きます。明細が数十行になる受注なら、明細を別のタブか別の画面に分け、この画面には品目の数と合計だけを残します。スマホで確かめてから操作するのが主な使い方なら、主な操作を画面の下端に固定します。',
       },
@@ -438,12 +438,15 @@ function CancelModal({
 
 function OrderActions({
   order,
+  nextStepRef,
   onShip,
   onRecordPayment,
   onNotifyDelay,
   onCancel,
 }: {
   order: Order;
+  /** The filled button, whichever it is, so focus can move to it after a step is recorded. */
+  nextStepRef: Ref<HTMLButtonElement>;
   onShip: () => void;
   onRecordPayment: () => void;
   onNotifyDelay: () => void;
@@ -461,12 +464,17 @@ function OrderActions({
        * has none. Once the customer has been told, the notice stays at hand for a second one, unfilled.
        */}
       {order.status === 'paymentPending' && (
-        <Button leftSection={<IconCash size={ICON_SIZE} />} onClick={onRecordPayment}>
+        <Button
+          ref={nextStepRef}
+          leftSection={<IconCash size={ICON_SIZE} />}
+          onClick={onRecordPayment}
+        >
           入金を記録
         </Button>
       )}
       {order.status === 'notShipped' && short && (
         <Button
+          ref={nextStepRef}
           variant={isDelayNoticeSent(order) ? 'default' : undefined}
           leftSection={<IconMail size={ICON_SIZE} />}
           onClick={onNotifyDelay}
@@ -475,7 +483,11 @@ function OrderActions({
         </Button>
       )}
       {order.status === 'notShipped' && !short && (
-        <Button leftSection={<IconTruckDelivery size={ICON_SIZE} />} onClick={onShip}>
+        <Button
+          ref={nextStepRef}
+          leftSection={<IconTruckDelivery size={ICON_SIZE} />}
+          onClick={onShip}
+        >
           発送を記録
         </Button>
       )}
@@ -670,12 +682,29 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
   const [delayOpened, setDelayOpened] = useState(false);
   const [cancelOpened, setCancelOpened] = useState(false);
 
-  const addEvent = (status: Order['status'], event: Omit<OrderEvent, 'at' | 'by'>) =>
+  /*
+   * A recorded step changes the state, and the button that started it goes away with the old state (入金を記録,
+   * 発送を記録, the menu's 受注をキャンセル), so the dialog would hand focus back to nothing and leave it on the page.
+   * Focus moves to the next step's filled button instead, or to the heading when the state has none, where the new
+   * state and the line on whether the order can ship are read next.
+   */
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const nextStepRef = useRef<HTMLButtonElement>(null);
+  const stepRecorded = useRef(false);
+  useEffect(() => {
+    if (!stepRecorded.current) return;
+    stepRecorded.current = false;
+    (nextStepRef.current ?? headingRef.current)?.focus();
+  }, [order]);
+
+  const addEvent = (status: Order['status'], event: Omit<OrderEvent, 'at' | 'by'>) => {
+    stepRecorded.current = true;
     setOrder((current) => ({
       ...current,
       status,
       history: [...current.history, { at: NOW.at, by: CURRENT_USER.name, ...event }],
     }));
+  };
 
   const ship = ({ carrier, trackingNumber }: ShipmentValues) => {
     addEvent('shipped', { label: `発送（${carrier} ${trackingNumber.trim()}）` });
@@ -720,7 +749,7 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
         <Group justify="space-between" align="flex-start" gap="md">
           <Stack gap={4}>
             <Group gap="sm" wrap="nowrap">
-              <Title order={1} size="h3">
+              <Title ref={headingRef} tabIndex={-1} order={1} size="h3">
                 {order.id}
               </Title>
               <OrderStatusBadge status={order.status} />
@@ -732,6 +761,7 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
           </Stack>
           <OrderActions
             order={order}
+            nextStepRef={nextStepRef}
             onShip={() => setShipOpened(true)}
             onRecordPayment={() => setPaymentOpened(true)}
             onNotifyDelay={() => setDelayOpened(true)}
