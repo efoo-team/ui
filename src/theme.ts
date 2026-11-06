@@ -31,6 +31,7 @@ import {
   Input,
   InputWrapper,
   Menu,
+  MenuRadioItem,
   Loader,
   Modal,
   MultiSelect,
@@ -46,6 +47,7 @@ import {
   ProgressRoot,
   Radio,
   RadioGroup,
+  RadioIcon,
   RadioIndicator,
   RangeSlider,
   RingProgress,
@@ -63,9 +65,11 @@ import {
   Timeline,
   TreeSelect,
   Tooltip,
+  useMenuContext,
   type MantineTheme,
   type MantineThemeOverride,
 } from '@mantine/core';
+import { createElement } from 'react';
 import {
   blueColors,
   darkColors,
@@ -132,6 +136,14 @@ import tabsClasses from './styles/tabs.module.css';
 import textClasses from './styles/text.module.css';
 import './text-variants.js';
 import tooltipClasses from './styles/tooltip.module.css';
+
+/**
+ * shadcn/ui marks the chosen radio item with an 8px dot, where Mantine draws a 5px one. A default prop on the radio
+ * item would hide a checkIcon set on Menu, so the dot gives way to it, as Mantine's own does.
+ */
+function MenuRadioDot() {
+  return useMenuContext().checkIcon ?? createElement(RadioIcon, { size: 8 });
+}
 
 interface IconColorProps {
   color?: string;
@@ -579,6 +591,9 @@ export const efooTheme: MantineThemeOverride = createTheme({
         itemIndicator: menuClasses.itemIndicator,
         label: menuClasses.label,
       },
+    }),
+    MenuRadioItem: MenuRadioItem.extend({
+      defaultProps: { checkIcon: createElement(MenuRadioDot) },
     }),
     Modal: Modal.extend({
       classNames: {
