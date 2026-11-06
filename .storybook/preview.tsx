@@ -40,6 +40,8 @@ function readColorScheme(context: ComponentProps<typeof DocsContainer>['context'
 
 // Stories drawn in an iframe on a docs page (docs.story.inline: false, used by the 画面例 whose AppShell is fixed to the
 // viewport) run a preview of their own. It starts from the globals in its URL and reports them to this page as well.
+// PREVIEW_URL is not a public API of Storybook: it is read by addon-docs' internal story iframe code. When Storybook
+// is updated, check the Docs pages (light and dark) of the 画面例 again.
 declare global {
   var PREVIEW_URL: string | undefined;
 }
@@ -67,6 +69,7 @@ function ThemedDocsContainer(props: ComponentProps<typeof DocsContainer>) {
 
   // The story iframes take their URL from PREVIEW_URL, so they open in the toolbar's scheme, and the page is drawn
   // again when the scheme changes so that they reload in it.
+  // This relies on addon-docs reading `globalThis.PREVIEW_URL` (an internal detail, see the declaration above).
   globalThis.PREVIEW_URL = `iframe.html?globals=colorScheme:${colorScheme === 'dark' ? 'dark' : 'light'}`;
 
   return (

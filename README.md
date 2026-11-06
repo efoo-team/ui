@@ -186,6 +186,8 @@ DateInput の既定の `YYYY/MM/DD` は `efooDateParser` が厳密に解析し�
 
 ### サービスごとに調整する
 
+部品に Mantine をそのまま使うと、状態・フォーカス・キーボード操作・読み上げの品質を、Mantine の部品から得られます。見た目の上書きをサービスの `createTheme` の 1 か所にまとめると、サービスの中の統一が保たれます。theme で表せない表現（LP のヒーローの構図など）は、サービス側に置いてかまいません。
+
 theme の差分は `createTheme` で書き、`mergeThemeOverrides` で `efooTheme` に重ねます。次の例の `primaryColor` と `defaultRadius` は差分の一例なので、サービスで変えたい項目だけを書いてください。
 
 ```tsx
@@ -376,13 +378,13 @@ Badge の既定は `variant="light"` です。`color` を指定しない Badge �
 
 - `@efoo/ui` を入れたリポジトリでは、`node_modules/@efoo/ui/SCREEN-EXAMPLES.md` を読みます。入っている版の画面例と一致します。ソースは `node_modules/@efoo/ui/stories/ScreenExamples/` に同梱しています。
 - `@efoo/ui` をまだ入れていない段階（土台を選ぶ段階）では、`https://raw.githubusercontent.com/efoo-team/ui/main/SCREEN-EXAMPLES.md` を読みます。
-- 見た目は、公開 Storybook（https://efoo-team.github.io/ui/）の「画面例」で見られます。
+- 見た目は、[公開 Storybook](https://efoo-team.github.io/ui/) の「画面例」で見られます。
 
-各画面例の説明文（Storybook の Docs）には、その画面をそう作った理由として「目的と読み手」「主役」「抑えたもの・使わなかったもの」「目的が違えば変わるところ」を書いています。画面例は、見た目をそのまま写すためのものではありません。どの操作者が AI エージェントに指示しても画面が最初から質が高く、その品質が保たれるように、判断の理由を読んで、作るサービスの目的に合わせて考え方を写すためのものです。
+各画面例の説明文（Storybook の Docs）には、その画面をそう作った理由として「目的と読み手」「情報構造」「データパターン」「情報の流れ」「主役」「抑えたもの・使わなかったもの」「目的が違えば変わるところ」の 7 項目を書いています。画面例は、見た目をそのまま写すためのものではありません。どの操作者が AI エージェントに指示しても画面が最初から質が高く、その品質が保たれるように、判断の理由を読んで、作るサービスの目的に合わせて考え方を写すためのものです。
 
 ## 開発
 
-Node.js 22 と pnpm を使います。`pnpm install` で依存関係を入れた後、`pnpm storybook` で開発サーバーを起動します。変更を入れる前に、`pnpm typecheck`・`pnpm lint`・`pnpm format:check`・`pnpm build-storybook` が通ることを確認してください。Mantine を更新したときは、Storybook でライトとダークの表示を確認します。
+Node.js 22 と pnpm を使います。`pnpm install` で依存関係を入れた後、`pnpm storybook` で開発サーバーを起動します。変更を入れる前に、`pnpm typecheck`・`pnpm lint`・`pnpm format:check`・`pnpm build-storybook` が通ることを確認してください。Mantine を更新したときは、`pnpm storybook` で起動したローカルの Storybook を、撮影 tool（`shoot.mjs`）に `--storybook http://localhost:6006/` を付けて撮り、ライトとダークの表示を確認します。
 
 `fix:` や `feat:` などのコミットを main に push すると、CI が変更内容に応じた版を決めて npm に公開します。
 
