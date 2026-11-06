@@ -29,10 +29,9 @@ import { useForm, type FormErrors } from '@mantine/form';
 import { useWindowEvent } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { AppFrame } from './shared/AppFrame';
-import { CONTENT_BREAKPOINTS } from './shared/constants';
+import { ATTENTION_COLOR, CONTENT_BREAKPOINTS } from './shared/constants';
 import {
   ACCOUNTING_STAFF,
-  ATTENTION_COLOR,
   CURRENT_USER,
   DEFAULT_ORGANIZATION,
   PAYMENT_METHODS,

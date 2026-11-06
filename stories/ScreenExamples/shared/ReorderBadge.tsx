@@ -1,5 +1,5 @@
 import { Badge } from '@mantine/core';
-import { ATTENTION_COLOR } from './data';
+import { ATTENTION_COLOR } from './constants';
 
 /*
  * The mark of a product whose stock is below its reorder point, the same on every screen that shows it. The screen

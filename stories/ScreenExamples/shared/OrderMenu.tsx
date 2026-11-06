@@ -1,7 +1,7 @@
 import { ActionIcon, Menu } from '@mantine/core';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { ICON_SIZE } from './constants';
-import { ATTENTION_COLOR, awaitsShipment, type Order } from './data';
+import { ATTENTION_COLOR, ICON_SIZE } from './constants';
+import { awaitsShipment, type Order } from './data';
 
 /*
  * The menu at the end of an order's row. It has no item that opens the order: the order number is the link to it

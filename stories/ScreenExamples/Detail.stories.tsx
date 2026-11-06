@@ -44,10 +44,9 @@ import {
   type Icon,
 } from '@tabler/icons-react';
 import { AppFrame } from './shared/AppFrame';
-import { CONTENT_BREAKPOINTS, ICON_SIZE } from './shared/constants';
+import { ATTENTION_COLOR, CONTENT_BREAKPOINTS, ICON_SIZE } from './shared/constants';
 import { BackLink } from './shared/BackLink';
 import {
-  ATTENTION_COLOR,
   awaitsShipment,
   CURRENT_USER,
   DEFAULT_ORGANIZATION,

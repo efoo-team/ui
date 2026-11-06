@@ -14,8 +14,7 @@ import {
 } from '@mantine/core';
 import { useForm, type FormErrors } from '@mantine/form';
 import { IconAlertCircle } from '@tabler/icons-react';
-import { SERVICE_NAME } from './shared/constants';
-import { ATTENTION_COLOR } from './shared/data';
+import { ATTENTION_COLOR, SERVICE_NAME } from './shared/constants';
 
 const meta = {
   title: '画面例 / サインイン',

@@ -33,9 +33,8 @@ import {
   IconX,
 } from '@tabler/icons-react';
 import { AppFrame } from './shared/AppFrame';
-import { ICON_SIZE } from './shared/constants';
+import { ATTENTION_COLOR, ICON_SIZE } from './shared/constants';
 import {
-  ATTENTION_COLOR,
   CURRENT_USER,
   isoDate,
   lateDays,

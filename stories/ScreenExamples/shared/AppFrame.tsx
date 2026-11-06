@@ -46,14 +46,13 @@ import {
   type Icon,
 } from '@tabler/icons-react';
 import {
-  ATTENTION_COLOR,
   CURRENT_USER,
   DEFAULT_ORGANIZATION,
   INQUIRIES,
   ORGANIZATIONS,
   type Organization,
 } from './data';
-import { ICON_SIZE } from './constants';
+import { ATTENTION_COLOR, ICON_SIZE } from './constants';
 
 interface NavItem {
   label: string;

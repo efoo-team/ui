@@ -1,4 +1,9 @@
-// Values the 画面例 share apart from the fictional data in data.ts: the service's name and the sizes they lay out by.
+// Values the 画面例 share apart from the fictional data in data.ts: the service's name, the attention color and the
+// sizes they lay out by.
+
+// The color for "the user should act on this or take care": a state to act on, an error, and an action that cannot be
+// undone. Everything else stays neutral.
+export const ATTENTION_COLOR = 'red';
 
 // The size of an icon beside text: in a button, a menu item, a link or an input.
 export const ICON_SIZE = 16;

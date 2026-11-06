@@ -21,11 +21,10 @@ import { notifications } from '@mantine/notifications';
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { AppFrame } from './shared/AppFrame';
-import { CONTENT_BREAKPOINTS } from './shared/constants';
+import { ATTENTION_COLOR, CONTENT_BREAKPOINTS } from './shared/constants';
 import { BackLink } from './shared/BackLink';
 import {
   ALL_PRODUCTS,
-  ATTENTION_COLOR,
   PRODUCT_CATEGORIES,
   PRODUCTS,
   TAX_RATE,
