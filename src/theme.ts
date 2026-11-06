@@ -26,6 +26,8 @@ import {
   Combobox,
   createTheme,
   Drawer,
+  DrawerOverlay,
+  DrawerRoot,
   EmptyState,
   Indicator,
   Input,
@@ -34,6 +36,8 @@ import {
   MenuRadioItem,
   Loader,
   Modal,
+  ModalOverlay,
+  ModalRoot,
   MultiSelect,
   NavLink,
   Notification,
@@ -321,6 +325,16 @@ const comboboxClassNames = {
 
 const overlayProps = { backgroundOpacity: 0.15, blur: 4 };
 
+/*
+ * Drawer and Modal pass their defaults on to their Root and Overlay parts, but those parts used on their own
+ * (Drawer.Root, Drawer.Overlay, Modal.Root, Modal.Overlay) read only theirs (DrawerRoot, DrawerOverlay, ModalRoot,
+ * ModalOverlay). Both take the same objects, so either way of building one opens the same. Drawer and Modal keep
+ * them too: Mantine's Modal passes its own transition to the Root, which would win over the Root's default.
+ */
+const drawerProps = { transitionProps: drawerTransitionProps, shadow: 'lg' };
+// shadcn/ui's dialog is drawn by its 1px line, with no large shadow, and opens in the middle of the viewport.
+const modalProps = { transitionProps: modalTransitionProps, shadow: 'xs', centered: true };
+
 export const efooTheme: MantineThemeOverride = createTheme({
   colors: {
     zinc: zincColors,
@@ -557,8 +571,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
         body: drawerClasses.body,
         close: drawerClasses.close,
       }),
-      defaultProps: { transitionProps: drawerTransitionProps, overlayProps, shadow: 'lg' },
+      defaultProps: { ...drawerProps, overlayProps },
     }),
+    DrawerOverlay: DrawerOverlay.extend({ defaultProps: overlayProps }),
+    DrawerRoot: DrawerRoot.extend({ defaultProps: drawerProps }),
     EmptyState: EmptyState.extend({
       classNames: {
         root: emptyStateClasses.root,
@@ -605,15 +621,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
         body: modalClasses.body,
         close: modalClasses.close,
       },
-      // shadcn/ui's dialog is drawn by its 1px line, with no large shadow.
-      // shadcn/ui's dialog opens in the middle of the viewport.
-      defaultProps: {
-        transitionProps: modalTransitionProps,
-        overlayProps,
-        shadow: 'xs',
-        centered: true,
-      },
+      defaultProps: { ...modalProps, overlayProps },
     }),
+    ModalOverlay: ModalOverlay.extend({ defaultProps: overlayProps }),
+    ModalRoot: ModalRoot.extend({ defaultProps: modalProps }),
     MultiSelect: MultiSelect.extend({
       classNames: { ...comboboxClassNames, inputField: inputClasses.pillsField },
       defaultProps: { clearButtonProps: clearSelectionProps },
