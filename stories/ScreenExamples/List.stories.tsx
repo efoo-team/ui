@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 import {
   Alert,
   Avatar,
   Badge,
   Button,
   Card,
+  Collapse,
   Divider,
   EmptyState,
   Group,
@@ -18,10 +19,12 @@ import {
   Text,
   TextInput,
   Title,
+  useMatches,
   VisuallyHidden,
 } from '@mantine/core';
 import { DatePickerInput } from '@mantine/dates';
 import {
+  IconAdjustmentsHorizontal,
   IconAlertCircle,
   IconArrowsSort,
   IconCalendar,
@@ -33,6 +36,8 @@ import { AppFrame, ICON_SIZE } from './shared/AppFrame';
 import {
   ATTENTION_COLOR,
   isoDate,
+  lateDays,
+  monthDay,
   NOW,
   ORDER_STATUS,
   ORDERS,
@@ -58,11 +63,11 @@ const meta = {
           '架空の販売管理サービスの受注一覧の画面です。\n\n' +
           '**目的と読み手**　受注と出荷を受け持つ担当者が、毎日何度も開く画面です。電話で問い合わせを受けた受注を探す、今日発送する受注を拾う、という短い用事のたびに開き、目当ての受注の詳細へ移ります。\n\n' +
           '**情報構造**　主は受注で、1 件ごとに顧客（1 社）、明細（1〜3 品目）、担当者、状態、金額、受注日が従います。状態（未発送・入金待ち・発送済み・キャンセル）は受注を仕事のまとまりに分ける軸で、明細の中身や配送先・履歴は詳細の画面に任せます。\n\n' +
-          '**データパターン**　項目は受注番号・顧客・品目・金額・状態・担当者・受注日の 7 つです。件数は 10 月 14 日〜31 日の 36 件（未発送 5・入金待ち 4・発送済み 24・キャンセル 3）で、未発送と入金待ちのほとんどは直近の数日の受注、古い受注はほとんどが発送済みです。1 社の受注に複数の状態が混ざり、絞り込むと 0〜36 件になります。値の長さは、顧客名が 3〜7 字、品目が「付箋 75mm 角」から「A4 コピー用紙（500 枚） ほか 2 品目」まで、金額が 4〜6 桁です。状態は、読み込み後（story『受注一覧』）、0 件（story『絞り込みに当たる受注が無いとき』）、読み込み中（story『読み込み中』）、取得の失敗（story『読み込みに失敗したとき』）です。\n\n' +
-          '**情報の流れ**　開いた担当者は、まず状態ごとの件数で今日の仕事の量（未発送が何件か）を知ります。次に状態のタブ・検索・担当者・受注日で対象を絞り、行の状態・顧客・金額を見比べて目当ての受注を決め、受注番号から詳細へ移ります。受注の登録は電話や FAX を受けたときに始まる別の流れです。\n\n' +
-          '**主役**　流れの順に、件数付きの状態のタブ、絞り込みの欄、表を上から並べ、詳細への道である受注番号を行の左端のリンクにしました。状態のタブは、どの幅でも 5 つの状態の件数が並んで見える pills にし、スマホの幅では 2 段に折り返します。色は未発送の件数と未発送の状態にだけ使い、最初に目に入るのが対応の要る受注になるようにしています。ページ全体の操作である「受注を登録」だけを塗りのボタンにし、見出しの右に置きました。\n\n' +
-          '**抑えたもの・使わなかったもの**　絞り込みの条件は欄そのものが見せるので、条件のチップの列は重ねず、欄に条件があるときだけ「検索と絞り込みを解除」を出します。状態はタブの「すべて」で戻せるので、このボタンは欄の条件だけを消します。見出しの補足には期間を書かず、表示する受注は条件で決まることにしました。並べ替えは列の見出しではなく欄の 1 つにし、行の操作のメニューには詳細を開く項目を置かず、受注番号のリンクに一本化しました。スマホの幅では、横スクロールで状態と金額が隠れないよう表を 1 件ずつの短いまとまりに組み替えています。状態のタブを選択欄に替えると件数と色が開くまで見えず、横スクロールにすると後ろの状態の件数が隠れるので、どちらも使いませんでした。\n\n' +
-          '**目的が違えば変わるところ**　件数が数百件を超えるなら、件数の表示とページ送りに加えて CSV の書き出しや表示件数の切り替えを置きます。絞り込みの条件が 5 つを超えるなら、欄を折りたたみの中に移し、選んだ条件をチップの列で見せます。項目が 3〜4 つと少なく、スマホで使うことが多いなら、表ではなく 1 件ずつのまとまりの並びを全幅で使ってよいです。',
+          '**データパターン**　項目は受注番号・顧客・品目・金額・状態・担当者・受注日の 7 つです。件数は 10 月 14 日〜31 日の 36 件（未発送 5・入金待ち 4・発送済み 24・キャンセル 3）で、未発送と入金待ちのほとんどは直近の数日の受注、古い受注はほとんどが発送済みです。未発送のうち 2 件は受注から 2 日以上たっており（2 日と 6 日）、ダッシュボードの「2 件は受注から 2 日以上です」はこの 2 件です。1 社の受注に複数の状態が混ざり、絞り込むと 0〜36 件になります。値の長さは、顧客名が 3〜7 字、品目が「付箋 75mm 角」から「A4 コピー用紙（500 枚） ほか 2 品目」まで、金額が 4〜6 桁です。状態は、読み込み後（story『受注一覧』）、0 件（story『絞り込みに当たる受注が無いとき』）、読み込み中（story『読み込み中』）、取得の失敗（story『読み込みに失敗したとき』）です。\n\n' +
+          '**情報の流れ**　開いた担当者は、まず状態ごとの件数で今日の仕事の量（未発送が何件か）を知ります。未発送の中で急ぐものは、受注日の横の経過日数（「6 日経過」）で見分けます。次に状態のタブ・検索・担当者・受注日で対象を絞り、行の状態・顧客・金額を見比べて目当ての受注を決め、受注番号から詳細へ移ります。受注の登録は電話や FAX を受けたときに始まる別の流れです。\n\n' +
+          '**主役**　流れの順に、件数付きの状態のタブ、絞り込みの欄、表を上から並べ、詳細への道である受注番号を行の左端のリンクにしました。状態のタブは、どの幅でも 5 つの状態の件数が並んで見える pills にし、スマホの幅では 2 段に折り返します。スマホの幅では、短い用事のたびに最初に使う検索だけを出し、担当者・受注日・並び順は「絞り込み・並べ替え」のボタンから開くようにして、開いた最初の画面に受注が見えるようにしました。ボタンには中でかかっている条件の数を出します。色は未発送の件数と未発送の状態にだけ使い、最初に目に入るのが対応の要る受注になるようにしています。ページ全体の操作である「受注を登録」だけを塗りのボタンにし、見出しの右に置きました。\n\n' +
+          '**抑えたもの・使わなかったもの**　絞り込みの条件は欄そのものが見せるので、条件のチップの列は重ねませんでした。「検索と絞り込みを解除」は欄の並びの端に常に置き、消す条件が無いときは無効にしています。条件ができたときに現れると、入力中の検索欄が細くなって並びが動くためです。状態はタブの「すべて」で戻せるので、このボタンは欄の条件だけを消します。見出しの補足には画面の時点を書き、期間は書きません。表示する受注は条件で決まり、期間で絞ったときは受注日の欄がそれを示すためです。経過日数には色を付けていません。その行は未発送の赤い Badge で既に対応が要ると示しているためです。並べ替えは列の見出しではなく欄の 1 つにし、行の操作のメニューには詳細を開く項目を置かず、受注番号のリンクに一本化しました。スマホの幅では、横スクロールで状態と金額が隠れないよう表を 1 件ずつの短いまとまりに組み替えています。状態のタブを選択欄に替えると件数と色が開くまで見えず、横スクロールにすると後ろの状態の件数が隠れるので、どちらも使いませんでした。\n\n' +
+          '**目的が違えば変わるところ**　件数が数百件を超えるなら、件数の表示とページ送りに加えて CSV の書き出しや表示件数の切り替えを置きます。絞り込みの条件が 5 つを超えるなら、広い画面でも欄をスマホの幅と同じボタンの中に移し、選んだ条件をチップの列で見せます。項目が 3〜4 つと少なく、スマホで使うことが多いなら、表ではなく 1 件ずつのまとまりの並びを全幅で使ってよいです。',
       },
     },
   },
@@ -93,7 +98,7 @@ const DEFAULT_FILTERS: OrderFilters = {
   page: 1,
 };
 
-// Every state is a tab here, unlike the dashboard's three: the list is where each state is worked through.
+// Every state is a tab: the list is where each state is worked through.
 const STATUS_TABS: { value: StatusTab; label: string }[] = [
   { value: 'all', label: 'すべて' },
   ...(['notShipped', 'paymentPending', 'shipped', 'cancelled'] as const).map((value) => ({
@@ -120,6 +125,17 @@ function itemsSummary(order: Order) {
   if (!first) return '';
   return rest.length > 0 ? `${first.product.name} ほか ${rest.length} 品目` : first.product.name;
 }
+
+/*
+ * The dashboard says how many unshipped orders are two days old or more; their rows name the wait, so those orders
+ * are told apart here without working out dates. The red state badge already marks the row, so the wait takes no color.
+ */
+function orderDate(order: Order) {
+  const days = lateDays(order);
+  return days === undefined ? order.date : `${order.date}（${days} 日経過）`;
+}
+
+const [asOfDay, asOfTime] = NOW.at.split(' ');
 
 function matchesConditions(order: Order, { query, staff, dates }: OrderFilters) {
   const keyword = query.trim().toUpperCase();
@@ -210,7 +226,7 @@ function OrdersTable({ orders, sort }: { orders: Order[] | null; sort: SortKey }
                       <Text size="sm">{order.staff}</Text>
                     </Group>
                   </Table.Td>
-                  <Table.Td>{order.date}</Table.Td>
+                  <Table.Td>{orderDate(order)}</Table.Td>
                   <Table.Td>
                     <OrderMenu order={order} />
                   </Table.Td>
@@ -279,7 +295,7 @@ function OrdersStack({ orders }: { orders: Order[] | null }) {
                 {itemsSummary(order)}
               </Text>
               <Text size="sm" c="dimmed">
-                {order.date}・{order.staff}
+                {orderDate(order)}・{order.staff}
               </Text>
             </Stack>
           ) : (
@@ -302,6 +318,13 @@ function OrdersStack({ orders }: { orders: Order[] | null }) {
   );
 }
 
+// On a phone the staff, the dates and the order sit behind one button, so the button counts the ones that differ from
+// the default; the search stays in view and shows itself.
+const tuckedConditionCount = ({ staff, dates, sort }: OrderFilters) =>
+  [staff !== null, dates[0] !== null || dates[1] !== null, sort !== DEFAULT_FILTERS.sort].filter(
+    Boolean,
+  ).length;
+
 function FilterBar({
   filters,
   disabled,
@@ -311,20 +334,28 @@ function FilterBar({
   disabled: boolean;
   onChange: (next: Partial<OrderFilters>) => void;
 }) {
-  return (
-    // The bases put the search on its own row on a phone and two short fields side by side under it.
-    <Group my="md" gap="sm" wrap="wrap">
-      <TextInput
-        flex="2 1 240px"
-        leftSection={<IconSearch size={ICON_SIZE} />}
-        placeholder="受注番号・顧客名・商品名で検索"
-        aria-label="受注を検索"
-        value={filters.query}
-        disabled={disabled}
-        onChange={(event) => onChange({ query: event.currentTarget.value, page: 1 })}
-      />
+  // The same breakpoint as the switch from the table to the phone blocks below.
+  const wide = useMatches({ base: false, sm: true }, { getInitialValueInEffect: false });
+  const [opened, setOpened] = useState(false);
+  const fieldsId = useId();
+  // Flex bases share one row on a wide screen; stacked on a phone, each field takes the full width.
+  const flex = (value: string) => (wide ? value : undefined);
+
+  const search = (
+    <TextInput
+      flex={flex('2 1 240px')}
+      leftSection={<IconSearch size={ICON_SIZE} />}
+      placeholder="受注番号・顧客名・商品名で検索"
+      aria-label="受注を検索"
+      value={filters.query}
+      disabled={disabled}
+      onChange={(event) => onChange({ query: event.currentTarget.value, page: 1 })}
+    />
+  );
+  const fields = (
+    <>
       <Select
-        flex="1 1 140px"
+        flex={flex('1 1 140px')}
         placeholder="担当者で絞り込み"
         aria-label="担当者で絞り込み"
         data={STAFF}
@@ -335,7 +366,7 @@ function FilterBar({
       />
       <DatePickerInput
         type="range"
-        flex="1 1 220px"
+        flex={flex('1 1 220px')}
         leftSection={<IconCalendar size={ICON_SIZE} />}
         placeholder="受注日で絞り込み"
         aria-label="受注日で絞り込み"
@@ -349,7 +380,7 @@ function FilterBar({
         clearable
       />
       <Select
-        flex="1 1 140px"
+        flex={flex('1 1 140px')}
         leftSection={<IconArrowsSort size={ICON_SIZE} />}
         aria-label="並べ替え"
         data={SORTS}
@@ -358,17 +389,59 @@ function FilterBar({
         onChange={(value) => onChange({ sort: (value as SortKey | null) ?? 'dateDesc', page: 1 })}
         allowDeselect={false}
       />
-      {hasFieldConditions(filters) && (
+    </>
+  );
+  // Always in place and disabled while there is nothing to clear: appearing on the first typed letter would narrow
+  // the field being typed in and shift the row.
+  const clear = (
+    <Button
+      variant="subtle"
+      leftSection={<IconX size={ICON_SIZE} />}
+      disabled={disabled || !hasFieldConditions(filters)}
+      onClick={() => onChange(CLEARED_FIELDS)}
+    >
+      検索と絞り込みを解除
+    </Button>
+  );
+
+  if (wide) {
+    return (
+      <Group my="md" gap="sm" wrap="wrap">
+        {search}
+        {fields}
+        {clear}
+      </Group>
+    );
+  }
+
+  /*
+   * Stacked on a phone, the four fields pushed the first order below the middle of the screen on every visit. The
+   * search, the most common way in, stays; the rest open from one button that counts the conditions behind it.
+   */
+  const tucked = tuckedConditionCount(filters);
+  return (
+    <Stack my="md" gap="sm">
+      {search}
+      <Group>
         <Button
-          variant="subtle"
-          leftSection={<IconX size={ICON_SIZE} />}
+          variant="default"
+          leftSection={<IconAdjustmentsHorizontal size={ICON_SIZE} />}
+          rightSection={tucked > 0 ? <Badge>{tucked}</Badge> : undefined}
+          aria-expanded={opened}
+          aria-controls={fieldsId}
           disabled={disabled}
-          onClick={() => onChange(CLEARED_FIELDS)}
+          onClick={() => setOpened((current) => !current)}
         >
-          検索と絞り込みを解除
+          絞り込み・並べ替え
         </Button>
-      )}
-    </Group>
+      </Group>
+      <Collapse expanded={opened} id={fieldsId}>
+        <Stack gap="sm">
+          {fields}
+          <Group>{clear}</Group>
+        </Stack>
+      </Collapse>
+    </Stack>
   );
 }
 
@@ -422,10 +495,8 @@ function OrdersCard({
                 value={tab.value}
                 disabled={state !== 'ready'}
                 rightSection={
-                  // A badge-sized skeleton keeps the tabs at their loaded size; after a failure there is no count to show.
-                  state === 'loading' ? (
-                    <Skeleton height={20} width={24} />
-                  ) : state === 'ready' ? (
+                  // No count until the orders arrive. A skeleton here would sit on the pills' own gray and not show.
+                  state === 'ready' ? (
                     <Badge color={attention ? ATTENTION_COLOR : undefined}>{count}</Badge>
                   ) : undefined
                 }
@@ -443,7 +514,7 @@ function OrdersCard({
               <Alert title="受注を読み込めませんでした" color="red" icon={<IconAlertCircle />}>
                 <Stack gap="sm" align="flex-start">
                   <Text size="sm">
-                    再読み込みしても読み込めないときは、時間をおいてからもう一度試してください。
+                    再読み込みしても読み込めないときは時間をおいてもう一度試し、それでも続くときは情報システムの担当者に連絡してください。
                   </Text>
                   <Button variant="default" onClick={onReload}>
                     再読み込み
@@ -545,9 +616,12 @@ function OrderListPage({
             <Title order={1} size="h3">
               受注一覧
             </Title>
-            {/* No period here: the orders shown are set by the conditions, and the date field says when it narrows them. */}
+            {/*
+             * The moment the list stands at, not a period: the orders shown are set by the conditions, and the date
+             * field says when it narrows them.
+             */}
             <Text size="sm" c="dimmed">
-              受注を状態ごとに分けて表示します。
+              {monthDay(asOfDay ?? '')} {asOfTime} 時点の受注です。
             </Text>
           </Stack>
           <Button leftSection={<IconPlus size={ICON_SIZE} />}>受注を登録</Button>
@@ -569,7 +643,7 @@ export const Loading: Story = {
     docs: {
       description: {
         story:
-          '取得の待ち（データパターンの「読み込み中」）です。見出し・タブ・絞り込みの欄・表の見出しは読み込み後と同じ位置に出し、件数・行・ページ送りだけを Skeleton にして、読み込み後に配置が動かないようにしました。欄とタブは押しても結果が無いので無効にしています。',
+          '取得の待ち（データパターンの「読み込み中」）です。見出し・タブの名前・絞り込みの欄・表の見出しは読み込み後と同じ位置に出し、行・件数の表示・ページ送りだけを Skeleton にしました。タブの件数は Skeleton にするとタブの地に紛れて見えないので、読み込むまで出さず、欄とタブは押しても結果が無いので無効にしています。',
       },
     },
   },
@@ -582,7 +656,7 @@ export const NoMatches: Story = {
     docs: {
       description: {
         story:
-          '0 件（データパターンの「絞り込みの結果が無い」）です。電話で問い合わせを受けたテスト物産の受注を未発送のタブで探し、当たらなかった場面です。受注そのものはあるので、登録への案内ではなく、ほかの状態に当たる件数と「すべての状態で探す」を出し、検索の言葉を残したまま状態だけを広げられるようにしました。どの状態に何件あるかはタブの件数でも分かります。表とページ送りは消しています。',
+          '0 件（データパターンの「絞り込みの結果が無い」）です。電話で問い合わせを受けたテスト物産の受注を未発送のタブで探し、当たらなかった場面です。受注そのものはあるので、登録への案内ではなく、ほかの状態に当たる件数と「すべての状態で探す」を出し、検索の言葉を残したまま状態だけを広げられるようにしました。どの状態に何件あるかはタブの件数でも分かり、欄の条件ごと消すときは有効になった「検索と絞り込みを解除」を使えます。表とページ送りは消しています。',
       },
     },
   },
@@ -595,7 +669,7 @@ export const LoadFailed: Story = {
     docs: {
       description: {
         story:
-          '取得の失敗（データパターンの「取得の失敗」）です。自分の担当の未発送を開いたときに失敗した場面で、何が起きたかを見出しに、まず再読み込みし、直らなければ時間をおくことを 1 文にした Alert を、表のあった場所に置きました。タブと絞り込みの欄は選んだ条件を見せたまま無効にし、再読み込みで同じ条件の受注が戻るようにしています。件数・表・ページ送りは消し、受注の登録は一覧の取得と関係なく使えるので残しています。',
+          '取得の失敗（データパターンの「取得の失敗」）です。自分の担当の未発送を開いたときに失敗した場面で、何が起きたかを見出しに、まず再読み込みし、直らなければ時間をおき、それでも続けば情報システムの担当者に連絡することを 1 文にした Alert を、表のあった場所に置きました。タブと絞り込みの欄は選んだ条件を見せたまま無効にし、再読み込みで同じ条件の受注が戻るようにしています。件数・表・ページ送りは消し、受注の登録は一覧の取得と関係なく使えるので残しています。',
       },
     },
   },

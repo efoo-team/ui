@@ -9,38 +9,31 @@ import {
   Divider,
   Grid,
   Group,
-  Pagination,
   Progress,
   SegmentedControl,
-  Select,
   SimpleGrid,
   Skeleton,
   Stack,
   Table,
-  Tabs,
   Text,
-  TextInput,
   Title,
   VisuallyHidden,
 } from '@mantine/core';
 import { AreaChart } from '@mantine/charts';
 import '@mantine/charts/styles.layer.css';
-import { IconPlus, IconSearch, IconTrendingUp } from '@tabler/icons-react';
+import { IconPlus, IconTrendingUp } from '@tabler/icons-react';
 import { AppFrame, CONTENT_BREAKPOINTS, ICON_SIZE } from './shared/AppFrame';
 import {
   ALL_PRODUCTS,
   ATTENTION_COLOR,
   INQUIRIES,
-  isoDate,
+  LATE_DAYS,
+  lateDays,
   needsReorder,
-  NOW,
-  ORDER_STATUS,
   ORDERS,
-  STAFF,
   sum,
   yen,
   type Order,
-  type OrderStatus,
 } from './shared/data';
 import { OrderLink } from './shared/OrderLink';
 import { OrderMenu } from './shared/OrderMenu';
@@ -58,11 +51,11 @@ const meta = {
         component:
           '架空の販売管理サービスのダッシュボードです。\n\n' +
           '**目的と読み手**　受注・在庫・問い合わせを扱う社員が、サイドバーの「ホーム」から毎日くり返し開く画面です。今月の実績と、いま対応が要るものを開いてすぐに確かめ、対応する画面へ進むことを目的にしています。\n\n' +
-          '**情報構造**　受注・商品（在庫）・問い合わせの 3 つの対象を、それぞれの画面へ入る前の要約として扱います。主は最上段の 4 つの数字（今月の受注額と、対応が要る未発送の受注・発注が必要な品目・未対応の問い合わせの件数）で、受注の推移・品目ごとの在庫・最近の受注・問い合わせの内訳は、その数字の中身を示す従の情報です。受注は顧客と担当者に、商品は在庫数・発注点・適正在庫に結び付きます。\n\n' +
-          '**データパターン**　数字は 4 つで、金額は 7 桁、件数は 0〜2 桁です。受注の推移は 1 日 1 点で 7・31・90 日、在庫は全 12 品目（うち 4 品目が発注点割れ）のうち発注点に近い 5 品目、受注は 10 月 14 日〜31 日の 36 件（うち未発送 5 件、そのうち受注から 2 日以上は 2 件。金額は 1 件 ¥495〜¥171,325、顧客名は 3〜7 文字）を 8 件ずつ表示します。対応が要る件数は 0 になることがあり、そのときは「要発送」などの Badge を出さず、補足を「未発送の受注はありません。」のように替えます。状態は story『ダッシュボード』の 1 つにまとめ、その中に、集計中の部分（「今週の売れ筋」の読み込み中の表示）と、検索・絞り込みに当たる受注が無いとき（受注の表で操作すると出る「条件に合う受注はありません」）を含みます。画面全体の読み込み中と取得の失敗、件数が 0 のときの story はありません。\n\n' +
-          '**情報の流れ**　利用者はまず最上段の左端で今月の受注額をつかみ、続く 3 枚（未発送の受注、発注が必要な品目、未対応の問い合わせ）の件数から、今日対応が要るものがあるかを判断します。対応が要れば、そのカードのリンクから、受注一覧の未発送・発注が必要な品目・未対応の問い合わせの画面へ進んで対応します。どの品目や受注かをこの画面で先に確かめたいときは、下の在庫の残りと最近の受注を見ます。\n\n' +
+          '**情報構造**　受注・商品（在庫）・問い合わせの 3 つの対象を、それぞれの画面へ入る前の要約として扱います。主は最上段の 4 つの数字（今月の受注額と、対応が要る未発送の受注・発注が必要な品目・未対応の問い合わせの件数）で、受注の推移・品目ごとの在庫・最近の受注・問い合わせの内訳は、その数字の中身を示す従の情報です。最近の受注は前に開いてから入った受注の要約で、受注を探すことは受注一覧の画面に任せます。受注は顧客と担当者に、商品は在庫数・発注点・適正在庫に結び付きます。\n\n' +
+          '**データパターン**　数字は 4 つで、金額は 7 桁、件数は 0〜2 桁です。受注の推移は 1 日 1 点で 7・31・90 日、在庫は全 12 品目（うち 4 品目が発注点割れ）のうち発注点に近い 5 品目で、品目ごとに在庫数・発注点・適正在庫（2〜3 桁）を持ちます。受注は 10 月 14 日〜31 日の 36 件（うち未発送 5 件、そのうち受注から 2 日以上は 2 件。金額は 1 件 ¥495〜¥171,325、顧客名は 3〜7 文字）のうち、受注日が新しい 5 件を表示します。対応が要る件数は 0 になることがあり、そのときは「要発送」などの Badge を出さず、補足を「未発送の受注はありません。」のように替えます。状態は story『ダッシュボード』の 1 つにまとめ、その中に集計中の部分（「今週の売れ筋」の読み込み中の表示）を含みます。画面全体の読み込み中と取得の失敗、件数が 0 のときの story はありません。\n\n' +
+          '**情報の流れ**　利用者はまず最上段の左端で今月の受注額をつかみ、続く 3 枚（未発送の受注、発注が必要な品目、未対応の問い合わせ）の件数から、今日対応が要るものがあるかを判断します。対応が要れば、そのカードのリンクから、受注一覧の未発送・発注が必要な品目・未対応の問い合わせの画面へ進んで対応します。どの品目かをこの画面で先に確かめたいときは下の在庫の残りを、前に開いてから入った受注は最近の受注を見て、受注を探すときは最近の受注の下のリンクから受注一覧へ移ります。\n\n' +
           '**主役**　流れの起点で、判断の場でもある最上段の 4 つの数字です。対応が要る 3 つの件数を受注額と同じ段に並べ、件数が 1 以上のものにだけ色の Badge を付けて、数字を見渡した目が対応の要るカードに留まるようにしました。そのカードの下の端に、数字と同じ対象を名前にしたリンク（「未発送の受注を見る」「発注が必要な品目を見る」「未対応の問い合わせを見る」）を置き、判断した場所からそのまま対応へ進めるようにしています。スマホの幅では 4 枚を 1 列に並べたまま数字をラベルの右に上げ、4 つの数字とリンクが最初の 1 画面に収まるようにしました。2 列にすると受注額の 7 桁が数字の大きさのまま入らないためです。\n\n' +
-          '**抑えたもの・使わなかったもの**　カード全体はリンクにせず、行き先を名前にしたリンクを置きました。カード全体だと、読み上げでカードの文がすべてリンクの名前になり、行き先が伝わりにくいためです。対応の判断に使わない新規顧客の数は最上段に置かず、増えた受注額は良い知らせでも対応は要らないので枠線だけの Badge にし、どの問い合わせに対応するかを示さない問い合わせの内訳は、未対応の数字の近くに上げず下の段に置いています。最近の受注は要約なので、受注一覧の画面例とは状態のタブ（同じ 5 つの状態と件数、スマホの幅で 2 段に折り返す pills）・受注番号のリンク・行のメニュー・件数の表示の言い方・スマホの幅での 1 件ずつのまとまりだけを揃え、品目の列や並べ替えは持たせていません。タブの件数を一覧と揃えたのは、ここで見た件数が一覧に移っても同じであるためです。\n\n' +
+          '**抑えたもの・使わなかったもの**　カード全体はリンクにせず、行き先を名前にしたリンクを置きました。カード全体だと、読み上げでカードの文がすべてリンクの名前になり、行き先が伝わりにくいためです。対応の判断に使わない新規顧客の数は最上段に置かず、増えた受注額は良い知らせでも対応は要らないので枠線だけの Badge にし、どの問い合わせに対応するかを示さない問い合わせの内訳は、未対応の数字の近くに上げず下の段に置いています。最近の受注は新しい 5 件に絞り、状態のタブ・検索・絞り込み・ページ送りを持たせず、末尾に「受注一覧を見る」を置きました。ここで受注を探し始めると画面が受注一覧と同じ長さに伸び、下のカードが遠くなるうえ、対応が要る受注への入口は最上段のカードが既に担っているためです。受注一覧の画面例とは、受注番号のリンク・状態の Badge・行のメニュー・スマホの幅での 1 件ずつのまとまりを揃えています。在庫の残りは、棒を赤くする基準の発注点と、棒がいっぱいになる適正在庫を品目ごとに棒の下へ書き、補足には母数（全 12 品目）を書きました。\n\n' +
           '**目的が違えば変わるところ**　管理者が月に 1 度、前月と比べるために見る画面なら、対応を促す色とリンクよりも推移のグラフと前月比を主役にします。対応すべきものが受注の発送だけのサービスなら、最上段の数字よりも未発送の受注の一覧を最上段に置きます。',
       },
     },
@@ -128,11 +121,8 @@ const salesOfPeriod = (period: string) =>
     ? SALES.filter((point) => point.month === 10)
     : SALES.slice(period === 'week' ? -7 : -90);
 
-const DAY = 24 * 60 * 60 * 1000;
 const NOT_SHIPPED = ORDERS.filter((order) => order.status === 'notShipped');
-const NOT_SHIPPED_LATE = NOT_SHIPPED.filter(
-  (order) => Date.parse(NOW.date) - Date.parse(isoDate(order.date)) >= 2 * DAY,
-).length;
+const NOT_SHIPPED_LATE = NOT_SHIPPED.filter((order) => lateDays(order) !== undefined).length;
 
 // The count covers every product, as the product list and the stock screen do, not only the ones the card shows.
 const REORDER_COUNT = ALL_PRODUCTS.filter(needsReorder).length;
@@ -186,7 +176,7 @@ const STATS: Stat[] = [
     label: '未発送の受注',
     count: NOT_SHIPPED.length,
     attention: '要発送',
-    note: `${NOT_SHIPPED_LATE} 件は受注から 2 日以上です。`,
+    note: `${NOT_SHIPPED_LATE} 件は受注から ${LATE_DAYS} 日以上です。`,
     noneNote: '未発送の受注はありません。',
     link: '未発送の受注を見る',
   }),
@@ -208,18 +198,8 @@ const STATS: Stat[] = [
   }),
 ];
 
-type StatusTab = 'all' | OrderStatus;
-
-// The same states, order and counts as the order list's tabs, so a count read here is the one found there.
-const STATUS_TABS: { value: StatusTab; label: string }[] = [
-  { value: 'all', label: 'すべて' },
-  ...(['notShipped', 'paymentPending', 'shipped', 'cancelled'] as const).map((value) => ({
-    value,
-    label: ORDER_STATUS[value].label,
-  })),
-];
-
-const PAGE_SIZE = 8;
+// ORDERS is newest first.
+const RECENT_ORDERS = ORDERS.slice(0, 5);
 
 /*
  * The card itself is not a link: a whole-card link reads every line as its name and hides where it goes. A link
@@ -245,9 +225,11 @@ function StatCard({ stat }: { stat: Stat }) {
         {stat.note}
       </Text>
       {stat.link && (
-        <Anchor href="#" size="sm">
-          {stat.link}
-        </Anchor>
+        <Group>
+          <Anchor href="#" size="sm">
+            {stat.link}
+          </Anchor>
+        </Group>
       )}
     </Stack>
   );
@@ -306,8 +288,9 @@ function SalesCard() {
           aria-label="表示する期間"
         />
       </Group>
+      {/* As tall as the stock card beside it, whose rows name the reorder point and the target stock. */}
       <AreaChart
-        h={260}
+        h={300}
         data={data}
         dataKey="date"
         series={[{ name: 'amount', label: '受注額', color: 'var(--efoo-chart-1)' }]}
@@ -328,10 +311,10 @@ function StockCard() {
           在庫の残り
         </Title>
         <Text size="sm" c="dimmed">
-          発注点に近い {STOCK_ROWS.length} 品目の在庫数と適正在庫です。
+          全 {ALL_PRODUCTS.length} 品目のうち発注点に近い {STOCK_ROWS.length} 品目です。
         </Text>
       </Stack>
-      <Stack gap="md">
+      <Stack gap="sm">
         {STOCK_ROWS.map((item) => {
           const reorder = needsReorder(item);
           return (
@@ -341,8 +324,8 @@ function StockCard() {
                   <Text size="sm">{item.name}</Text>
                   {reorder && <Badge color={ATTENTION_COLOR}>要発注</Badge>}
                 </Group>
-                <Text size="sm" c="dimmed">
-                  {item.quantity} / {item.target} {item.unit}
+                <Text size="sm">
+                  {item.quantity} {item.unit}
                 </Text>
               </Group>
               <Progress
@@ -350,18 +333,19 @@ function StockCard() {
                 color={reorder ? ATTENTION_COLOR : undefined}
                 aria-label={`${item.name}の在庫 ${item.quantity} ${item.unit}（適正在庫 ${item.target} ${item.unit}、発注点 ${item.reorderPoint} ${item.unit}）`}
               />
+              {/*
+               * The reorder point is what turns a bar red, and the bar is full at the target stock, so both are named
+               * under it. A row of their own keeps the name, the badge and the stock on one line on a phone.
+               */}
+              <Text size="xs" c="dimmed">
+                発注点 {item.reorderPoint} {item.unit}・適正在庫 {item.target} {item.unit}
+              </Text>
             </Stack>
           );
         })}
       </Stack>
     </Card>
   );
-}
-
-interface OrderFilters {
-  query: string;
-  staff: string | null;
-  page: number;
 }
 
 function OrdersTable({ orders }: { orders: Order[] }) {
@@ -446,135 +430,39 @@ function OrdersStack({ orders }: { orders: Order[] }) {
   );
 }
 
-const matchesConditions = (order: Order, { query, staff }: OrderFilters) => {
-  const keyword = query.trim().toUpperCase();
-  return (
-    (!staff || order.staff === staff) &&
-    (keyword === '' || order.id.includes(keyword) || order.customer.name.includes(keyword))
-  );
-};
-
-function OrdersPanel({
-  orders,
-  filters,
-  onChange,
-}: {
-  orders: Order[];
-  filters: OrderFilters;
-  onChange: (next: Partial<OrderFilters>) => void;
-}) {
-  const { staff, page } = filters;
-  const totalPages = Math.max(1, Math.ceil(orders.length / PAGE_SIZE));
-  const rows = orders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-  const first = (page - 1) * PAGE_SIZE + 1;
-  const last = first + rows.length - 1;
-
-  return (
-    <>
-      <Group my="md" gap="sm" wrap="wrap">
-        <TextInput
-          flex="1 1 240px"
-          leftSection={<IconSearch size={ICON_SIZE} />}
-          placeholder="受注番号・顧客名で検索"
-          aria-label="受注を検索"
-          value={filters.query}
-          onChange={(event) => onChange({ query: event.currentTarget.value, page: 1 })}
-        />
-        <Select
-          flex="0 1 180px"
-          placeholder="担当者で絞り込み"
-          aria-label="担当者で絞り込み"
-          data={STAFF}
-          value={staff}
-          onChange={(value) => onChange({ staff: value, page: 1 })}
-          clearable
-        />
-      </Group>
-      {rows.length === 0 ? (
-        // A status region, so a screen reader hears that the conditions left nothing.
-        <Text size="sm" c="dimmed" ta="center" py="lg" role="status">
-          条件に合う受注はありません。
-        </Text>
-      ) : (
-        <>
-          <Stack visibleFrom="sm" gap={0}>
-            <OrdersTable orders={rows} />
-          </Stack>
-          <Stack hiddenFrom="sm" gap={0}>
-            <OrdersStack orders={rows} />
-          </Stack>
-          <Group justify="space-between" mt="md" gap="sm">
-            {/* A status region, so a screen reader hears the new count after each change of the conditions. */}
-            <Text size="sm" c="dimmed" role="status">
-              {orders.length} 件中 {first}〜{last} 件を表示
-            </Text>
-            <Pagination
-              total={totalPages}
-              value={page}
-              onChange={(next) => onChange({ page: next })}
-            />
-          </Group>
-        </>
-      )}
-    </>
-  );
-}
-
+/*
+ * The newest few orders, to see what came in since the last look. Finding an order is the order list's work, so the
+ * card has no search, filter or paging and ends in the link to that list; the stat cards above lead to the orders
+ * that need action.
+ */
 function OrdersCard() {
-  // The search and staff filter live outside the tabs so switching tabs keeps them.
-  const [tab, setTab] = useState<StatusTab>('all');
-  const [filters, setFilters] = useState<OrderFilters>({ query: '', staff: null, page: 1 });
-  const updateFilters = (next: Partial<OrderFilters>) =>
-    setFilters((current) => ({ ...current, ...next }));
-  // The tab counts follow the search and the staff filter, as on the order list.
-  const matching = ORDERS.filter((order) => matchesConditions(order, filters));
-  const ordersOf = (status: StatusTab) =>
-    status === 'all' ? matching : matching.filter((order) => order.status === status);
-
   return (
     <Card>
-      <Group justify="space-between" mb="md">
-        <Title order={2} size="h5">
-          最近の受注
-        </Title>
+      <Group justify="space-between" align="flex-start" mb="md">
+        <Stack gap={4}>
+          <Title order={2} size="h5">
+            最近の受注
+          </Title>
+          <Text size="sm" c="dimmed">
+            受注日が新しい {RECENT_ORDERS.length} 件です。
+          </Text>
+        </Stack>
         <Button variant="outline" leftSection={<IconPlus size={ICON_SIZE} />}>
           受注を登録
         </Button>
       </Group>
-      {/* Pills, as on the order list: on a phone they wrap into two rows and every count stays in view. */}
-      <Tabs
-        variant="pills"
-        value={tab}
-        onChange={(value) => {
-          setTab((value as StatusTab | null) ?? 'all');
-          updateFilters({ page: 1 });
-        }}
-        keepMounted={false}
-      >
-        <Tabs.List>
-          {STATUS_TABS.map((item) => {
-            const count = ordersOf(item.value).length;
-            const attention =
-              item.value !== 'all' && ORDER_STATUS[item.value].attention && count > 0;
-            return (
-              <Tabs.Tab
-                key={item.value}
-                value={item.value}
-                rightSection={
-                  <Badge color={attention ? ATTENTION_COLOR : undefined}>{count}</Badge>
-                }
-              >
-                {item.label}
-              </Tabs.Tab>
-            );
-          })}
-        </Tabs.List>
-        {STATUS_TABS.map((item) => (
-          <Tabs.Panel key={item.value} value={item.value}>
-            <OrdersPanel orders={ordersOf(item.value)} filters={filters} onChange={updateFilters} />
-          </Tabs.Panel>
-        ))}
-      </Tabs>
+      <Stack visibleFrom="sm" gap={0}>
+        <OrdersTable orders={RECENT_ORDERS} />
+      </Stack>
+      <Stack hiddenFrom="sm" gap={0}>
+        <OrdersStack orders={RECENT_ORDERS} />
+      </Stack>
+      {/* A group, so the link is as wide as its name and not the whole card. */}
+      <Group mt="md">
+        <Anchor href="#" size="sm">
+          受注一覧を見る
+        </Anchor>
+      </Group>
     </Card>
   );
 }
@@ -689,7 +577,7 @@ export const Dashboard: Story = {
     docs: {
       description: {
         story:
-          'データパターンのうち、10 月 31 日時点で読み込みが済み、対応が要る 3 つの件数がどれも 1 以上の状態です。集計の終わっていない「今週の売れ筋」だけを読み込み中の表示（Skeleton）にしてほかのカードは待たせずに見せ、最近の受注は検索・絞り込みに当たる受注が無くなると、表と件数の表示に替えてその旨を出します。',
+          'データパターンのうち、10 月 31 日時点で読み込みが済み、対応が要る 3 つの件数がどれも 1 以上の状態です。集計の終わっていない「今週の売れ筋」だけを読み込み中の表示（Skeleton）にして、ほかのカードは待たせずに見せています。',
       },
     },
   },

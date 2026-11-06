@@ -407,6 +407,18 @@ export const ORDERS: Order[] = Array.from({ length: 36 }, (_, index) => {
   };
 });
 
+// An unshipped order that has waited this many days or more is late.
+export const LATE_DAYS = 2;
+
+const DAY = 24 * 60 * 60 * 1000;
+
+/** Days an unshipped order has waited as of NOW, when that reaches LATE_DAYS; otherwise undefined. */
+export const lateDays = (order: Pick<Order, 'status' | 'date'>) => {
+  if (order.status !== 'notShipped') return undefined;
+  const days = Math.round((Date.parse(NOW.date) - Date.parse(isoDate(order.date))) / DAY);
+  return days >= LATE_DAYS ? days : undefined;
+};
+
 export const findOrder = (id: string) => ORDERS.find((order) => order.id === id);
 
 export const INQUIRIES = { total: 100, done: 62, inProgress: 24, open: 14, overdue: 3 };
