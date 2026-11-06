@@ -428,7 +428,12 @@ export const efooTheme: MantineThemeOverride = createTheme({
     }),
     ActionIcon: ActionIcon.extend({ classNames: { root: actionIconClasses.root } }),
     // variant="sticky-actions" draws a bar of actions kept at the bottom of the window; see affix.module.css.
-    Affix: Affix.extend({ classNames: { root: affixClasses.root } }),
+    // Mantine's default zIndex (200) is always written as --affix-z-index; without it the variable comes from a
+    // zIndex prop only, and affix.module.css holds the default for each variant.
+    Affix: Affix.extend({
+      classNames: { root: affixClasses.root },
+      defaultProps: { zIndex: undefined },
+    }),
     Alert: Alert.extend({
       classNames: (theme, props) => ({
         root: `${alertClasses.root} ${!props.color && !props.variant && theme.primaryColor === NEUTRAL_COLOR ? alertClasses.neutral : ''}`,

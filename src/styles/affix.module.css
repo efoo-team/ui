@@ -1,10 +1,16 @@
 @layer efoo {
+  /* The theme takes Affix's default zIndex off (theme.ts), so Mantine writes --affix-z-index only for a zIndex prop,
+     which wins over the default here: Mantine's own 200 (modal) for an Affix, and the one below for the bar. */
+  .root {
+    z-index: var(--affix-z-index, var(--mantine-z-index-modal));
+  }
+
   /* variant="sticky-actions": a bar of actions kept at the bottom of the window over the page, like a form's save bar.
      It stays under the header and the narrow-screen navbar (app) and above inputs, which stack their parts over
      plain positioned boxes. The strip under the bar is the page's background down to the window's edge, so content
      scrolling under the bar is cut at the bar's top edge and does not show through below it. */
   .root[data-variant='sticky-actions'] {
-    z-index: calc(var(--mantine-z-index-app) - 1);
+    z-index: var(--affix-z-index, calc(var(--mantine-z-index-app) - 1));
     padding-bottom: var(--mantine-spacing-md);
     background-color: var(--mantine-color-body);
   }
