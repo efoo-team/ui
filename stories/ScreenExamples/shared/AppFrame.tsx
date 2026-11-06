@@ -459,9 +459,10 @@ export function AppFrame({
       {/*
         On narrow screens the same sidebar opens in a Drawer, like shadcn/ui's mobile sidebar in a Sheet (18rem). The
         Drawer moves focus into it and keeps Tab there, closes on Escape and on the overlay, stops the page behind it
-        from scrolling and returns focus to the Burger. A link that moves to a screen closes it.
+        from scrolling and returns focus to the Burger. A link that moves to a screen closes it. variant="sidebar"
+        gives it the navbar's surface and inset.
       */}
-      <Drawer.Root opened={opened && wide === false} onClose={close} size={288}>
+      <Drawer.Root variant="sidebar" opened={opened && wide === false} onClose={close} size={288}>
         <Drawer.Overlay />
         <Drawer.Content aria-label="サイドバー">
           <Drawer.Body mih="100%" display="flex">

@@ -317,6 +317,8 @@ const [rail, setRail] = useState(false);
 
 組織の切り替えの起点は Mantine の静的な class（`mantine-Avatar-root`）で見分けるので、MantineProvider の `classNamesPrefix` を変えたり、`withStaticClasses={false}` にしたりすると、48px の行になりません。
 
+狭い幅では、広い幅と同じ navbar の中身を Drawer に入れて開きます。Drawer に `variant="sidebar"` を渡すと、theme が navbar と同じ面の色（`--efoo-color-sidebar`）と内側の余白（8px）を付けるので、同じ NavLink が幅によって別の見た目になりません。`padding` を渡すと、theme の余白より優先されます。
+
 ### shadcn/ui の variant との対応
 
 | shadcn/ui の variant | Mantine での指定           |

@@ -526,17 +526,20 @@ export const efooTheme: MantineThemeOverride = createTheme({
       classNames: { dropdown: popoverClasses.list },
       defaultProps: { transitionProps: overlayTransitionProps },
     }),
+    // variant="sidebar" holds a navbar on narrow screens with the navbar's surface and inset; see drawer.module.css.
     Drawer: Drawer.extend({
       classNames: (_theme, props) => ({
+        root: drawerClasses.root,
         inner: drawerClasses.inner,
-        content:
+        content: `${drawerClasses.content} ${
           props.position === 'right'
             ? drawerClasses.contentRight
             : props.position === 'top'
               ? drawerClasses.contentTop
               : props.position === 'bottom'
                 ? drawerClasses.contentBottom
-                : drawerClasses.contentLeft,
+                : drawerClasses.contentLeft
+        }`,
         header: drawerClasses.header,
         title: drawerClasses.title,
         body: drawerClasses.body,

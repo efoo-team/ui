@@ -45,4 +45,14 @@
   .close:hover {
     background-color: var(--mantine-color-default-hover);
   }
+
+  /* variant="sidebar": the navbar opened in a Drawer on narrow screens. It takes the navbar's surface and its 8px
+     inset (app-shell.module.css), so the same links look the same at every width. A padding prop still wins. */
+  .root[data-variant='sidebar'] {
+    --mb-padding: var(--mantine-spacing-xs);
+  }
+
+  .root[data-variant='sidebar'] :is(.content, .header) {
+    background-color: var(--efoo-color-sidebar, var(--mantine-color-body));
+  }
 }
