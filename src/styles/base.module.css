@@ -37,27 +37,21 @@
   }
 }
 
-/* Japanese text wraps between phrases (文節), not in the middle of a word such as まとめ／て or くださ／い, in headings,
-   buttons, labels and paragraphs alike: every element inherits it from the root. overflow-wrap: break-word breaks a
-   phrase longer than a line inside it, and leaves the longest phrase as the narrowest the text can be, so a short
-   label beside a long sentence in a row that does not wrap keeps its width (overflow-wrap: anywhere would let it
-   shrink to one character). A phrase longer than the width a flex item, a start-aligned Stack child or a grid's auto
-   column can take (a long company name in katakana in a Group) still overflows; the service sets
-   overflow-wrap: anywhere on that element or on a container around it.
-   Table cells and everything in them go back to the browser's wrapping, so a column takes the width of a figure or a
-   code instead of the longest phrase, and a long name no longer widens a 280px table to 623px. Mantine sets
-   overflow-wrap: break-word on an input's label, description and error itself; it keeps that in a cell, and it does
-   not widen the column.
-   The rules sit in a layer under every Mantine rule, and both properties are inherited, so what a part or a service
-   sets on an element or a container reaches everything inside it. The browser wraps between phrases only for content
-   whose language is known to be Japanese (<html lang="ja">), and only Chrome and Edge 119+ do it; Safari and Firefox
-   wrap as before. */
+/* A sublayer of mantine sits under every Mantine rule, so what a Mantine part or a service sets on an element wins
+   over these defaults. */
 @layer mantine.efoo-base {
+  /* Japanese text wraps between phrases (文節), not in the middle of a word such as まとめ／て, and a phrase longer than
+     a line breaks inside it; break-word keeps the longest phrase as the narrowest the text can be. Both properties
+     are inherited, so every element takes them from the root and what is set on a container reaches everything in
+     it. The browser wraps between phrases only in content whose language is Japanese (<html lang="ja">), and only
+     Chrome and Edge 119+ do it. */
   :root {
     word-break: auto-phrase;
     overflow-wrap: break-word;
   }
 
+  /* Table cells and what they hold go back to the browser's wrapping, so a column takes the width of a figure or a
+     code instead of the longest phrase. */
   :where(th, td) {
     word-break: normal;
     overflow-wrap: normal;
@@ -65,8 +59,8 @@
 
   /* An element that only a script focuses (tabIndex={-1}: a page heading that takes focus when the control holding it
      goes away, a section reached from a link) shows the theme's ring instead of the browser's outline, and only when
-     the focus came from the keyboard (:focus-visible), like the theme's controls. The rule sits in a layer under every
-     Mantine rule, so the parts that draw their own focus or none at all (dialogs, menus, Paper, tree items) keep it.
+     the focus came from the keyboard (:focus-visible), like the theme's controls. The parts that draw their own focus
+     or none at all (dialogs, menus, Paper, tree items) keep it, as the layer is under theirs.
      The ring is an outline drawn where --efoo-focus-ring's shadow is, so it leaves a card's own shadow in place, with
      the controls' corners on an element that has none of its own (a heading is as tall as a button). */
   :where([tabindex='-1']):focus-visible {
