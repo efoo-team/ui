@@ -26,6 +26,7 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
   IconArrowLeft,
+  IconCash,
   IconCopy,
   IconDotsVertical,
   IconEdit,
@@ -43,6 +44,8 @@ import {
   isCancellable,
   monthDay,
   NOW,
+  ORGANIZATIONS,
+  PAYMENT_METHODS,
   TAX_RATE,
   yen,
   type Order,
@@ -64,11 +67,11 @@ const meta = {
           '架空の販売管理サービスの、受注 1 件の詳細の画面です。\n\n' +
           '**目的と読み手**　受注の担当者が、一覧やダッシュボードから未発送の受注を開き、中身と届け先を確かめて発送を記録する画面です。1 日に何度も開くので、毎日くり返し使う画面として、見慣れた配置と少ない色で組んでいます。\n\n' +
           '**情報構造**　主は 1 件の受注（番号・状態）で、明細・届け先・支払い・履歴はその受注に従います。明細は商品（在庫）に、届け先と請求先は顧客につながっていて、この画面では発送の判断に要る在庫と連絡先だけを受注の側に引いて見せます。\n\n' +
-          '**データパターン**　明細は 1〜3 行（商品名は 9〜15 文字）、履歴は 1〜3 件、住所は 13〜26 文字で狭い幅では折り返します。希望の着日は無い受注もあり、そのときは「指定なし」と出します。状態は、未発送の受注（story『受注の詳細』。「発送を記録」を押すと発送済みに変わります）、在庫が足りない明細（この受注には無く、明細の行に印を出す作りだけを持ちます）、読み込み中（story『読み込み中』）、受注が見つからない（story『受注が見つからないとき』）です。\n\n' +
+          '**データパターン**　明細は 1〜3 行（商品名は 9〜15 文字）、履歴は 1〜3 件、住所は 13〜26 文字で狭い幅では折り返します。希望の着日は無い受注もあり、そのときは「指定なし」と出します。状態は、在庫も支払いも発送を止めない未発送の受注（story『受注の詳細』。「発送を記録」を押すと発送済みに変わります）、銀行振込の入金を待っている受注（story『入金を待っているとき』。「入金を記録」を押すと未発送に変わります）、在庫が足りない明細がある受注（story『在庫が足りないとき』）、読み込み中（story『読み込み中』）、受注が見つからない（story『受注が見つからないとき』）です。\n\n' +
           '**情報の流れ**　担当者は、まずこの受注が何で今どの状態か（番号・状態・顧客）を知り、次に何をいくつ送り在庫が足りるか（明細）、いつまでにどこへ送るか（希望の着日・届け先）、支払いが発送を止めないか（支払い）を確かめ、発送を記録します。履歴は、ほかの人が先に手を付けていないかを確かめたいときにだけ見ます。\n\n' +
-          '**主役**　流れの最初に知る状態と、最後にする操作です。状態の Badge を受注番号の横に置き、未発送の受注では「発送を記録」だけを塗りのボタンにして見出しの右に置きました。記録すると Badge と履歴が変わり、塗りのボタンは消えます。本文は流れの順に、明細を左の広い列に、届け先（希望の着日を先頭）・支払い・履歴を右の列に上から並べ、狭い幅では同じ順で縦に積みます。\n\n' +
-          '**抑えたもの・使わなかったもの**　色は未発送の Badge と、在庫が足りない明細の印にだけ使います。編集・複製・キャンセルはこの場面ではまれな操作なので「その他の操作」のメニューに収め、納品書の印刷は枠線のボタンにしました。金額は明細の下の合計に 1 か所だけ置き、見出しにはくり返していません。明細の表は 3 列にして、単価を金額の下に、在庫を商品の下に添え、スマホの幅でも横に送らずに読めるようにしました。\n\n' +
-          '**目的が違えば変わるところ**　入金待ちの受注なら、主な操作は「入金を記録」に変わります。経理の担当者が請求を確かめる画面なら、支払いと金額を主役にして左の列に置きます。明細が数十行になる受注なら、明細を別のタブか別の画面に分け、この画面には品目の数と合計だけを残します。スマホで確かめてから操作するのが主な使い方なら、主な操作を画面の下端に固定します。',
+          '**主役**　流れの最初に知る状態と、最後にする操作です。状態の Badge を受注番号の横に置き、塗りのボタンは受注の状態の次の一手（未発送なら「発送を記録」、入金待ちなら「入金を記録」）だけにして見出しの右に置きました。発送できるかの答えは、明細の Card の補足（在庫が足りるか）と支払いの Card の補足（入金を待つか）に文で書き、読み手が在庫の数と数量を見比べたり支払い方法から導いたりしなくて済むようにしています。在庫が足りないときは「発送を記録」を同じ位置のまま押せなくし、そのすぐ下の明細の Card で理由を示します。\n\n' +
+          '**抑えたもの・使わなかったもの**　色は未発送の Badge と、在庫が足りない明細の印にだけ使います。在庫が発注点を下回っている商品（A4 コピー用紙など）の「要発注」は、ダッシュボードと商品の画面では出しますが、ここでは出しません。発注はこの画面の読み手の仕事ではなく、この受注を出せるかは受注の数量と在庫で決まるので、出せる明細に印を付けると在庫不足の印が埋もれるためです。編集・複製・キャンセルはこの場面ではまれな操作なので「その他の操作」のメニューに収め、納品書の印刷は枠線のボタンにしました。金額は明細の下の合計に 1 か所だけ置き、明細の表は 3 列にして、単価を金額の下に、在庫を商品の下に添え、スマホの幅でも横に送らずに読めるようにしました。\n\n' +
+          '**目的が違えば変わるところ**　在庫のある品目だけを先に送る分割の発送を扱うなら、在庫が足りないときにも「発送を記録」を押せるようにし、送る数量を明細ごとに入れる欄を発送の記録に足します。経理の担当者が請求を確かめる画面なら、支払いと金額を主役にして左の列に置きます。明細が数十行になる受注なら、明細を別のタブか別の画面に分け、この画面には品目の数と合計だけを残します。スマホで確かめてから操作するのが主な使い方なら、主な操作を画面の下端に固定します。',
       },
     },
   },
@@ -83,6 +86,12 @@ type Story = StoryObj<typeof meta>;
 const ORDER_ID = 'SO-010240';
 // Two digits of ORDER_ID swapped: the most common way to land on an order that does not exist.
 const MISSING_ORDER_ID = 'SO-010420';
+// An order waiting for its bank transfer, and the one whose ballpoint pens are short in stock.
+const PAYMENT_PENDING_ORDER_ID = 'SO-010239';
+const SHORT_STOCK_ORDER_ID = 'SO-010228';
+
+// The organization AppFrame opens with, the one whose orders the screen looked in.
+const ORGANIZATION = ORGANIZATIONS[0]!;
 
 const DELIVERY_REQUESTS: Record<string, string> = { [ORDER_ID]: '11 月 4 日（水）午前中' };
 
@@ -99,8 +108,51 @@ interface ShipmentValues {
 const SHIPMENT_FIELDS = ['shippedOn', 'carrier', 'trackingNumber'] as const;
 
 function validateTrackingNumber(value: string) {
-  if (value.trim() === '') return '送り状番号を入力してください';
-  return /^[0-9-]+$/.test(value.trim()) ? null : '送り状番号は数字とハイフンで入力してください';
+  if (value.trim() === '') return '送り状番号を入力してください。';
+  return /^[0-9-]+$/.test(value.trim()) ? null : '送り状番号は数字とハイフンで入力してください。';
+}
+
+// An order takes stock only when it ships, so stock is checked until then.
+const isUnshipped = (order: Order) =>
+  order.status === 'notShipped' || order.status === 'paymentPending';
+
+const shortLines = (order: Order) =>
+  isUnshipped(order) ? order.lines.filter((line) => line.product.quantity < line.quantity) : [];
+
+// The lines card answers "is there enough stock" in its description, before the person compares each row.
+function stockNote(order: Order) {
+  if (!isUnshipped(order)) return `${order.lines.length} 品目`;
+  const short = shortLines(order);
+  if (short.length > 0) {
+    const missing = short
+      .map(
+        ({ product, quantity }) =>
+          `${product.name}が ${quantity - product.quantity} ${product.unit}`,
+      )
+      .join('、');
+    return `${missing}足りないため、入荷するまで発送できません。`;
+  }
+  return order.lines.length === 1
+    ? '在庫が足りています。'
+    : `在庫は ${order.lines.length} 品目とも足りています。`;
+}
+
+// What each payment method means for shipping: the payment card answers whether the order may leave now.
+const PAYMENT_NOTES: Record<string, string> = {
+  [PAYMENT_METHODS[0]!]: '後払いのため、入金を待たずに発送できます。',
+  [PAYMENT_METHODS[1]!]: '入金を確認したため、発送できます。',
+  [PAYMENT_METHODS[2]!]: '受注のときにカードの決済が済んでいるため、発送できます。',
+};
+
+function paymentNote(order: Order) {
+  if (order.status === 'paymentPending') return '前払いのため、入金を記録するまで発送できません。';
+  return order.status === 'notShipped' ? PAYMENT_NOTES[order.payment] : undefined;
+}
+
+// '2026-10-31' -> '10 月 31 日'.
+function isoMonthDay(date: string) {
+  const [, month, day] = date.split('-');
+  return `${Number(month)} 月 ${Number(day)} 日`;
 }
 
 function ShipmentModal({
@@ -118,8 +170,8 @@ function ShipmentModal({
     mode: 'uncontrolled',
     initialValues: { shippedOn: NOW.date, carrier: null, trackingNumber: '' },
     validate: {
-      shippedOn: (value) => (value ? null : '発送日を選択してください'),
-      carrier: (value) => (value ? null : '配送業者を選択してください'),
+      shippedOn: (value) => (value ? null : '発送日を選択してください。'),
+      carrier: (value) => (value ? null : '配送業者を選択してください。'),
       trackingNumber: validateTrackingNumber,
     },
     validateInputOnBlur: true,
@@ -173,6 +225,57 @@ function ShipmentModal({
   );
 }
 
+interface PaymentValues {
+  paidOn: string | null;
+}
+
+function PaymentModal({
+  order,
+  opened,
+  onClose,
+  onSubmit,
+}: {
+  order: Order;
+  opened: boolean;
+  onClose: () => void;
+  onSubmit: (values: PaymentValues) => void;
+}) {
+  const form = useForm<PaymentValues>({
+    mode: 'uncontrolled',
+    initialValues: { paidOn: NOW.date },
+    validate: { paidOn: (value) => (value ? null : '入金日を選択してください。') },
+    validateInputOnBlur: true,
+  });
+
+  return (
+    <Modal opened={opened} onClose={onClose} title="入金を記録">
+      <form
+        noValidate
+        onSubmit={form.onSubmit(onSubmit, () => form.getInputNode('paidOn')?.focus())}
+      >
+        <Stack gap="md">
+          <Text size="sm" c="dimmed">
+            {order.id}（{order.customer.name}）の {yen(order.amount)}{' '}
+            の振込を記録します。記録すると発送できるようになります。
+          </Text>
+          <DateInput
+            label="入金日"
+            required
+            key={form.key('paidOn')}
+            {...form.getInputProps('paidOn')}
+          />
+          <Group justify="flex-end" gap="sm">
+            <Button variant="default" onClick={onClose}>
+              戻る
+            </Button>
+            <Button type="submit">入金済みにする</Button>
+          </Group>
+        </Stack>
+      </form>
+    </Modal>
+  );
+}
+
 function CancelModal({
   order,
   opened,
@@ -207,10 +310,12 @@ function CancelModal({
 function OrderActions({
   order,
   onShip,
+  onRecordPayment,
   onCancel,
 }: {
   order: Order;
   onShip: () => void;
+  onRecordPayment: () => void;
   onCancel: () => void;
 }) {
   return (
@@ -219,14 +324,25 @@ function OrderActions({
         納品書を印刷
       </Button>
       {/* The one filled button is the next step for the order's state; a shipped order has none. */}
+      {order.status === 'paymentPending' && (
+        <Button leftSection={<IconCash size={ICON_SIZE} />} onClick={onRecordPayment}>
+          入金を記録
+        </Button>
+      )}
+      {/* Short stock keeps the button where the person expects it, unpressable; the lines card right below says why. */}
       {order.status === 'notShipped' && (
-        <Button leftSection={<IconTruckDelivery size={ICON_SIZE} />} onClick={onShip}>
+        <Button
+          leftSection={<IconTruckDelivery size={ICON_SIZE} />}
+          onClick={onShip}
+          disabled={shortLines(order).length > 0}
+        >
           発送を記録
         </Button>
       )}
       <Menu position="bottom-end" width={200}>
+        {/* The default size is a Button's height, so the row of actions lines up. */}
         <Menu.Target>
-          <ActionIcon variant="default" size="lg" aria-label="その他の操作">
+          <ActionIcon variant="default" aria-label="その他の操作">
             <IconDotsVertical size={ICON_SIZE} />
           </ActionIcon>
         </Menu.Target>
@@ -255,7 +371,7 @@ function OrderActions({
 // the product, where the person checking whether the order can ship looks.
 function LinesCard({ order }: { order: Order }) {
   return (
-    <SectionCard title="明細" description={`${order.lines.length} 品目`}>
+    <SectionCard title="明細" description={stockNote(order)}>
       <Table>
         <Table.Thead>
           <Table.Tr>
@@ -266,7 +382,7 @@ function LinesCard({ order }: { order: Order }) {
         </Table.Thead>
         <Table.Tbody>
           {order.lines.map(({ product, quantity, unitPrice }) => {
-            const short = order.status === 'notShipped' && product.quantity < quantity;
+            const short = isUnshipped(order) && product.quantity < quantity;
             return (
               <Table.Tr key={product.code}>
                 <Table.Td>
@@ -280,9 +396,8 @@ function LinesCard({ order }: { order: Order }) {
                     </Text>
                   </Stack>
                 </Table.Td>
-                <Table.Td ta="right">
-                  {quantity} {product.unit}
-                </Table.Td>
+                {/* A no-break space keeps a figure with its unit when a narrow column wraps. */}
+                <Table.Td ta="right">{`${quantity}\u00a0${product.unit}`}</Table.Td>
                 <Table.Td ta="right">
                   <Stack gap={2}>
                     <Text size="sm">{yen(unitPrice * quantity)}</Text>
@@ -366,7 +481,7 @@ function ShipToCard({ order }: { order: Order }) {
 
 function PaymentCard({ order }: { order: Order }) {
   return (
-    <SectionCard title="支払い">
+    <SectionCard title="支払い" description={paymentNote(order)}>
       <DataList labelWidth={96}>
         <DataList.Item>
           <DataList.ItemLabel>支払い方法</DataList.ItemLabel>
@@ -411,6 +526,7 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
   // The screen keeps its own copy, so recording a shipment or a cancellation changes what it shows.
   const [order, setOrder] = useState(initialOrder);
   const [shipOpened, setShipOpened] = useState(false);
+  const [paymentOpened, setPaymentOpened] = useState(false);
   const [cancelOpened, setCancelOpened] = useState(false);
 
   const addEvent = (status: Order['status'], event: Omit<OrderEvent, 'at' | 'by'>) =>
@@ -426,6 +542,15 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
     notifications.show({
       title: '発送を記録しました',
       message: `${order.id} を発送済みにしました。`,
+    });
+  };
+
+  const recordPayment = ({ paidOn }: PaymentValues) => {
+    addEvent('notShipped', { label: `入金を確認（${isoMonthDay(paidOn ?? NOW.date)}の振込）` });
+    setPaymentOpened(false);
+    notifications.show({
+      title: '入金を記録しました',
+      message: `${order.id} を発送できるようになりました。`,
     });
   };
 
@@ -457,6 +582,7 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
           <OrderActions
             order={order}
             onShip={() => setShipOpened(true)}
+            onRecordPayment={() => setPaymentOpened(true)}
             onCancel={() => setCancelOpened(true)}
           />
         </Group>
@@ -478,6 +604,12 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
         opened={shipOpened}
         onClose={() => setShipOpened(false)}
         onSubmit={ship}
+      />
+      <PaymentModal
+        order={order}
+        opened={paymentOpened}
+        onClose={() => setPaymentOpened(false)}
+        onSubmit={recordPayment}
       />
       <CancelModal
         order={order}
@@ -517,10 +649,11 @@ function LoadingDetail({ id }: { id: string }) {
             </Group>
             <Skeleton height={14} my={3} width={260} maw="100%" />
           </Stack>
+          {/* The sizes of 納品書を印刷, 発送を記録 and その他の操作, so the buttons do not move when they arrive. */}
           <Group gap="sm" wrap="nowrap">
-            <Skeleton height={36} width={136} />
-            <Skeleton height={36} width={124} />
-            <Skeleton height={36} width={36} />
+            <Skeleton height={32} width={118} />
+            <Skeleton height={32} width={105} />
+            <Skeleton height={32} width={32} />
           </Group>
         </Group>
       </Stack>
@@ -528,6 +661,8 @@ function LoadingDetail({ id }: { id: string }) {
         <Grid.Col span={{ base: 12, lg: 8 }}>
           <SectionCard title="明細">
             <Stack gap="md">
+              {/* The line on whether the stock is enough, which the loaded card puts under its title. */}
+              <Skeleton height={14} width="45%" />
               {[0, 1, 2].map((row) => (
                 <Group key={row} justify="space-between" wrap="nowrap" gap="md">
                   <Stack gap={6} flex={1}>
@@ -548,7 +683,8 @@ function LoadingDetail({ id }: { id: string }) {
         <Grid.Col span={{ base: 12, lg: 4 }}>
           <Stack gap="md">
             <SkeletonCard title="お届け先" rows={5} />
-            <SkeletonCard title="支払い" rows={3} />
+            {/* Three items and the line on whether the payment lets the order ship. */}
+            <SkeletonCard title="支払い" rows={4} />
             <SkeletonCard title="履歴" rows={2} />
           </Stack>
         </Grid.Col>
@@ -557,22 +693,33 @@ function LoadingDetail({ id }: { id: string }) {
   );
 }
 
+// The heading keeps the number that was opened, so a mistyped number shows, and names the organization looked in.
 function NotFoundContent({ id }: { id: string }) {
   return (
-    <Card>
-      <EmptyState withIndicatorBackground>
-        <EmptyState.Indicator>
-          <IconFileSearch />
-        </EmptyState.Indicator>
-        <EmptyState.Title order={1}>{id} の受注は見つかりません</EmptyState.Title>
-        <EmptyState.Description>
-          受注番号が誤っているか、ほかの組織の受注である可能性があります。受注一覧で探すか、サイドバーの組織名から組織を切り替えてください。
-        </EmptyState.Description>
-        <EmptyState.Actions>
-          <Button leftSection={<IconArrowLeft size={ICON_SIZE} />}>受注一覧に戻る</Button>
-        </EmptyState.Actions>
-      </EmptyState>
-    </Card>
+    <Stack gap="lg">
+      <Stack gap={4}>
+        <Title order={1} size="h3">
+          {id}
+        </Title>
+        <Text size="sm" c="dimmed">
+          {ORGANIZATION.name}の受注に、この受注番号はありません。
+        </Text>
+      </Stack>
+      <Card>
+        <EmptyState withIndicatorBackground>
+          <EmptyState.Indicator>
+            <IconFileSearch />
+          </EmptyState.Indicator>
+          <EmptyState.Title order={2}>受注が見つかりません</EmptyState.Title>
+          <EmptyState.Description>
+            受注番号が誤っているか、ほかの組織の受注である可能性があります。受注一覧で探すか、組織を切り替えてから開き直してください。
+          </EmptyState.Description>
+          <EmptyState.Actions>
+            <Button leftSection={<IconArrowLeft size={ICON_SIZE} />}>受注一覧に戻る</Button>
+          </EmptyState.Actions>
+        </EmptyState>
+      </Card>
+    </Stack>
   );
 }
 
@@ -583,7 +730,12 @@ function OrderDetailPage({ id, state }: { id: string; state?: 'loading' }) {
   else if (order) content = <OrderDetail initialOrder={order} />;
   else content = <NotFoundContent id={id} />;
   return (
-    <AppFrame parent="受注" page="受注一覧" breadcrumbs={[...LIST_BREADCRUMBS, id]}>
+    <AppFrame
+      parent="受注"
+      page="受注一覧"
+      breadcrumbs={[...LIST_BREADCRUMBS, id]}
+      defaultOrganization={ORGANIZATION}
+    >
       {content}
     </AppFrame>
   );
@@ -600,6 +752,32 @@ export const Detail: Story = {
     },
   },
   render: () => <OrderDetailPage id={ORDER_ID} />,
+};
+
+export const PaymentPending: Story = {
+  name: '入金を待っているとき',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'データパターンの「入金待ち」（銀行振込の前払い、明細 2 行、希望の着日なし）です。支払いの Card が入金まで発送できないことを答え、塗りのボタンは「発送を記録」の代わりに「入金を記録」になります。入金日を入れて記録すると未発送に変わり、「発送を記録」が出ます。',
+      },
+    },
+  },
+  render: () => <OrderDetailPage id={PAYMENT_PENDING_ORDER_ID} />,
+};
+
+export const ShortStock: Story = {
+  name: '在庫が足りないとき',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'データパターンの「在庫が足りない明細がある」（明細 3 行のうち 1 行、後払い）です。足りない行に在庫不足の印を出し、明細の Card の補足に何がいくつ足りないかと入荷まで発送できないことを書きます。「発送を記録」は同じ位置のまま押せない状態にしました。',
+      },
+    },
+  },
+  render: () => <OrderDetailPage id={SHORT_STOCK_ORDER_ID} />,
 };
 
 export const Loading: Story = {
@@ -621,7 +799,7 @@ export const NotFound: Story = {
     docs: {
       description: {
         story:
-          'データパターンの「受注が見つからない」です。開いた受注番号を見出しに出して打ち間違いに気づけるようにし、見つからない理由として考えられる 2 つ（番号の誤り、ほかの組織の受注）と、次の行き先を示します。操作は一覧へ戻るボタン 1 つにし、狭い幅でも同じボタンが戻る道になるので、画面上部の戻るリンクは出しません。',
+          'データパターンの「受注が見つからない」です。ほかの状態と同じページの見出しに開いた受注番号と探した組織の名前を出して打ち間違いに気づけるようにし、Card に考えられる理由 2 つ（番号の誤り、ほかの組織の受注）と次の行き先を示します。組織の切り替えは幅によってサイドバーの表示が変わるので場所を言わずに操作だけを案内し、一覧へ戻るボタンが狭い幅でも戻る道になるので、画面上部の戻るリンクは出しません。',
       },
     },
   },
