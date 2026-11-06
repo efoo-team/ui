@@ -33,13 +33,24 @@
   }
 }
 
-/* Japanese text wraps between phrases (文節), not in the middle of a word such as まとめ／て or くださ／い, in headings,
-   buttons, labels and paragraphs alike. Every element inherits it from the root, in a layer under every Mantine rule,
-   so a part or a service can set its own word-break. The browser does this only for content whose language is
-   known to be Japanese (<html lang="ja">), and only Chrome and Edge 119+ do it; Safari and Firefox wrap as before. */
+/* Japanese text in headings, labels, buttons, paragraphs and the terms and values of a definition list wraps between
+   phrases (文節), not in the middle of a word such as まとめ／て or くださ／い. A table column or a flex item takes the
+   longest phrase as the narrowest it can be, so a long name such as a company name in katakana widened a 280px
+   table to 623px and pushed a flex row past its box. overflow-wrap: anywhere lets such a phrase break inside
+   and counts those breaks in that narrowest width, while a line still breaks between phrases first. Table cells keep
+   the browser's wrapping, so a figure or a code in a column stays whole and the column takes its width as before.
+   The rules sit in a layer under every Mantine rule, so a part or a service can set its own. The browser wraps
+   between phrases only for content whose language is known to be Japanese (<html lang="ja">), and only Chrome and
+   Edge 119+ do it; Safari and Firefox wrap as before. */
 @layer mantine.efoo-base {
-  :root {
+  :where(h1, h2, h3, h4, h5, h6, p, label, legend, dt, dd, button) {
     word-break: auto-phrase;
+    overflow-wrap: anywhere;
+  }
+
+  :where(th, td) :where(h1, h2, h3, h4, h5, h6, p, label, legend, dt, dd, button) {
+    word-break: normal;
+    overflow-wrap: normal;
   }
 }
 

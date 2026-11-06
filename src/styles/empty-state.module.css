@@ -15,9 +15,12 @@
     gap: calc(var(--empty-state-gap) * 2);
   }
 
+  /* Without an order the title is a div, so it takes the phrase wrapping of headings here (base.module.css). */
   .title {
     font-weight: var(--mantine-font-weight-medium);
     line-height: var(--mantine-line-height-sm);
+    word-break: auto-phrase;
+    overflow-wrap: anywhere;
   }
 
   .indicator[data-with-background] {
