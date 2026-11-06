@@ -48,7 +48,7 @@ import '@efoo/ui/styles.css';
 
 Mantine の CSS は `styles.css` ではなく `styles.layer.css` を読み込みます。パッケージの CSS は `@layer efoo` に入っており、`@layer mantine` の後に宣言されるため、層なしの `@mantine/core/styles.css` と一緒に使うと、パッケージの規則がすべて Mantine に負けて効きません。`styles.css` と `styles.layer.css` を両方読み込むこともしないでください。
 
-パッケージの CSS は読み込み順に関係なく Mantine の CSS に勝ちます。サービス側の指定との優先順位は次のとおりです。
+パッケージの CSS は読み込み順に関係なく Mantine の CSS に勝ちます。ただし、日本語の折り返し（`:root` と `th`・`td` の `word-break`・`overflow-wrap`）と、`tabindex="-1"` の要素の focus の輪郭は、Mantine の layer の中の下位の層（`@layer mantine.efoo-base`）に入っているため、Mantine の規則より弱く、Mantine が同じ property を指定した要素では Mantine の値になります。サービス側の指定との優先順位は次のとおりです。
 
 - Mantine の style props（`mt`・`c` など）、`style`、`styles` は、inline style か layer に入らない `<style>` として出力されるため、通常はパッケージの CSS に勝ちます。日付の前後ボタンのアイコン寸法は、Mantine の inline style に対して `!important` を使っています。
 - サービス側で書く layer に入らない CSS も、パッケージの CSS に勝ちます。詳細度を気にせずに調整できます。ただし Notification の緩急は例外です。パッケージの CSS が `!important` で差し替えているため、layer に入らない CSS や、efoo より後に宣言した layer からは上書きできません。戻すには、サービスの theme で `components.Notifications.classNames.notification` を別の class に差し替えます。
@@ -271,95 +271,50 @@ Popover の中で操作させる場合は、Escape で閉じられるように `
 
 ### サイドメニュー
 
-AppShell の navbar に NavLink を並べると、shadcn/ui の sidebar と同じ見た目になります。入れ子は NavLink の `children` に子の NavLink を渡すと、左の線と字下げつきで開閉します。`leftSection` に Avatar を置いた NavLink は組織の切り替えの起点（高さ 48px）になるので、`Menu.Target` で包みます。
+AppShell の navbar に NavLink を並べると、shadcn/ui の sidebar と同じ見た目になります。コード例は `stories/ScreenExamples/shared/AppFrame.tsx` です（`@efoo/ui` を入れたリポジトリでは `node_modules/@efoo/ui/stories/ScreenExamples/shared/AppFrame.tsx`）。サービスが守る規則は次のとおりで、AppFrame.tsx の実装とコメントに基づきます。
 
-アイコンだけの帯（rail）にするときは、`navbar.width` に 48 を渡し、`AppShell.Navbar` に `mod={{ rail }}`（`data-rail` が付く）を渡します。navbar の余白は theme が持つので、`p` は渡しません（渡すと theme の余白より優先され、開閉でアイコンの位置がずれます）。navbar の中は、上から組織の切り替え・リンク・設定を `AppShell.Section` に分け、リンクの Section を `grow component={ScrollArea}` にします。theme は余白をスクロールする領域の内側（各 Section と ScrollArea の中身）に置くので、focus の輪郭が切れません。theme は navbar の幅に合わせて NavLink を帯の中央の 32px のアイコンに畳みます。名前と説明は右端で切れていき、畳み終わると隠れます。chevron や Badge を置いた右の section は畳み始めに隠れます。子の項目は幅と同時に高さが 0 へ縮みながら薄くなるので、下の項目は幅に合わせて少しずつ上がります。広げるときは逆に、子の項目の高さと、右の section・子の項目の不透明度が幅に合わせて戻ります（`interpolate-size` に対応していないブラウザでは、子の項目は開閉の始まりに一度に抜け、戻ります）。rail ではアイコンしか見えないので、NavLink には `aria-label` で名前を渡し、Tooltip で名前を示します（Mantine の Tooltip は名前を付けません）。子を持つ項目は、rail では子が見えないので、押すとサイドバーを広げてその項目の子を開きます（shadcn/ui の sidebar-07 と同じ）。子を持つ NavLink は押すと自分で子の開閉を反転させるので、`opened` と `onChange` で開閉を持ち、rail のときの `onChange` を「広げて、その項目を開く」に置き換えます（クリック・Enter・Space のどれも `onChange` に届きます）。rail では子が見えないので、`aria-expanded` は rail のとき false にし、rail のときは今いる画面を子に持つ項目に `active` を渡して現在地を示します。開いた帯と rail で同じ NavLink を使い続けます（作り直すと畳む最初のフレームで子の行が消えます）。Menu を開く項目（組織の切り替え）は、`Menu` の中に `Tooltip`、その中に `Menu.Target` と NavLink を置きます。Tooltip が hover と focus の受け口を Menu.Target に渡し、Menu.Target がそれと `aria-haspopup`・`aria-expanded`・`aria-controls` を NavLink に付けます（Tooltip を Menu.Target の内側に置くと aria 属性が Tooltip に付き、`target` で別に置くと focus で出ません）。Menu の開閉を `opened` で持ち、開いている間は Tooltip を `disabled` にします。子を持つ NavLink は Menu.Target にしません（子の開閉と Menu の開閉が 1 つのボタンで干渉します）。見出しなど NavLink 以外の文字は、rail のときに描かないようにしてください。
+構造:
 
-```tsx
-const [rail, setRail] = useState(false);
-const [openedParents, setOpenedParents] = useState<string[]>(['受注']);
-const toggleParent = (label: string) =>
-  setOpenedParents((current) =>
-    current.includes(label) ? current.filter((value) => value !== label) : [...current, label],
-  );
-// In the rail a parent widens the sidebar and opens itself.
-const expandParent = (label: string) => {
-  setRail(false);
-  setOpenedParents((current) => (current.includes(label) ? current : [...current, label]));
-};
+- 入れ子は NavLink の `children` に子の NavLink を渡します。左の線と字下げつきで開閉します。
+- 組織の切り替えの起点は、`leftSection` に Avatar を置いた NavLink にします（高さ 48px になります）。
+- 組織の切り替えの NavLink は `Menu.Target` で包み、選択肢は `Menu.RadioGroup` と `Menu.RadioItem` で組みます。
+- 組織の切り替えの NavLink の `aria-label` には「組織を切り替える（現在：組織名）」のように、操作と現在の組織を入れます。
+- 画面を移る項目は `component="a"` のリンクにし、サービスでは router の Link を `component` に渡します。
+- 子を開くだけの項目は `component="button"` にします。
+- 今いる画面の項目には `active` と `aria-current="page"` を渡します。
+- navbar の中は、上から組織の切り替え・リンク・設定を `AppShell.Section` に分け、リンクの Section を `grow component={ScrollArea}` にします。
+- navbar に `p` を渡しません（渡すと theme の余白より優先され、開閉でアイコンの位置がずれます）。
+- 見出しなど NavLink 以外の文字は、rail のときに描きません。
 
-// The organization switcher: a Menu, with its name in a Tooltip while the navbar is a rail.
-function OrganizationMenu({ rail }) {
-  const [opened, setOpened] = useState(false);
-  return (
-    <Menu opened={opened} onChange={setOpened} position={rail ? 'right-start' : 'bottom-start'}>
-      <Tooltip label="組織名" position="right" disabled={!rail || opened}>
-        <Menu.Target>
-          <NavLink
-            component="button"
-            label="組織名"
-            description="プラン"
-            aria-label="組織を切り替える（現在：組織名）"
-            leftSection={<Avatar aria-hidden>A</Avatar>}
-            rightSection={<IconSelector size={16} />}
-          />
-        </Menu.Target>
-      </Tooltip>
-      <Menu.Dropdown>{/* 組織の一覧（Menu.RadioGroup と Menu.RadioItem） */}</Menu.Dropdown>
-    </Menu>
-  );
-}
+アイコンだけの帯（rail）:
 
-<AppShell navbar={{ width: rail ? 48 : 256, breakpoint: 'sm' }}>
-  <AppShell.Navbar mod={{ rail }}>
-    <AppShell.Section>
-      <OrganizationMenu rail={rail} />
-    </AppShell.Section>
-    <AppShell.Section grow component={ScrollArea}>
-      <Tooltip label="ダッシュボード" position="right" disabled={!rail}>
-        <NavLink
-          component="a"
-          href="/dashboard"
-          label="ダッシュボード"
-          aria-label="ダッシュボード"
-          leftSection={<IconHome size={16} />}
-        />
-      </Tooltip>
-      <Tooltip label="受注" position="right" disabled={!rail}>
-        <NavLink
-          component="button"
-          label="受注"
-          aria-label="受注"
-          leftSection={<IconReceipt size={16} />}
-          // In the rail the open child is hidden, so the parent of the current screen is active.
-          active={rail}
-          opened={openedParents.includes('受注')}
-          onChange={() => (rail ? expandParent('受注') : toggleParent('受注'))}
-          aria-expanded={rail ? false : openedParents.includes('受注')}
-        >
-          <NavLink component="a" href="/orders" label="受注一覧" active aria-current="page" />
-          <NavLink component="a" href="/shipments" label="出荷" />
-        </NavLink>
-      </Tooltip>
-    </AppShell.Section>
-    <AppShell.Section>
-      <Tooltip label="設定" position="right" disabled={!rail}>
-        <NavLink
-          component="a"
-          href="/settings"
-          label="設定"
-          aria-label="設定"
-          leftSection={<IconSettings size={16} />}
-        />
-      </Tooltip>
-    </AppShell.Section>
-  </AppShell.Navbar>
-</AppShell>;
-```
+- rail にするときは、`navbar.width` に 48 を渡し、`AppShell.Navbar` に `mod={{ rail }}`（`data-rail` が付く）を渡します。
+- 開いた帯と rail で、同じ NavLink を使い続けます（作り直すと畳む最初のフレームで子の行が消えます）。
+- rail ではアイコンしか見えないので、NavLink に `aria-label` で名前を渡し、Tooltip で名前を示します（Mantine の Tooltip は名前を付けません）。
+- 件数の Badge は rail で theme が隠すので、件数は `aria-label` と Tooltip の文に「受注（未対応 3 件）」のように含め、Badge には `aria-hidden` を付けます。
+- 子を持つ NavLink の開閉は `opened` と `onChange` で持ちます（クリック・Enter・Space のどれも `onChange` に届きます）。
+- rail のときの `onChange` は、サイドバーを広げてその項目の子を開く処理に置き換えます（shadcn/ui の sidebar-07 と同じ）。
+- 子を持つ NavLink の `aria-expanded` は、rail のとき false にします（rail では子が見えません）。
+- rail のときは、今いる画面を子に持つ項目に `active` を渡して現在地を示します。
+- Menu を開く項目（組織の切り替え）は、`Menu` の中に `Tooltip`、その中に `Menu.Target` と NavLink を置きます（Tooltip を `Menu.Target` の内側に置くと aria 属性が Tooltip に付き、`target` で別に置くと focus で Tooltip が出ません）。
+- Menu の開閉を `opened` で持ち、開いている間は Tooltip を `disabled` にします。
+- 子を持つ NavLink は `Menu.Target` にしません（子の開閉と Menu の開閉が 1 つのボタンで干渉します）。
+
+狭い幅（Drawer）:
+
+- 狭い幅では、広い幅と同じ navbar の中身を Drawer に入れて開き、AppShell の navbar は `collapsed: { mobile: true }` で隠します。
+- Drawer には `variant="sidebar"` を渡します（theme が navbar と同じ面の色 `--efoo-color-sidebar`、内側の余白 8px、shadcn/ui のモバイルのサイドバーと同じ幅 18rem を付けます）。
+- Drawer の `padding` と `size` は、渡すと theme の値より優先されます。
+- navbar の部品（組織の切り替え・項目・設定）は `Drawer.Body` の直下に置きます（theme が navbar の Section どうしと同じ 16px の間隔で縦に並べます）。
+- Drawer の中の navbar の上段には、組織の切り替えと並べて `Drawer.CloseButton` を置き、`aria-label` に「サイドバーを閉じる」を渡します。
+- Drawer を開く Burger には、`aria-haspopup="dialog"` と `aria-expanded` を渡します。
+- Drawer は、リンクを押した時点ではなく、location が変わった時点（`useLocation`）で閉じます（移動を止められたときに開いたままにするためです）。
+- 保存していない変更がある画面からの移動は、リンクの click handler で止めず、画面が router の blocker（React Router の `useBlocker`。data router か framework mode が要ります）で止めます。
+- blocker の確認は `blocker.state` が `"blocked"` の間に出し、「移動」が選ばれたら `blocker.proceed()`、「残る」が選ばれたら `blocker.reset()` を呼びます（AppFrame の `onBeforeNavigate` は、リンクがどこにも移らない Storybook でこの blocker の代わりを務める prop で、サービスは写しません）。
+- 確認の Modal と Drawer は、Escape で両方とも閉じます（それぞれが window の Escape を聞くためです。1 つの `Modal.Stack` の中の Modal どうし、1 つの `Drawer.Stack` の中の Drawer どうしだけが 1 回の Escape を共有し、Modal と Drawer は同じ stack に入りません）。
+- Drawer と Modal に `overlayProps` の一部（`backgroundOpacity` など）だけを渡すと、theme の `overlayProps` の既定値はまるごと置き換わります。それでも、Drawer・Modal は受け取った値を Overlay の部品に渡し、その部品が渡されていない値（`blur` など）を theme の DrawerOverlay・ModalOverlay の既定値から補うので、背景のぼかしは残ります。
 
 組織の切り替えの起点は Mantine の静的な class（`mantine-Avatar-root`）で見分けるので、MantineProvider の `classNamesPrefix` を変えたり、`withStaticClasses={false}` にしたりすると、48px の行になりません。
-
-狭い幅では、広い幅と同じ navbar の中身を Drawer に入れて開きます。Drawer に `variant="sidebar"` を渡すと、theme が navbar と同じ面の色（`--efoo-color-sidebar`）と内側の余白（8px）、shadcn/ui のモバイルのサイドバーと同じ幅（18rem）を付け、`Drawer.Body` の直下に置いた部品（組織の切り替え・項目・設定）を navbar の Section どうしと同じ 16px の間隔で縦に並べるので、同じ NavLink が幅によって別の見た目になりません。`padding` と `size` を渡すと、theme の値より優先されます。Drawer と Modal に `overlayProps` の一部（`backgroundOpacity` など）だけを渡すと、theme の Drawer・Modal の `overlayProps` の既定値はまるごと置き換わります。それでも、Drawer・Modal は受け取った値を Overlay の部品に渡し、その部品が渡されていない値（`blur` など）を theme の DrawerOverlay・ModalOverlay の既定値から補うので、背景のぼかしは残ります。
 
 ### shadcn/ui の variant との対応
 
@@ -378,6 +333,8 @@ function OrganizationMenu({ rail }) {
 パッケージは Text の `variant` の型に `metric`・`emphasis` を足しています（`declare module '@mantine/core'` で `TextProps.variant` を広げる形）。サービスでも `TextProps.variant` を独自の型で広げると TypeScript が TS2717 を出すので、独自の variant は文字列のまま渡してください（型は任意の文字列を受け付けます）。
 
 画面の下に固定する操作の欄（保存の欄など）は、Affix の variant `sticky-actions` で作ります。`<Affix variant="sticky-actions" withinPortal={false} pos="sticky" position={{ bottom: 0 }}><Card>…</Card></Affix>` の形で、重なり順（`app` の 1 つ下）、本文の背景色の帯、下の余白（`md`）、中の Card の padding（`md`）、中のリンクの押せる高さは theme が持ちます。Card に `padding` を渡すと、theme の余白より優先されます。
+
+中の Card と Anchor は Mantine の静的な class（`mantine-Card-root`・`mantine-Anchor-root`）で見分けるので、MantineProvider の `classNamesPrefix` を変えたり、`withStaticClasses={false}` にしたりすると、Card の余白（`md`）とリンクの押せる高さが付きません。
 
 Badge の既定は `variant="light"` です。`color` を指定しない Badge は shadcn/ui の secondary（muted の面に本文の色の文字）、状態色の Badge は色の 10% の面に色の文字になります。塗りつぶしにする場合は `variant="filled"` を指定します。
 
