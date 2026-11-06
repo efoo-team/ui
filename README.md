@@ -291,7 +291,7 @@ AppShell の navbar に NavLink を並べると、shadcn/ui の sidebar と同�
 - 今いる画面の項目には `active` と `aria-current="page"` を渡します。
 - navbar の中は、上から組織の切り替え・リンク・設定を `AppShell.Section` に分け、リンクの Section を `grow component={ScrollArea}` にします。
 - navbar に `p` を渡しません（渡すと theme の余白より優先され、開閉でアイコンの位置がずれます）。
-- 見出しなど NavLink 以外の文字は、rail のときに描きません。
+- 見出しなど NavLink 以外の文字は、rail のときに描きません（theme が rail で隠すのは NavLink の名前と説明だけなので、ほかの文字は 48px の幅に残ってはみ出します）。
 
 アイコンだけの帯（rail）:
 
@@ -316,6 +316,9 @@ AppShell の navbar に NavLink を並べると、shadcn/ui の sidebar と同�
 - Drawer の中の navbar の上段には、組織の切り替えと並べて `Drawer.CloseButton` を置き、`aria-label` に「サイドバーを閉じる」を渡します。
 - Drawer を開く Burger には、`aria-haspopup="dialog"` と `aria-expanded` を渡します。
 - Drawer は、リンクを押した時点ではなく、location が変わった時点（`useLocation`）で閉じます（移動を止められたときに開いたままにするためです）。
+
+Drawer と Modal の確認と overlayProps:
+
 - 保存していない変更がある画面からの移動は、リンクの click handler で止めず、画面が router の blocker（React Router の `useBlocker`。data router か framework mode が要ります）で止めます。
 - blocker の確認は `blocker.state` が `"blocked"` の間に出し、「移動」が選ばれたら `blocker.proceed()`、「残る」が選ばれたら `blocker.reset()` を呼びます（AppFrame の `onBeforeNavigate` は、リンクがどこにも移らない Storybook でこの blocker の代わりを務める prop で、サービスは写しません）。
 - 確認の Modal と Drawer は、Escape で両方とも閉じます（それぞれが window の Escape を聞くためです。1 つの `Modal.Stack` の中の Modal どうし、1 つの `Drawer.Stack` の中の Drawer どうしだけが 1 回の Escape を共有し、Modal と Drawer は同じ stack に入りません）。
