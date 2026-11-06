@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button, Card, EmptyState, FileButton, Stack, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconBox, IconPlus, IconUpload } from '@tabler/icons-react';
-import { AppFrame, ICON_SIZE } from './shared/AppFrame';
+import { AppFrame } from './shared/AppFrame';
+import { ICON_SIZE } from './shared/constants';
 import { ORGANIZATIONS } from './shared/data';
 
 const meta = {

@@ -32,7 +32,8 @@ import {
   IconSearch,
   IconX,
 } from '@tabler/icons-react';
-import { AppFrame, ICON_SIZE } from './shared/AppFrame';
+import { AppFrame } from './shared/AppFrame';
+import { ICON_SIZE } from './shared/constants';
 import {
   ATTENTION_COLOR,
   CURRENT_USER,

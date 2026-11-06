@@ -1,6 +1,6 @@
 import { Anchor, Group } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
-import { ICON_SIZE } from './AppFrame';
+import { ICON_SIZE } from './constants';
 
 /*
  * The header shows the page path only from the sm breakpoint, so below it a screen under a list carries its own way

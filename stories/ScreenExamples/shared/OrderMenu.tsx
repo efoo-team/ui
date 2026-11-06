@@ -1,6 +1,6 @@
 import { ActionIcon, Menu } from '@mantine/core';
 import { IconDotsVertical } from '@tabler/icons-react';
-import { ICON_SIZE } from './AppFrame';
+import { ICON_SIZE } from './constants';
 import { awaitsShipment, type Order } from './data';
 
 /*

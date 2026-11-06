@@ -22,7 +22,8 @@ import {
 import { AreaChart } from '@mantine/charts';
 import '@mantine/charts/styles.layer.css';
 import { IconPlus, IconTrendingUp } from '@tabler/icons-react';
-import { AppFrame, CONTENT_BREAKPOINTS, ICON_SIZE } from './shared/AppFrame';
+import { AppFrame } from './shared/AppFrame';
+import { CONTENT_BREAKPOINTS, ICON_SIZE } from './shared/constants';
 import {
   ALL_PRODUCTS,
   ATTENTION_COLOR,

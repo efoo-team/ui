@@ -21,7 +21,8 @@ import {
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconLock, IconPencil, IconSearch } from '@tabler/icons-react';
-import { AppFrame, ICON_SIZE } from './shared/AppFrame';
+import { AppFrame } from './shared/AppFrame';
+import { ICON_SIZE } from './shared/constants';
 import {
   ALL_PRODUCTS,
   needsReorder,

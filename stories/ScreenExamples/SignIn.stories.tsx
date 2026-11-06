@@ -14,7 +14,7 @@ import {
 } from '@mantine/core';
 import { useForm, type FormErrors } from '@mantine/form';
 import { IconAlertCircle } from '@tabler/icons-react';
-import { SERVICE_NAME } from './shared/AppFrame';
+import { SERVICE_NAME } from './shared/constants';
 import { ATTENTION_COLOR } from './shared/data';
 
 const meta = {
