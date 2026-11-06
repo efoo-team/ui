@@ -6,18 +6,15 @@
     /* shadcn/ui's card is 4px rounder than its controls (radius-xl = --radius + 4px). Following the default radius
        lets a service change both with defaultRadius; a radius prop is written inline and still wins. */
     --paper-radius: calc(var(--mantine-radius-default) + 4px);
-    /* The card's padding is the side inset of what it holds, so an empty state inside it adds only what the card's
-       padding lacks of the empty state's own lg: none with the default padding, all of it with padding={0}. */
-    --efoo-empty-state-padding-inline: max(
-      0px,
-      calc(var(--mantine-spacing-lg) - var(--card-padding))
-    );
+    /* The side inset the card gives what it holds, for content that has a side inset of its own and should not
+       double it (empty-state.module.css). */
+    --efoo-card-inset-inline: var(--card-padding);
   }
 
-  /* A Card.Section without inheritPadding reaches the card's edges, like one that holds a table, so an empty state
-     in it keeps its own side inset. */
+  /* A Card.Section without inheritPadding reaches the card's edges, like one that holds a table, so the card gives
+     what is in it no side inset. */
   .section:not([data-inherit-padding]) {
-    --efoo-empty-state-padding-inline: initial;
+    --efoo-card-inset-inline: 0px;
   }
 
   /* Paper draws no outline, so a dialog shows no ring around itself. A card that a script focuses (tabIndex={-1},
