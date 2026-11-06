@@ -140,7 +140,11 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
     ...(theme.primaryColor === 'red'
       ? {}
       : { '--mantine-color-red-outline': 'var(--mantine-color-red-6)' }),
-    '--efoo-color-ring': `var(--mantine-color-${z}-4)`,
+    // The line of controls that take input keeps 3:1 against the page, a Card and the input surface (all white):
+    // zinc-5 at 24% over zinc-4. No zinc shade lies between zinc-4 (2.6:1) and zinc-5 (4.8:1).
+    '--efoo-color-input-border': `color-mix(in srgb, var(--mantine-color-${z}-5) 24%, var(--mantine-color-${z}-4))`,
+    // The focus line stays darker than the input line it replaces.
+    '--efoo-color-ring': `var(--mantine-color-${z}-5)`,
     '--efoo-tooltip-bg': 'var(--mantine-color-gray-9)',
     '--efoo-tooltip-color': 'var(--mantine-color-white)',
     '--efoo-color-tab-pills-text': 'var(--mantine-color-gray-7)',
@@ -180,11 +184,12 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
     // One step lighter than the menu hover (zinc-7) and two above the row hover (zinc-8).
     '--efoo-color-avatar': `var(--mantine-color-${z}-6)`,
     '--efoo-color-avatar-text': `var(--mantine-color-${z}-2)`,
-    // shadcn/ui's dark input line is white 15%; other surfaces keep white 10%.
-    '--efoo-color-input-border': 'rgba(255, 255, 255, 0.15)',
+    // The input line keeps 3:1 against a Card and the input surface (zinc-9) and the page: zinc-5 at 57% over zinc-6.
+    // Surface lines keep white 10%. The focus line (zinc-5) stays brighter than it.
+    '--efoo-color-input-border': `color-mix(in srgb, var(--mantine-color-${z}-5) 57%, var(--mantine-color-${z}-6))`,
     '--efoo-color-input-error-border':
       'color-mix(in srgb, var(--mantine-color-error) 50%, transparent)',
-    // shadcn/ui's dark outline surface: input (white 15%) at 30%, and at 50% on hover.
+    // shadcn/ui's dark outline surface: its input line (white 15%) at 30%, and at 50% on hover.
     '--efoo-color-outline-bg': 'color-mix(in srgb, white 4.5%, transparent)',
     '--efoo-color-outline-hover': 'color-mix(in srgb, white 7.5%, transparent)',
     '--efoo-color-tab-pills-active':

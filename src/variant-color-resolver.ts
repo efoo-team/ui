@@ -53,8 +53,8 @@ export const efooVariantColorResolver: VariantColorsResolver = (input) => {
   const resolved = defaultVariantColorsResolver(input);
   const autoContrast = input.autoContrast ?? input.theme.autoContrast;
 
-  // variant="default" is shadcn/ui's outline button (README): in dark it has the input line (white 15%) and the faint
-  // outline surface instead of Mantine's card surface. The light scheme leaves --efoo-color-* undefined.
+  // variant="default" is shadcn/ui's outline button (README): it has the input line, and in dark the faint outline
+  // surface instead of Mantine's card surface. The light scheme leaves --efoo-color-outline-* undefined.
   if (input.variant === 'default') {
     return {
       ...resolved,

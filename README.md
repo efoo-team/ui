@@ -84,7 +84,7 @@ export function App() {
 - `yellow` の塗りつぶしがライトで 700 番台、ダークで 800 番台の茶色になり、ダークの `green`・`blue` も 800 番台で沈む。塗りつぶしの文字の白黒も塗りの色と合わなくなる。
 - `red`・`yellow`・`green`・`blue` の `variant="light"` の背景が色の 10%（ダークは 20%）の透過にならず、ライトは 100 番台の不透明な面、文字は 900 番台になる。
 - ダークで `red`・`yellow`・`green`・`blue` の `variant="light"`（Badge・Alert など）の文字がほぼ白になり、状態の色が文字に出ない。
-- ダークの入力欄の枠が白 15% にならず、白 10% のままになる。
+- 入力欄・Checkbox・Radio・Chip と outline の Button の枠が、背景に対して 3:1 に届かない薄い線（ライトは `zinc-200`、ダークは白 10%）になる。
 - ダークで `gray` の `variant="light"`（Badge など）の面がほぼ黒になり、Card の上で沈む。
 - AppShell の navbar の面が page と同じ色になる。
 - ダークの `red` の塗りつぶしが `red-8`（`#9f0712`）になり、Card の上で沈む。
