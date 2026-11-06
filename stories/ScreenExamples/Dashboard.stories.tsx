@@ -38,6 +38,7 @@ import {
 import { OrderLink } from './shared/OrderLink';
 import { OrderMenu } from './shared/OrderMenu';
 import { OrderStatusBadge } from './shared/OrderStatusBadge';
+import { SectionCard } from './shared/SectionCard';
 
 const meta = {
   title: '画面例 / ダッシュボード',
@@ -271,23 +272,19 @@ function SalesCard() {
   const last = data[data.length - 1]?.date ?? '';
 
   return (
-    <Card h="100%">
-      <Group justify="space-between" align="flex-start" mb="md">
-        <Stack gap={4}>
-          <Title order={2} size="h5">
-            受注の推移
-          </Title>
-          <Text size="sm" c="dimmed">
-            {first}〜{last} の合計 {yen(sum(data.map((point) => point.amount)))}
-          </Text>
-        </Stack>
+    <SectionCard
+      h="100%"
+      title="受注の推移"
+      description={`${first}〜${last} の合計 ${yen(sum(data.map((point) => point.amount)))}`}
+      actions={
         <SegmentedControl
           data={PERIODS}
           value={period}
           onChange={setPeriod}
           aria-label="表示する期間"
         />
-      </Group>
+      }
+    >
       {/* As tall as the stock card beside it, whose rows name the reorder point and the target stock. */}
       <AreaChart
         h={300}
@@ -299,21 +296,17 @@ function SalesCard() {
         // Equal steps between the dates, so the last label does not jump closer than the others on a narrow chart.
         xAxisProps={{ minTickGap: 24, interval: 'equidistantPreserveStart' }}
       />
-    </Card>
+    </SectionCard>
   );
 }
 
 function StockCard() {
   return (
-    <Card h="100%">
-      <Stack gap={4} mb="md">
-        <Title order={2} size="h5">
-          在庫の残り
-        </Title>
-        <Text size="sm" c="dimmed">
-          全 {ALL_PRODUCTS.length} 品目のうち発注点に近い {STOCK_ROWS.length} 品目です。
-        </Text>
-      </Stack>
+    <SectionCard
+      h="100%"
+      title="在庫の残り"
+      description={`全 ${ALL_PRODUCTS.length} 品目のうち発注点に近い ${STOCK_ROWS.length} 品目です。`}
+    >
       <Stack gap="sm">
         {STOCK_ROWS.map((item) => {
           const reorder = needsReorder(item);
@@ -344,7 +337,7 @@ function StockCard() {
           );
         })}
       </Stack>
-    </Card>
+    </SectionCard>
   );
 }
 
@@ -437,20 +430,15 @@ function OrdersStack({ orders }: { orders: Order[] }) {
  */
 function OrdersCard() {
   return (
-    <Card>
-      <Group justify="space-between" align="flex-start" mb="md">
-        <Stack gap={4}>
-          <Title order={2} size="h5">
-            最近の受注
-          </Title>
-          <Text size="sm" c="dimmed">
-            受注日が新しい {RECENT_ORDERS.length} 件です。
-          </Text>
-        </Stack>
+    <SectionCard
+      title="最近の受注"
+      description={`受注日が新しい ${RECENT_ORDERS.length} 件です。`}
+      actions={
         <Button variant="outline" leftSection={<IconPlus size={ICON_SIZE} />}>
           受注を登録
         </Button>
-      </Group>
+      }
+    >
       <Stack visibleFrom="sm" gap={0}>
         <OrdersTable orders={RECENT_ORDERS} />
       </Stack>
@@ -463,7 +451,7 @@ function OrdersCard() {
           受注一覧を見る
         </Anchor>
       </Group>
-    </Card>
+    </SectionCard>
   );
 }
 
@@ -481,15 +469,11 @@ function InquiriesCard() {
   ];
 
   return (
-    <Card h="100%">
-      <Stack gap={4} mb="md">
-        <Title order={2} size="h5">
-          問い合わせの対応状況
-        </Title>
-        <Text size="sm" c="dimmed">
-          10 月に受け付けた {INQUIRIES.total} 件の対応状況です。
-        </Text>
-      </Stack>
+    <SectionCard
+      h="100%"
+      title="問い合わせの対応状況"
+      description={`10 月に受け付けた ${INQUIRIES.total} 件の対応状況です。`}
+    >
       <Progress.Root mb="md">
         {rows.map((row) => (
           <Progress.Section
@@ -510,21 +494,13 @@ function InquiriesCard() {
           </Stack>
         ))}
       </SimpleGrid>
-    </Card>
+    </SectionCard>
   );
 }
 
 function BestSellersCard() {
   return (
-    <Card h="100%" aria-busy="true">
-      <Stack gap={4} mb="md">
-        <Title order={2} size="h5">
-          今週の売れ筋
-        </Title>
-        <Text size="sm" c="dimmed">
-          集計しています。
-        </Text>
-      </Stack>
+    <SectionCard h="100%" aria-busy="true" title="今週の売れ筋" description="集計しています。">
       <Stack gap="sm">
         {[0, 1, 2].map((row) => (
           <Group key={row} gap="sm" wrap="nowrap">
@@ -536,7 +512,7 @@ function BestSellersCard() {
           </Group>
         ))}
       </Stack>
-    </Card>
+    </SectionCard>
   );
 }
 
