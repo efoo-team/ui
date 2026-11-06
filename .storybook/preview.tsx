@@ -18,6 +18,11 @@ import './preview.css';
 
 dayjs.extend(customParseFormat);
 
+// Storybook writes <html lang="en"> into the preview. The examples are Japanese, and services write <html lang="ja">:
+// the theme's phrase-based line breaking (word-break: auto-phrase) and the browser's Japanese fonts and line breaking
+// rules follow the document's language.
+document.documentElement.lang = 'ja';
+
 // The docs page is rendered outside the story decorators, so it follows the toolbar through the globals event.
 // Docs pages without a story (MDX only) are mounted again after every globals change, so the last value is kept
 // outside the component, and the iframe URL (which carries `globals=colorScheme:dark`) gives the value on first load.

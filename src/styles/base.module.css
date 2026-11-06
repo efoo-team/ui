@@ -36,6 +36,16 @@
   }
 }
 
+/* Japanese text wraps between phrases (文節), not in the middle of a word such as まとめ／て or くださ／い, in headings,
+   buttons, labels and paragraphs alike. Every element inherits it from the root, in a layer under every Mantine rule,
+   so a part or a service can set its own word-break. The browser does this only for content whose language is
+   known to be Japanese (<html lang="ja">), and only Chrome and Edge 119+ do it; Safari and Firefox wrap as before. */
+@layer mantine.efoo-base {
+  :root {
+    word-break: auto-phrase;
+  }
+}
+
 /* An element that only a script focuses (tabIndex={-1}: a page heading that takes focus when the control holding it
    goes away, a section reached from a link) shows the theme's ring instead of the browser's outline, and only when
    the focus came from the keyboard (:focus-visible), like the theme's controls. The rule sits in a layer under every
