@@ -657,6 +657,13 @@ function OrderListPage({
           </Stack>
           <Button leftSection={<IconPlus size={ICON_SIZE} />}>受注を登録</Button>
         </Group>
+        {/*
+         * Said only to a screen reader, as the skeletons say nothing to it. The line stays in place empty while the
+         * orders are shown, so it is read when a reload starts, and sits outside the card, which is aria-busy meanwhile.
+         */}
+        <VisuallyHidden role="status">
+          {state === 'loading' ? '受注を読み込んでいます' : ''}
+        </VisuallyHidden>
         <OrdersCard state={state} filters={filters} onChange={updateFilters} onReload={reload} />
       </Stack>
     </AppFrame>
@@ -674,7 +681,7 @@ export const Loading: Story = {
     docs: {
       description: {
         story:
-          '取得の待ち（データパターンの「読み込み中」）です。見出し・タブの名前・絞り込みの欄・表の見出しは読み込み後と同じ位置に出し、受注と一緒に届く見出しの補足（時点）、タブの件数、行、件数の表示、ページ送りを Skeleton にしました。表の列幅は読み込み後と同じ定義にし、行末のメニューの列にも Skeleton を置いて、受注が届いても列とタブの幅が動かないようにしています。欄とタブは押しても結果が無いので無効にしています。',
+          '取得の待ち（データパターンの「読み込み中」）です。見出し・タブの名前・絞り込みの欄・表の見出しは読み込み後と同じ位置に出し、受注と一緒に届く見出しの補足（時点）、タブの件数、行、件数の表示、ページ送りを Skeleton にしました。表の列幅は読み込み後と同じ定義にし、行末のメニューの列にも Skeleton を置いて、受注が届いても列とタブの幅が動かないようにしています。欄とタブは押しても結果が無いので無効にしています。Skeleton はスクリーンリーダーに何も伝えないので、読み上げだけに届く「受注を読み込んでいます」の行（role="status"）を Card の外に置き、再読み込みを始めたときにも読み上げられるよう、読み込み後も空のまま残しています。',
       },
     },
   },

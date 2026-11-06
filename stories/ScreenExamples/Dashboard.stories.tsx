@@ -498,10 +498,16 @@ function InquiriesCard() {
   );
 }
 
+/*
+ * Waiting is said the same way on every screen: the skeletons hold the place for the eye, and a status line that only a
+ * screen reader reads says what is on its way, since the skeletons say nothing to it. The line sits outside the
+ * aria-busy part, where a screen reader may hold back what changes until the wait is over.
+ */
 function BestSellersCard() {
   return (
-    <SectionCard h="100%" aria-busy="true" title="今週の売れ筋" description="集計しています。">
-      <Stack gap="sm">
+    <SectionCard h="100%" title="今週の売れ筋">
+      <VisuallyHidden role="status">今週の売れ筋を集計しています</VisuallyHidden>
+      <Stack gap="sm" aria-busy="true">
         {[0, 1, 2].map((row) => (
           <Group key={row} gap="sm" wrap="nowrap">
             <Skeleton height={36} width={36} />
@@ -564,7 +570,7 @@ export const Dashboard: Story = {
     docs: {
       description: {
         story:
-          'データパターンのうち、10 月 31 日時点で読み込みが済み、対応が要る 3 つの件数がどれも 1 以上の状態です。集計の終わっていない「今週の売れ筋」だけを読み込み中の表示（Skeleton）にして、ほかのカードは待たせずに見せています。',
+          'データパターンのうち、10 月 31 日時点で読み込みが済み、対応が要る 3 つの件数がどれも 1 以上の状態です。集計の終わっていない「今週の売れ筋」だけを読み込み中の表示（Skeleton）にして、ほかのカードは待たせずに見せています。Skeleton はスクリーンリーダーに何も伝えないので、読み上げだけに届く「今週の売れ筋を集計しています」の行（role="status"）を添えています。読み込み中の表し方は、ほかの画面例と同じです。',
       },
     },
   },

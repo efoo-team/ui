@@ -22,6 +22,7 @@ import {
   TextInput,
   Timeline,
   Title,
+  VisuallyHidden,
 } from '@mantine/core';
 import { DateInput } from '@mantine/dates';
 import { useForm } from '@mantine/form';
@@ -892,6 +893,13 @@ function OrderDetailPage({ id, state }: { id: string; state?: 'loading' }) {
       breadcrumbs={[...LIST_BREADCRUMBS, id]}
       defaultOrganization={ORGANIZATION}
     >
+      {/*
+       * Said only to a screen reader, as the skeletons say nothing to it. The line stays in place empty once the order
+       * is shown, and sits outside the loading part, which is aria-busy meanwhile.
+       */}
+      <VisuallyHidden role="status">
+        {state === 'loading' ? '受注を読み込んでいます' : ''}
+      </VisuallyHidden>
       {content}
     </AppFrame>
   );
@@ -942,7 +950,7 @@ export const Loading: Story = {
     docs: {
       description: {
         story:
-          'データパターンの「読み込み中」です。受注番号は開いたアドレスから分かるので見出しに出し、状態・顧客・発送できるかの 1 行・明細・操作のボタンは読み込み後と同じ位置に Skeleton で置きます。Card の見出しも先に出して、どこに何が来るかを読み込み中から分かるようにしています。',
+          'データパターンの「読み込み中」です。受注番号は開いたアドレスから分かるので見出しに出し、状態・顧客・発送できるかの 1 行・明細・操作のボタンは読み込み後と同じ位置に Skeleton で置きます。Card の見出しも先に出して、どこに何が来るかを読み込み中から分かるようにしています。Skeleton はスクリーンリーダーに何も伝えないので、読み上げだけに届く「受注を読み込んでいます」の行（role="status"）を添えています。',
       },
     },
   },
