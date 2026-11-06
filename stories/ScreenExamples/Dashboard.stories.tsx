@@ -33,6 +33,7 @@ import {
   monthDay,
   needsReorder,
   ORDERS,
+  SALES,
   sum,
   yen,
   type Order,
@@ -69,41 +70,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Every name and number below is fictional. Figures that appear twice on the screen are computed from one source.
-
-// Deterministic pseudo-random numbers (mulberry32) so the chart is the same on every render.
-function seededRandom(seed: number) {
-  let state = seed;
-  return () => {
-    state = (state + 0x6d2b79f5) | 0;
-    let t = Math.imul(state ^ (state >>> 15), 1 | state);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-// Orders dip on weekends (Sunday first), rise slowly over the quarter and vary a little from day to day.
-const WEEKDAY_FACTOR = [0.66, 0.96, 1.06, 1.12, 1.0, 1.16, 0.78];
-
-interface SalesPoint {
-  month: number;
-  day: number;
-  date: string;
-  amount: number;
-}
-
-// 90 days from August 3 to October 31, 2026. The screen shows the state on October 31.
-const SALES: SalesPoint[] = (() => {
-  const random = seededRandom(20261031);
-  return Array.from({ length: 90 }, (_, index) => {
-    const date = new Date(2026, 7, 3 + index);
-    const trend = 150_000 + index * 650;
-    const noise = 1 + (random() - 0.5) * 0.24;
-    const amount = Math.round((trend * (WEEKDAY_FACTOR[date.getDay()] ?? 1) * noise) / 100) * 100;
-    const month = date.getMonth() + 1;
-    return { month, day: date.getDate(), date: `${month}/${date.getDate()}`, amount };
-  });
-})();
+// Every name and number below is fictional. The figures are derived from the shared data (the daily SALES, ORDERS,
+// the products), so a figure that appears twice on the screen comes from one source.
 
 const salesOfMonth = (month: number) =>
   SALES.filter((point) => point.month === month).map((point) => point.amount);
