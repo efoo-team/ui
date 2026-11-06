@@ -70,6 +70,17 @@ export const States: Story = {
           <Switch label="オンで変更できません" disabled defaultChecked />
         </Group>
       </Stack>
+      <Switch.Group
+        label="通知の受け取り方"
+        description="オンにした方法で通知を受け取ります。"
+        defaultValue={['email']}
+      >
+        <Group>
+          <Switch value="email" label="メール" />
+          <Switch value="push" label="プッシュ通知" />
+          <Switch value="sms" label="SMS" />
+        </Group>
+      </Switch.Group>
     </Stack>
   ),
 };
