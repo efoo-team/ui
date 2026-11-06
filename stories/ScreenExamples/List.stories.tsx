@@ -560,7 +560,7 @@ function OrdersCard({
               </Alert>
             ) : !loading && rows.length === 0 ? (
               // Not the first-run empty state: orders exist, the conditions exclude them, so the way out is to loosen them.
-              <EmptyState icon={<IconSearch />} withIndicatorBackground py="xl">
+              <EmptyState icon={<IconSearch />} withIndicatorBackground>
                 {/* The compound Title takes a heading level, so the message sits under the page's h1 in the outline. */}
                 <EmptyState.Title order={2}>条件に合う受注はありません</EmptyState.Title>
                 {/* When other states hold matches, the way out is the tab; otherwise it is the fields above. */}
