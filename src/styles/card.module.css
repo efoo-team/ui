@@ -1,7 +1,10 @@
 @layer efoo {
-  /* shadcn/ui's card is 4px rounder than its controls (radius-xl = --radius + 4px). Following the default radius
-     lets a service change both with defaultRadius; a radius prop is written inline and still wins. */
   .root {
+    /* The padding is set on the variable Mantine's Card reads, not as a default prop, so a container can set its
+       own (like the sticky-actions Affix) and a padding prop, which Mantine writes inline, still wins. */
+    --card-padding: var(--mantine-spacing-lg);
+    /* shadcn/ui's card is 4px rounder than its controls (radius-xl = --radius + 4px). Following the default radius
+       lets a service change both with defaultRadius; a radius prop is written inline and still wins. */
     --paper-radius: calc(var(--mantine-radius-default) + 4px);
     /* The card's padding is the side inset of what it holds, so an empty state inside it adds only what the card's
        padding lacks of the empty state's own lg: none with the default padding, all of it with padding={0}. */

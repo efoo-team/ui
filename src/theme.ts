@@ -476,10 +476,10 @@ export const efooTheme: MantineThemeOverride = createTheme({
     Button: Button.extend({
       classNames: { root: buttonClasses.root, section: buttonClasses.section },
     }),
-    // shadcn/ui's dashboard-01 card: 24px padding and shadow-xs. The corners follow the default radius in card.module.css.
+    // shadcn/ui's dashboard-01 card: 24px padding and shadow-xs. The padding and the corners are in card.module.css.
     Card: Card.extend({
       classNames: { root: cardClasses.root, section: cardClasses.section },
-      defaultProps: { withBorder: true, padding: 'lg', shadow: 'xs' },
+      defaultProps: { withBorder: true, shadow: 'xs' },
     }),
     Cascader: Cascader.extend({ classNames: { dropdown: popoverClasses.list } }),
     Checkbox: Checkbox.extend({

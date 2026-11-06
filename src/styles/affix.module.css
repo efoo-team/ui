@@ -9,9 +9,10 @@
     background-color: var(--mantine-color-body);
   }
 
-  /* The bar is one line of actions, so its card is denser than a content card and covers less of the page. */
+  /* The bar is one line of actions, so its card is denser than a content card and covers less of the page. Setting
+     the card's padding variable keeps a padding prop and Card.Section working. */
   .root[data-variant='sticky-actions'] > :global(.mantine-Card-root) {
-    padding: var(--mantine-spacing-md);
+    --card-padding: var(--mantine-spacing-md);
   }
 
   /* A link in the bar is taller than its line, so a finger hits it at phone width. */
