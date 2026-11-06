@@ -55,7 +55,7 @@ const meta = {
           '**データパターン**　数字は 4 つで、金額は 7 桁、件数は 0〜2 桁です。受注の推移は 1 日 1 点で 7・31・90 日、在庫は全 12 品目（うち 4 品目が発注点割れ）のうち発注点に近い 5 品目で、品目ごとに在庫数・発注点・適正在庫（2〜3 桁）を持ちます。受注は 10 月 14 日〜31 日の 36 件（うち未発送 5 件、そのうち受注から 2 日以上は 2 件。金額は 1 件 ¥495〜¥171,325、顧客名は 3〜7 文字）のうち、受注日が新しい 5 件を表示します。対応が要る件数は 0 になることがあり、そのときは「要発送」などの Badge を出さず、補足を「未発送の受注はありません。」のように替えます。状態は story『ダッシュボード』の 1 つにまとめ、その中に集計中の部分（「今週の売れ筋」の読み込み中の表示）を含みます。画面全体の読み込み中と取得の失敗、件数が 0 のときの story はありません。\n\n' +
           '**情報の流れ**　利用者はまず最上段の左端で今月の受注額をつかみ、続く 3 枚（未発送の受注、発注が必要な品目、未対応の問い合わせ）の件数から、今日対応が要るものがあるかを判断します。対応が要れば、そのカードのリンクから、受注一覧の未発送・発注が必要な品目・未対応の問い合わせの画面へ進んで対応します。どの品目かをこの画面で先に確かめたいときは下の在庫の残りを、前に開いてから入った受注は最近の受注を見て、受注を探すときは最近の受注の下のリンクから受注一覧へ移ります。\n\n' +
           '**主役**　流れの起点で、判断の場でもある最上段の 4 つの数字です。対応が要る 3 つの件数を受注額と同じ段に並べ、件数が 1 以上のものにだけ色の Badge を付けて、数字を見渡した目が対応の要るカードに留まるようにしました。そのカードの下の端に、数字と同じ対象を名前にしたリンク（「未発送の受注を見る」「発注が必要な品目を見る」「未対応の問い合わせを見る」）を置き、判断した場所からそのまま対応へ進めるようにしています。スマホの幅では 4 枚を 1 列に並べたまま数字をラベルの右に上げ、4 つの数字とリンクが最初の 1 画面に収まるようにしました。2 列にすると受注額の 7 桁が数字の大きさのまま入らないためです。\n\n' +
-          '**抑えたもの・使わなかったもの**　カード全体はリンクにせず、行き先を名前にしたリンクを置きました。カード全体だと、読み上げでカードの文がすべてリンクの名前になり、行き先が伝わりにくいためです。対応の判断に使わない新規顧客の数は最上段に置かず、増えた受注額は良い知らせでも対応は要らないので枠線だけの Badge にし、どの問い合わせに対応するかを示さない問い合わせの内訳は、未対応の数字の近くに上げず下の段に置いています。最近の受注は新しい 5 件に絞り、状態のタブ・検索・絞り込み・ページ送りを持たせず、末尾に「受注一覧を見る」を置きました。ここで受注を探し始めると画面が受注一覧と同じ長さに伸び、下のカードが遠くなるうえ、対応が要る受注への入口は最上段のカードが既に担っているためです。受注一覧の画面例とは、受注番号のリンク・状態の Badge・行のメニュー・スマホの幅での 1 件ずつのまとまりを揃えています。在庫の残りは、棒を赤くする基準の発注点と、棒がいっぱいになる適正在庫を品目ごとに棒の下へ書き、補足には母数（全 12 品目）を書きました。\n\n' +
+          '**抑えたもの・使わなかったもの**　カード全体はリンクにせず、行き先を名前にしたリンクを置きました。カード全体だと、読み上げでカードの文がすべてリンクの名前になり、行き先が伝わりにくいためです。対応の判断に使わない新規顧客の数は最上段に置かず、増えた受注額は良い知らせでも対応は要らないので枠線だけの Badge にし、どの問い合わせに対応するかを示さない問い合わせの内訳は、未対応の数字の近くに上げず下の段に置いています。最近の受注は新しい 5 件に絞り、状態のタブ・検索・絞り込み・ページ送りを持たせず、末尾に「受注一覧を見る」を置きました。ここで受注を探し始めると画面が受注一覧と同じ長さに伸び、下のカードが遠くなるうえ、対応が要る受注への入口は最上段のカードが既に担っているためです。受注一覧の画面例とは、受注番号のリンク・状態の Badge・行のメニュー・スマホの幅での 1 件ずつのまとまりを揃えています。在庫の残りは、棒を赤くする基準の発注点と、棒がいっぱいになる適正在庫を品目ごとに棒の下へ書き、補足には母数（全 12 品目）を書きました。問い合わせの対応状況の帯は対応済み・対応中・未対応の 3 区間に分け、色は未対応の区間と、その名前の前の点にだけ付けました。最上段とサイドバーで赤く示す同じ 14 件を、ここでも対応が要るものとして扱うためです。\n\n' +
           '**目的が違えば変わるところ**　管理者が月に 1 度、前月と比べるために見る画面なら、対応を促す色とリンクよりも推移のグラフと前月比を主役にします。対応すべきものが受注の発送だけのサービスなら、最上段の数字よりも未発送の受注の一覧を最上段に置きます。',
       },
     },
@@ -467,11 +467,17 @@ function OrdersCard() {
   );
 }
 
+/*
+ * One bar in three parts, so the share still open shows beside what is done and what is under way. Only the open part
+ * asks for action, so only it takes the attention color, as the same 14 does at the top and in the sidebar. The labels
+ * carry the colors of their parts as dots, so the parts are read by name and not only by their place. The part under
+ * way takes the theme's secondary text color, the one neutral that stands apart from the primary in both schemes.
+ */
 function InquiriesCard() {
   const rows = [
-    { label: '対応済み', value: INQUIRIES.done },
-    { label: '対応中', value: INQUIRIES.inProgress },
-    { label: '未対応', value: INQUIRIES.open },
+    { label: '対応済み', value: INQUIRIES.done, color: undefined },
+    { label: '対応中', value: INQUIRIES.inProgress, color: 'var(--mantine-color-dimmed)' },
+    { label: '未対応', value: INQUIRIES.open, color: ATTENTION_COLOR },
   ];
 
   return (
@@ -484,17 +490,22 @@ function InquiriesCard() {
           10 月に受け付けた {INQUIRIES.total} 件の対応状況です。
         </Text>
       </Stack>
-      <Progress
-        value={(INQUIRIES.done / INQUIRIES.total) * 100}
-        mb="md"
-        aria-label={`対応済み ${INQUIRIES.done} 件 / ${INQUIRIES.total} 件`}
-      />
+      <Progress.Root mb="md">
+        {rows.map((row) => (
+          <Progress.Section
+            key={row.label}
+            value={(row.value / INQUIRIES.total) * 100}
+            color={row.color}
+            aria-label={`${row.label} ${row.value} 件 / ${INQUIRIES.total} 件`}
+          />
+        ))}
+      </Progress.Root>
       <SimpleGrid cols={3}>
         {rows.map((row) => (
-          <Stack key={row.label} gap={4}>
-            <Text size="sm" c="dimmed">
+          <Stack key={row.label} gap={4} align="flex-start">
+            <Badge variant="dot" color={row.color}>
               {row.label}
-            </Text>
+            </Badge>
             <Text variant="metric">{row.value}</Text>
           </Stack>
         ))}

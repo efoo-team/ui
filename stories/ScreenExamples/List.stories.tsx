@@ -64,9 +64,9 @@ const meta = {
           '**目的と読み手**　受注と出荷を受け持つ担当者が、毎日何度も開く画面です。電話で問い合わせを受けた受注を探す、今日発送する受注を拾う、という短い用事のたびに開き、目当ての受注の詳細へ移ります。\n\n' +
           '**情報構造**　主は受注で、1 件ごとに顧客（1 社）、明細（1〜3 品目）、担当者、状態、金額、受注日が従います。状態（未発送・入金待ち・発送済み・キャンセル）は受注を仕事のまとまりに分ける軸で、明細の中身や配送先・履歴は詳細の画面に任せます。\n\n' +
           '**データパターン**　項目は受注番号・顧客・品目・金額・状態・担当者・受注日の 7 つです。件数は 10 月 14 日〜31 日の 36 件（未発送 5・入金待ち 4・発送済み 24・キャンセル 3）で、未発送と入金待ちのほとんどは直近の数日の受注、古い受注はほとんどが発送済みです。未発送のうち 2 件は受注から 2 日以上たっており（2 日と 6 日）、ダッシュボードの「2 件は受注から 2 日以上です」はこの 2 件です。1 社の受注に複数の状態が混ざり、絞り込むと 0〜36 件になります。値の長さは、顧客名が 3〜7 字、品目が「付箋 75mm 角」から「A4 コピー用紙（500 枚） ほか 2 品目」まで、金額が 4〜6 桁です。状態は、読み込み後（story『受注一覧』）、0 件（story『絞り込みに当たる受注が無いとき』）、読み込み中（story『読み込み中』）、取得の失敗（story『読み込みに失敗したとき』）です。\n\n' +
-          '**情報の流れ**　開いた担当者は、まず状態ごとの件数で今日の仕事の量（未発送が何件か）を知ります。未発送の中で急ぐものは、受注日の横の経過日数（「6 日経過」）で見分けます。次に状態のタブ・検索・担当者・受注日で対象を絞り、行の状態・顧客・金額を見比べて目当ての受注を決め、受注番号から詳細へ移ります。受注の登録は電話や FAX を受けたときに始まる別の流れです。\n\n' +
-          '**主役**　流れの順に、件数付きの状態のタブ、絞り込みの欄、表を上から並べ、詳細への道である受注番号を行の左端のリンクにしました。状態のタブは、どの幅でも 5 つの状態の件数が並んで見える pills にし、スマホの幅では 2 段に折り返します。スマホの幅では、短い用事のたびに最初に使う検索だけを出し、担当者・受注日・並び順は「絞り込み・並べ替え」のボタンから開くようにして、開いた最初の画面に受注が見えるようにしました。ボタンには中でかかっている条件の数を出します。色は未発送の件数と未発送の状態にだけ使い、最初に目に入るのが対応の要る受注になるようにしています。ページ全体の操作である「受注を登録」だけを塗りのボタンにし、見出しの右に置きました。\n\n' +
-          '**抑えたもの・使わなかったもの**　絞り込みの条件は欄そのものが見せるので、条件のチップの列は重ねませんでした。「検索と絞り込みを解除」は欄の並びの端に常に置き、消す条件が無いときは無効にしています。条件ができたときに現れると、入力中の検索欄が細くなって並びが動くためです。状態はタブの「すべて」で戻せるので、このボタンは欄の条件だけを消します。見出しの補足には画面の時点を書き、期間は書きません。表示する受注は条件で決まり、期間で絞ったときは受注日の欄がそれを示すためです。経過日数には色を付けていません。その行は未発送の赤い Badge で既に対応が要ると示しているためです。並べ替えは列の見出しではなく欄の 1 つにし、行の操作のメニューには詳細を開く項目を置かず、受注番号のリンクに一本化しました。スマホの幅では、横スクロールで状態と金額が隠れないよう表を 1 件ずつの短いまとまりに組み替えています。状態のタブを選択欄に替えると件数と色が開くまで見えず、横スクロールにすると後ろの状態の件数が隠れるので、どちらも使いませんでした。\n\n' +
+          '**情報の流れ**　開いた担当者は、まず状態ごとの件数で今日の仕事の量（未発送が何件か）を知ります。未発送の中で急ぐものは、状態の Badge の隣の「受注から 6 日」で見分けます。次に状態のタブ・検索・担当者・受注日で対象を絞り、行の状態・顧客・金額を見比べて目当ての受注を決め、受注番号から詳細へ移ります。受注の登録は電話や FAX を受けたときに始まる別の流れです。\n\n' +
+          '**主役**　流れの順に、件数付きの状態のタブ、絞り込みの欄、表を上から並べ、詳細への道である受注番号を行の左端のリンクにしました。状態のタブは、どの幅でも 5 つの状態の件数が並んで見える pills にし、スマホの幅では 2 段に折り返します。スマホの幅では、短い用事のたびに最初に使う検索だけを出し、担当者・受注日・並び順は「絞り込み・並べ替え」のボタンから開くようにして、開いた最初の画面に受注が見えるようにしました。ボタンには中でかかっている条件の数を出します。色は未発送の件数、未発送の状態、受注から 2 日以上たった未発送の日数にだけ使い、最初に目に入るのが対応の要る受注になるようにしています。日数は、ダッシュボードの「2 件は受注から 2 日以上です。」と同じ「受注から」の言葉で、状態の Badge のすぐ隣に枠線の赤い Badge として置きました。スマホの幅でも受注番号と同じ 1 行目に並び、灰色の補足の行に埋もれません。ページ全体の操作である「受注を登録」だけを塗りのボタンにし、見出しの右に置きました。\n\n' +
+          '**抑えたもの・使わなかったもの**　絞り込みの条件は欄そのものが見せるので、条件のチップの列は重ねませんでした。「検索と絞り込みを解除」は欄の並びの端に常に置き、消す条件が無いときは無効にしています。条件ができたときに現れると、入力中の検索欄が細くなって並びが動くためです。状態はタブの「すべて」で戻せるので、このボタンは欄の条件だけを消します。見出しの補足には画面の時点を書き、期間は書きません。表示する受注は条件で決まり、期間で絞ったときは受注日の欄がそれを示すためです。受注からの日数は 2 日以上たった未発送にだけ出し、ほかの行には出していません。どの行にも出すと、急ぐ行が日数の列に紛れるためです。並べ替えは列の見出しではなく欄の 1 つにし、行の操作のメニューには詳細を開く項目を置かず、受注番号のリンクに一本化しました。スマホの幅では、横スクロールで状態と金額が隠れないよう表を 1 件ずつの短いまとまりに組み替えています。状態のタブを選択欄に替えると件数と色が開くまで見えず、横スクロールにすると後ろの状態の件数が隠れるので、どちらも使いませんでした。\n\n' +
           '**目的が違えば変わるところ**　件数が数百件を超えるなら、件数の表示とページ送りに加えて CSV の書き出しや表示件数の切り替えを置きます。絞り込みの条件が 5 つを超えるなら、広い画面でも欄をスマホの幅と同じボタンの中に移し、選んだ条件をチップの列で見せます。項目が 3〜4 つと少なく、スマホで使うことが多いなら、表ではなく 1 件ずつのまとまりの並びを全幅で使ってよいです。',
       },
     },
@@ -127,12 +127,26 @@ function itemsSummary(order: Order) {
 }
 
 /*
- * The dashboard says how many unshipped orders are two days old or more; their rows name the wait, so those orders
- * are told apart here without working out dates. The red state badge already marks the row, so the wait takes no color.
+ * The dashboard says how many unshipped orders are two days old or more, in the same words as this badge, so those
+ * orders are picked out here without working out dates. It sits with the state it qualifies and takes the attention
+ * color as an outline: it asks for action like the state, and stays apart from the state's own badge.
  */
-function orderDate(order: Order) {
+function LateBadge({ order }: { order: Order }) {
   const days = lateDays(order);
-  return days === undefined ? order.date : `${order.date}（${days} 日経過）`;
+  return days === undefined ? null : (
+    <Badge color={ATTENTION_COLOR} variant="outline">
+      受注から {days} 日
+    </Badge>
+  );
+}
+
+function StatusBadges({ order }: { order: Order }) {
+  return (
+    <Group gap={4} wrap="nowrap">
+      <OrderStatusBadge status={order.status} />
+      <LateBadge order={order} />
+    </Group>
+  );
 }
 
 const [asOfDay, asOfTime] = NOW.at.split(' ');
@@ -185,21 +199,27 @@ function ariaSort(column: 'date' | 'amount', sort: SortKey) {
   return undefined;
 }
 
+/*
+ * The widths are set on the headings and the layout is fixed, so the columns stand where they will be while the
+ * skeleton rows wait, and do not move when the orders arrive. The items take what is left.
+ */
 function OrdersTable({ orders, sort }: { orders: Order[] | null; sort: SortKey }) {
   return (
     <Table.ScrollContainer minWidth={960} scrollAreaProps={{ type: 'always' }}>
-      <Table highlightOnHover>
+      <Table highlightOnHover layout="fixed">
         <Table.Thead>
           <Table.Tr>
-            <Table.Th>受注番号</Table.Th>
-            <Table.Th>顧客</Table.Th>
+            <Table.Th w={120}>受注番号</Table.Th>
+            <Table.Th w={140}>顧客</Table.Th>
             <Table.Th>品目</Table.Th>
-            <Table.Th ta="right" aria-sort={ariaSort('amount', sort)}>
+            <Table.Th w={110} ta="right" aria-sort={ariaSort('amount', sort)}>
               金額
             </Table.Th>
-            <Table.Th>状態</Table.Th>
-            <Table.Th>担当者</Table.Th>
-            <Table.Th aria-sort={ariaSort('date', sort)}>受注日</Table.Th>
+            <Table.Th w={180}>状態</Table.Th>
+            <Table.Th w={130}>担当者</Table.Th>
+            <Table.Th w={90} aria-sort={ariaSort('date', sort)}>
+              受注日
+            </Table.Th>
             <Table.Th w={48}>
               <VisuallyHidden>操作</VisuallyHidden>
             </Table.Th>
@@ -216,7 +236,7 @@ function OrdersTable({ orders, sort }: { orders: Order[] | null; sort: SortKey }
                   <Table.Td>{itemsSummary(order)}</Table.Td>
                   <Table.Td ta="right">{yen(order.amount)}</Table.Td>
                   <Table.Td>
-                    <OrderStatusBadge status={order.status} />
+                    <StatusBadges order={order} />
                   </Table.Td>
                   <Table.Td>
                     <Group gap="xs" wrap="nowrap">
@@ -226,7 +246,7 @@ function OrdersTable({ orders, sort }: { orders: Order[] | null; sort: SortKey }
                       <Text size="sm">{order.staff}</Text>
                     </Group>
                   </Table.Td>
-                  <Table.Td>{orderDate(order)}</Table.Td>
+                  <Table.Td>{order.date}</Table.Td>
                   <Table.Td>
                     <OrderMenu order={order} />
                   </Table.Td>
@@ -255,7 +275,9 @@ function OrdersTable({ orders, sort }: { orders: Order[] | null; sort: SortKey }
                   <Table.Td>
                     <Skeleton height={12} width={40} />
                   </Table.Td>
-                  <Table.Td />
+                  <Table.Td>
+                    <Skeleton height={28} width={28} />
+                  </Table.Td>
                 </Table.Tr>
               ))}
         </Table.Tbody>
@@ -280,7 +302,7 @@ function OrdersStack({ orders }: { orders: Order[] | null }) {
               <Group justify="space-between" wrap="nowrap" gap="xs">
                 <Group gap="xs" wrap="nowrap">
                   <OrderLink order={order} />
-                  <OrderStatusBadge status={order.status} />
+                  <StatusBadges order={order} />
                 </Group>
                 <OrderMenu order={order} />
               </Group>
@@ -295,7 +317,7 @@ function OrdersStack({ orders }: { orders: Order[] | null }) {
                 {itemsSummary(order)}
               </Text>
               <Text size="sm" c="dimmed">
-                {orderDate(order)}・{order.staff}
+                {order.date}・{order.staff}
               </Text>
             </Stack>
           ) : (
@@ -495,9 +517,14 @@ function OrdersCard({
                 value={tab.value}
                 disabled={state !== 'ready'}
                 rightSection={
-                  // No count until the orders arrive. A skeleton here would sit on the pills' own gray and not show.
+                  /*
+                   * While loading, a skeleton holds the count's place, so the tabs keep the width they take once the
+                   * counts arrive. After a failure no count is coming, so none is shown.
+                   */
                   state === 'ready' ? (
                     <Badge color={attention ? ATTENTION_COLOR : undefined}>{count}</Badge>
+                  ) : loading ? (
+                    <Skeleton height={22} width={28} />
                   ) : undefined
                 }
               >
@@ -618,11 +645,15 @@ function OrderListPage({
             </Title>
             {/*
              * The moment the list stands at, not a period: the orders shown are set by the conditions, and the date
-             * field says when it narrows them.
+             * field says when it narrows them. The moment comes with the orders, so it waits as a skeleton while
+             * they load, and is left out when they could not be read.
              */}
-            <Text size="sm" c="dimmed">
-              {monthDay(asOfDay ?? '')} {asOfTime} 時点の受注です。
-            </Text>
+            {state === 'ready' && (
+              <Text size="sm" c="dimmed">
+                {monthDay(asOfDay ?? '')} {asOfTime} 時点の受注です。
+              </Text>
+            )}
+            {state === 'loading' && <Skeleton height={12} width={200} my={4} />}
           </Stack>
           <Button leftSection={<IconPlus size={ICON_SIZE} />}>受注を登録</Button>
         </Group>
@@ -643,7 +674,7 @@ export const Loading: Story = {
     docs: {
       description: {
         story:
-          '取得の待ち（データパターンの「読み込み中」）です。見出し・タブの名前・絞り込みの欄・表の見出しは読み込み後と同じ位置に出し、行・件数の表示・ページ送りだけを Skeleton にしました。タブの件数は Skeleton にするとタブの地に紛れて見えないので、読み込むまで出さず、欄とタブは押しても結果が無いので無効にしています。',
+          '取得の待ち（データパターンの「読み込み中」）です。見出し・タブの名前・絞り込みの欄・表の見出しは読み込み後と同じ位置に出し、受注と一緒に届く見出しの補足（時点）、タブの件数、行、件数の表示、ページ送りを Skeleton にしました。表の列幅は読み込み後と同じ定義にし、行末のメニューの列にも Skeleton を置いて、受注が届いても列とタブの幅が動かないようにしています。欄とタブは押しても結果が無いので無効にしています。',
       },
     },
   },
@@ -669,7 +700,7 @@ export const LoadFailed: Story = {
     docs: {
       description: {
         story:
-          '取得の失敗（データパターンの「取得の失敗」）です。自分の担当の未発送を開いたときに失敗した場面で、何が起きたかを見出しに、まず再読み込みし、直らなければ時間をおき、それでも続けば情報システムの担当者に連絡することを 1 文にした Alert を、表のあった場所に置きました。タブと絞り込みの欄は選んだ条件を見せたまま無効にし、再読み込みで同じ条件の受注が戻るようにしています。件数・表・ページ送りは消し、受注の登録は一覧の取得と関係なく使えるので残しています。',
+          '取得の失敗（データパターンの「取得の失敗」）です。自分の担当の未発送を開いたときに失敗した場面で、何が起きたかを見出しに、まず再読み込みし、直らなければ時間をおき、それでも続けば情報システムの担当者に連絡することを 1 文にした Alert を、表のあった場所に置きました。タブと絞り込みの欄は選んだ条件を見せたまま無効にし、再読み込みで同じ条件の受注が戻るようにしています。見出しの補足の時点・タブの件数・件数の表示・表・ページ送りは、読み込めていないので消し、受注の登録は一覧の取得と関係なく使えるので残しています。',
       },
     },
   },

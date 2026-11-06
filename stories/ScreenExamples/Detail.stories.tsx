@@ -163,7 +163,8 @@ function shippingVerdict(order: Order): Verdict {
     const due = restock ? `${restock}に入荷する予定です。` : '入荷の予定はまだありません。';
     return `${product.name}が ${quantity - product.quantity} ${product.unit}足りません。${due}`;
   });
-  if (order.status === 'paymentPending') reasons.push('入金をまだ確認していません。');
+  // The reason names the rule as well as the fact, so the person sees why money stops the shipment.
+  if (order.status === 'paymentPending') reasons.push('前払いのため、入金の確認を待っています。');
   if (reasons.length > 0) {
     const notice = isDelayNoticeSent(order) ? '顧客へは遅れを連絡済みです。' : '';
     return { icon: IconAlertCircle, text: `発送できません。${reasons.join('')}${notice}` };
@@ -867,7 +868,7 @@ function NotFoundContent({ id }: { id: string }) {
           <EmptyState.Title order={2}>受注が見つかりません</EmptyState.Title>
           <EmptyState.Description>
             {ORGANIZATION.name}
-            の受注に、この受注番号はありません。ほかの組織の受注なら、サイドバーのいちばん上で組織を切り替えてから開き直してください。
+            の受注に、この受注番号はありません。見出しの番号に打ち間違いが無いか確かめてください。ほかの組織の受注なら、サイドバーのいちばん上で組織を切り替えてから開き直してください。
           </EmptyState.Description>
           <EmptyState.Actions>
             <Button leftSection={<IconList size={ICON_SIZE} />}>受注一覧で探す</Button>
@@ -915,7 +916,7 @@ export const PaymentPending: Story = {
     docs: {
       description: {
         story:
-          'データパターンの「入金待ち」（銀行振込の前払い、明細 2 行、希望の着日なし）です。見出しの下の 1 行が入金を確認するまで発送できないことを答え、塗りのボタンは「発送を記録」の代わりに「入金を記録」になります。入金日を入れて記録すると未発送に変わり、1 行は発送できるという答えに、ボタンは「発送を記録」に替わります。',
+          'データパターンの「入金待ち」（銀行振込の前払い、明細 2 行、希望の着日なし）です。見出しの下の 1 行が、発送できないことと、前払いのため入金の確認を待っているという理由を答え、塗りのボタンは「発送を記録」の代わりに「入金を記録」になります。入金日を入れて記録すると未発送に変わり、1 行は発送できるという答えに、ボタンは「発送を記録」に替わります。',
       },
     },
   },
@@ -954,7 +955,7 @@ export const NotFound: Story = {
     docs: {
       description: {
         story:
-          'データパターンの「受注が見つからない」です。見出しには開いた受注番号だけを出して打ち間違いに気づけるようにし、Card で、探した組織に無いことと、ほかの組織の受注なら組織を切り替えて開き直すことを 1 度だけ書きます。組織の切り替えはどの幅でもサイドバーのいちばん上にある（スマホではメニューのボタンで開く）ので場所を名指しし、「受注一覧で探す」が狭い幅でも戻る道になるので、画面上部の戻るリンクは出しません。',
+          'データパターンの「受注が見つからない」です。見出しには開いた受注番号だけを出して打ち間違いに気づけるようにし、Card で、探した組織に無いこと、見出しの番号に打ち間違いが無いかを確かめること、ほかの組織の受注なら組織を切り替えて開き直すことを 1 度ずつ書きます。組織の切り替えはどの幅でもサイドバーのいちばん上にある（スマホではメニューのボタンで開く）ので場所を名指しし、「受注一覧で探す」が狭い幅でも戻る道になるので、画面上部の戻るリンクは出しません。',
       },
     },
   },

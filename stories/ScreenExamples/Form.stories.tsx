@@ -228,10 +228,11 @@ function ProductFormPage({
 
   const saving = savingProp || form.submitting;
   const suffix = unit ? ` ${unit}` : undefined;
-  // The line has the same shape before and after a price is typed, so it needs no word on how it works.
-  const priceWithTax =
-    !isBlank(price) && Number(price) > 0 ? yen(Math.floor(Number(price) * (1 + TAX_RATE))) : '—';
-  const priceNote = `税込 ${priceWithTax}（1 ${unit ?? '単位'}あたり）`;
+  // Before a price is typed, the line says what will appear on it; a bare placeholder figure would not tell.
+  const priceNote =
+    !isBlank(price) && Number(price) > 0
+      ? `税込 ${yen(Math.floor(Number(price) * (1 + TAX_RATE)))}（1 ${unit ?? '単位'}あたり）`
+      : '単価を入れると、税込の金額を表示します。';
   const reorderNow =
     product !== undefined && !isBlank(reorderPoint) && product.quantity < Number(reorderPoint);
 
@@ -552,7 +553,7 @@ export const CreateProduct: Story = {
     docs: {
       description: {
         story:
-          'データパターンの「何も入っていない」です。商品コードの欄には次に空いている番号を「例:」を付けて薄く出し、入力済みの値と見分けられるようにしています。単価の下には、入力する前から「税込 —（1 単位あたり）」の形で行を置き、単価と単位を入れるとその場で金額と単位が入ります。在庫の欄には、単位を選ぶまで単位を付けません。',
+          'データパターンの「何も入っていない」です。商品コードの欄には次に空いている番号を「例:」を付けて薄く出し、入力済みの値と見分けられるようにしています。単価の下には、入力する前は「単価を入れると、税込の金額を表示します。」と、その行に何が出るかを書き、単価を入れるとその場で「税込 ¥1,078（1 箱あたり）」の形に替わります。在庫の欄には、単位を選ぶまで単位を付けません。',
       },
     },
   },
