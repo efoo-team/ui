@@ -343,7 +343,7 @@ function OrganizationMenu({ rail }) {
 
 パッケージは Text の `variant` の型に `metric`・`emphasis` を足しています（`declare module '@mantine/core'` で `TextProps.variant` を広げる形）。サービスでも `TextProps.variant` を独自の型で広げると TypeScript が TS2717 を出すので、独自の variant は文字列のまま渡してください（型は任意の文字列を受け付けます）。
 
-画面の下に固定する操作の欄（保存の欄など）は、Affix の variant `action-bar` で作ります。`<Affix variant="action-bar" withinPortal={false} pos="sticky" position={{ bottom: 0 }}><Card>…</Card></Affix>` の形で、重なり順（`app` の 1 つ下）、本文の背景色の帯、下の余白（`md`）、中の Card の padding（`md`）、中のリンクの押せる高さは theme が持ちます。この欄の中では Card の `padding` prop が効かず、`Card.Section` の端も揃いません。
+画面の下に固定する操作の欄（保存の欄など）は、Affix の variant `sticky-actions` で作ります。`<Affix variant="sticky-actions" withinPortal={false} pos="sticky" position={{ bottom: 0 }}><Card>…</Card></Affix>` の形で、重なり順（`app` の 1 つ下）、本文の背景色の帯、下の余白（`md`）、中の Card の padding（`md`）、中のリンクの押せる高さは theme が持ちます。この欄の中では Card の `padding` prop が効かず、`Card.Section` の端も揃いません。
 
 Badge の既定は `variant="light"` です。`color` を指定しない Badge は shadcn/ui の secondary（muted の面に本文の色の文字）、状態色の Badge は色の 10% の面に色の文字になります。塗りつぶしにする場合は `variant="filled"` を指定します。
 

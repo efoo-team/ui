@@ -399,7 +399,7 @@ export const efooTheme: MantineThemeOverride = createTheme({
       },
     }),
     ActionIcon: ActionIcon.extend({ classNames: { root: actionIconClasses.root } }),
-    // variant="action-bar" draws a bar of actions kept at the bottom of the window; see affix.module.css.
+    // variant="sticky-actions" draws a bar of actions kept at the bottom of the window; see affix.module.css.
     Affix: Affix.extend({ classNames: { root: affixClasses.root } }),
     Alert: Alert.extend({
       classNames: (theme, props) => ({

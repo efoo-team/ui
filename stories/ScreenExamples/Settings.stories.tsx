@@ -696,10 +696,15 @@ function SettingsPage({
           {/*
            * The save bar exists only while something is unsaved. It stays in the content column and sticks to the
            * bottom of the window, so the save button is in reach at any scroll position and at phone width. The
-           * theme's action-bar variant draws it over the page, under the header and the narrow-screen sidebar.
+           * theme's sticky-actions variant draws it over the page, under the header and the narrow-screen sidebar.
            */}
           {dirty && (
-            <Affix variant="action-bar" withinPortal={false} pos="sticky" position={{ bottom: 0 }}>
+            <Affix
+              variant="sticky-actions"
+              withinPortal={false}
+              pos="sticky"
+              position={{ bottom: 0 }}
+            >
               <Card ref={saveBarRef} tabIndex={-1} role="region" aria-label="保存していない変更">
                 <Group justify="space-between" gap="sm">
                   {/* Errors exist only after a save has failed; the field clears its own as soon as it changes. */}
