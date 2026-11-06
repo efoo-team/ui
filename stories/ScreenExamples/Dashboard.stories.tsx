@@ -27,13 +27,16 @@ import {
   ALL_PRODUCTS,
   ATTENTION_COLOR,
   INQUIRIES,
+  isoDate,
   LATE_DAYS,
   lateDays,
+  monthDay,
   needsReorder,
   ORDERS,
   sum,
   yen,
   type Order,
+  type Product,
 } from './shared/data';
 import { OrderLink } from './shared/OrderLink';
 import { OrderMenu } from './shared/OrderMenu';
@@ -53,7 +56,7 @@ const meta = {
           '架空の販売管理サービスのダッシュボードです。\n\n' +
           '**目的と読み手**　受注・在庫・問い合わせを扱う社員が、サイドバーの「ホーム」から毎日くり返し開く画面です。今月の実績と、いま対応が要るものを開いてすぐに確かめ、対応する画面へ進むことを目的にしています。\n\n' +
           '**情報構造**　受注・商品（在庫）・問い合わせの 3 つの対象を、それぞれの画面へ入る前の要約として扱います。主は最上段の 4 つの数字（今月の受注額と、対応が要る未発送の受注・発注が必要な品目・未対応の問い合わせの件数）で、受注の推移・品目ごとの在庫・最近の受注・問い合わせの内訳は、その数字の中身を示す従の情報です。最近の受注は前に開いてから入った受注の要約で、受注を探すことは受注一覧の画面に任せます。受注は顧客と担当者に、商品は在庫数・発注点・適正在庫に結び付きます。\n\n' +
-          '**データパターン**　数字は 4 つで、金額は 7 桁、件数は 0〜2 桁です。受注の推移は 1 日 1 点で 7・31・90 日、在庫は全 12 品目（うち 4 品目が発注点割れ）のうち発注点に近い 5 品目で、品目ごとに在庫数・発注点・適正在庫（2〜3 桁）を持ちます。受注は 10 月 14 日〜31 日の 36 件（うち未発送 5 件、そのうち受注から 2 日以上は 2 件。金額は 1 件 ¥495〜¥171,325、顧客名は 3〜7 文字）のうち、受注日が新しい 5 件を表示します。対応が要る件数は 0 になることがあり、そのときは「要発送」などの Badge を出さず、補足を「未発送の受注はありません。」のように替えます。状態は story『ダッシュボード』の 1 つにまとめ、その中に集計中の部分（「今週の売れ筋」の読み込み中の表示）を含みます。画面全体の読み込み中と取得の失敗、件数が 0 のときの story はありません。\n\n' +
+          '**データパターン**　数字は 4 つで、金額は 7 桁、件数は 0〜2 桁です。受注の推移は 1 日 1 点で 7・31・90 日、在庫は全 12 品目（うち 4 品目が発注点割れ）のうち発注点に近い 5 品目で、品目ごとに在庫数・発注点・適正在庫（2〜3 桁）を持ちます。受注は 10 月 14 日〜31 日の 36 件（うち未発送 5 件、そのうち受注から 2 日以上は 2 件。金額は 1 件 ¥495〜¥171,325、顧客名は 3〜7 文字）のうち、受注日が新しい 5 件を表示します。今週の売れ筋は、10 月 26 日からの受注（キャンセル済みを除く）で受注額が多い 3 品目です。対応が要る件数は 0 になることがあり、そのときは「要発送」などの Badge を出さず、補足を「未発送の受注はありません。」のように替えます。状態は story『ダッシュボード』の 1 つにまとめ、その中に集計中の部分（「今週の売れ筋」の読み込み中の表示）を含みます。画面全体の読み込み中と取得の失敗、件数が 0 のときの story はありません。\n\n' +
           '**情報の流れ**　利用者はまず最上段の左端で今月の受注額をつかみ、続く 3 枚（未発送の受注、発注が必要な品目、未対応の問い合わせ）の件数から、今日対応が要るものがあるかを判断します。対応が要れば、そのカードのリンクから、受注一覧の未発送・発注が必要な品目・未対応の問い合わせの画面へ進んで対応します。どの品目かをこの画面で先に確かめたいときは下の在庫の残りを、前に開いてから入った受注は最近の受注を見て、受注を探すときは最近の受注の下のリンクから受注一覧へ移ります。\n\n' +
           '**主役**　流れの起点で、判断の場でもある最上段の 4 つの数字です。対応が要る 3 つの件数を受注額と同じ段に並べ、件数が 1 以上のものにだけ色の Badge を付けて、数字を見渡した目が対応の要るカードに留まるようにしました。そのカードの下の端に、数字と同じ対象を名前にしたリンク（「未発送の受注を見る」「発注が必要な品目を見る」「未対応の問い合わせを見る」）を置き、判断した場所からそのまま対応へ進めるようにしています。スマホの幅では 4 枚を 1 列に並べたまま数字をラベルの右に上げ、4 つの数字とリンクが最初の 1 画面に収まるようにしました。2 列にすると受注額の 7 桁が数字の大きさのまま入らないためです。\n\n' +
           '**抑えたもの・使わなかったもの**　カード全体はリンクにせず、行き先を名前にしたリンクを置きました。カード全体だと、読み上げでカードの文がすべてリンクの名前になり、行き先が伝わりにくいためです。対応の判断に使わない新規顧客の数は最上段に置かず、増えた受注額は良い知らせでも対応は要らないので枠線だけの Badge にし、どの問い合わせに対応するかを示さない問い合わせの内訳は、未対応の数字の近くに上げず下の段に置いています。最近の受注は新しい 5 件に絞り、状態のタブ・検索・絞り込み・ページ送りを持たせず、末尾に「受注一覧を見る」を置きました。ここで受注を探し始めると画面が受注一覧と同じ長さに伸び、下のカードが遠くなるうえ、対応が要る受注への入口は最上段のカードが既に担っているためです。受注一覧の画面例とは、受注番号のリンク・状態の Badge・行のメニュー・スマホの幅での 1 件ずつのまとまりを揃えています。在庫の残りは、棒を赤くする基準の発注点と、棒がいっぱいになる適正在庫を品目ごとに棒の下へ書き、補足には母数（全 12 品目）を書きました。問い合わせの対応状況の帯は対応済み・対応中・未対応の 3 区間に分け、色は未対応の区間と、その名前の前の点にだけ付けました。最上段とサイドバーで赤く示す同じ 14 件を、ここでも対応が要るものとして扱うためです。\n\n' +
@@ -201,6 +204,28 @@ const STATS: Stat[] = [
 
 // ORDERS is newest first.
 const RECENT_ORDERS = ORDERS.slice(0, 5);
+
+// This week runs from Monday, October 26, to the day the screens show. Cancelled orders sold nothing.
+const WEEK_START = '10/26';
+const BEST_SELLER_COUNT = 3;
+const BEST_SELLERS = (() => {
+  const totals = new Map<string, { product: Product; quantity: number; amount: number }>();
+  for (const order of ORDERS) {
+    if (order.status === 'cancelled' || isoDate(order.date) < isoDate(WEEK_START)) continue;
+    for (const line of order.lines) {
+      const total = totals.get(line.product.code) ?? {
+        product: line.product,
+        quantity: 0,
+        amount: 0,
+      };
+      total.quantity += line.quantity;
+      total.amount += line.unitPrice * line.quantity;
+      totals.set(line.product.code, total);
+    }
+  }
+  // Products count in different units, so the amount sold ranks them.
+  return [...totals.values()].sort((a, b) => b.amount - a.amount).slice(0, BEST_SELLER_COUNT);
+})();
 
 /*
  * The card itself is not a link: a whole-card link reads every line as its name and hides where it goes. A link
@@ -500,24 +525,45 @@ function InquiriesCard() {
 
 /*
  * Waiting is said the same way on every screen: the skeletons hold the place for the eye, and a status line that only a
- * screen reader reads says what is on its way, since the skeletons say nothing to it. The line sits outside the
+ * screen reader reads says what is on its way, since the skeletons say nothing to it. The line stays in place empty
+ * once the products are shown, so a screen reader reads it when the card starts waiting again, and sits outside the
  * aria-busy part, where a screen reader may hold back what changes until the wait is over.
  */
-function BestSellersCard() {
+function BestSellersCard({ loading }: { loading: boolean }) {
   return (
-    <SectionCard h="100%" title="今週の売れ筋">
-      <VisuallyHidden role="status">今週の売れ筋を集計しています</VisuallyHidden>
-      <Stack gap="sm" aria-busy="true">
-        {[0, 1, 2].map((row) => (
-          <Group key={row} gap="sm" wrap="nowrap">
-            <Skeleton height={36} width={36} />
-            <Stack gap={6} flex={1}>
-              <Skeleton height={12} width="70%" />
-              <Skeleton height={12} width="40%" />
+    <SectionCard
+      h="100%"
+      title="今週の売れ筋"
+      description={`${monthDay(WEEK_START)}からの受注額が多い ${BEST_SELLER_COUNT} 品目です。`}
+    >
+      <VisuallyHidden role="status">{loading ? '今週の売れ筋を集計しています' : ''}</VisuallyHidden>
+      {loading ? (
+        <Stack gap="sm" aria-busy="true">
+          {Array.from({ length: BEST_SELLER_COUNT }, (_, row) => (
+            <Stack key={row} gap={6}>
+              <Group justify="space-between" wrap="nowrap" gap="xs">
+                <Skeleton height={12} width="60%" />
+                <Skeleton height={12} width={64} />
+              </Group>
+              <Skeleton height={12} width="30%" />
             </Stack>
-          </Group>
-        ))}
-      </Stack>
+          ))}
+        </Stack>
+      ) : (
+        <Stack gap="sm" role="list" aria-label="今週の売れ筋">
+          {BEST_SELLERS.map((item) => (
+            <Stack key={item.product.code} gap={6} role="listitem">
+              <Group justify="space-between" wrap="nowrap" gap="xs">
+                <Text size="sm">{item.product.name}</Text>
+                <Text size="sm">{yen(item.amount)}</Text>
+              </Group>
+              <Text size="xs" c="dimmed">
+                {item.quantity} {item.product.unit}
+              </Text>
+            </Stack>
+          ))}
+        </Stack>
+      )}
     </SectionCard>
   );
 }
@@ -556,7 +602,8 @@ function DashboardPage() {
             <InquiriesCard />
           </Grid.Col>
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <BestSellersCard />
+            {/* The week's totals are still being counted when the screen opens; the other cards do not wait. */}
+            <BestSellersCard loading />
           </Grid.Col>
         </Grid>
       </Stack>
@@ -570,7 +617,7 @@ export const Dashboard: Story = {
     docs: {
       description: {
         story:
-          'データパターンのうち、10 月 31 日時点で読み込みが済み、対応が要る 3 つの件数がどれも 1 以上の状態です。集計の終わっていない「今週の売れ筋」だけを読み込み中の表示（Skeleton）にして、ほかのカードは待たせずに見せています。Skeleton はスクリーンリーダーに何も伝えないので、読み上げだけに届く「今週の売れ筋を集計しています」の行（role="status"）を添えています。読み込み中の表し方は、ほかの画面例と同じです。',
+          'データパターンのうち、10 月 31 日時点で読み込みが済み、対応が要る 3 つの件数がどれも 1 以上の状態です。集計の終わっていない「今週の売れ筋」だけを読み込み中の表示（Skeleton）にして、ほかのカードは待たせずに見せています。Skeleton はスクリーンリーダーに何も伝えないので、読み上げだけに届く「今週の売れ筋を集計しています」の行（role="status"）を添え、集計が終わって品目を出した後も、次に集計を始めたときに読み上げられるよう空のまま残します。読み込み中の表し方は、ほかの画面例と同じです。',
       },
     },
   },
