@@ -272,16 +272,6 @@ export const ORDER_STATUS: Record<OrderStatus, { label: string; attention: boole
 export const isCancellable = (order: { status: OrderStatus }) =>
   order.status === 'notShipped' || order.status === 'paymentPending';
 
-const STATUS_ORDER: OrderStatus[] = [
-  'notShipped',
-  'shipped',
-  'shipped',
-  'paymentPending',
-  'shipped',
-  'notShipped',
-  'cancelled',
-];
-
 export const PAYMENT_METHODS = [
   '請求書払い（月末締め翌月末払い）',
   '銀行振込（前払い）',
@@ -356,10 +346,39 @@ function orderHistory(
   return events;
 }
 
+// The customer of each order as an index into CUSTOMERS, newest order first. Regular customers order every few days
+// and small ones now and then, whatever state their earlier orders are in, so a customer's orders mix states.
+const ORDER_CUSTOMERS = [
+  0, 2, 1, 3, 6, 0, 5, 1, 2, 4, 0, 3, 1, 5, 2, 0, 6, 1, 3, 2, 4, 0, 1, 5, 2, 0, 3, 1, 6, 4, 0, 2, 5,
+  1, 0, 3,
+];
+
+/*
+ * The state follows the age of an order, as in a wholesaler's real book: an order is shipped within a day or two, so
+ * the unshipped ones are the last days' orders, and only two have waited two days or more (SO-010228 waits for
+ * ballpoint pens that are short in stock). Bank transfers wait a few days for the payment, and a few orders anywhere
+ * in the period are cancelled. Every order not listed here is shipped.
+ */
+const ORDER_STATUSES: Record<string, OrderStatus> = {
+  'SO-010240': 'notShipped',
+  'SO-010239': 'paymentPending',
+  'SO-010238': 'notShipped',
+  'SO-010237': 'notShipped',
+  'SO-010236': 'paymentPending',
+  'SO-010235': 'notShipped',
+  'SO-010231': 'paymentPending',
+  'SO-010229': 'cancelled',
+  'SO-010228': 'notShipped',
+  'SO-010224': 'paymentPending',
+  'SO-010220': 'cancelled',
+  'SO-010208': 'cancelled',
+};
+
 // 36 orders, two a day from October 31 back to October 14.
 export const ORDERS: Order[] = Array.from({ length: 36 }, (_, index) => {
-  const customer = CUSTOMERS[(index * 3) % CUSTOMERS.length]!;
-  const status = STATUS_ORDER[index % STATUS_ORDER.length]!;
+  const id = `SO-${String(10_240 - index).padStart(6, '0')}`;
+  const customer = CUSTOMERS[ORDER_CUSTOMERS[index]!]!;
+  const status = ORDER_STATUSES[id] ?? 'shipped';
   const staff = STAFF[(index * 2) % STAFF.length]!;
   const date = `10/${31 - Math.floor(index / 2)}`;
   // Only bank transfer is paid before shipping, so it is the payment of the orders waiting for it.
@@ -368,7 +387,7 @@ export const ORDERS: Order[] = Array.from({ length: 36 }, (_, index) => {
   const subtotal = sum(lines.map((line) => line.unitPrice * line.quantity));
   const tax = Math.floor(subtotal * TAX_RATE);
   return {
-    id: `SO-${String(10_240 - index).padStart(6, '0')}`,
+    id,
     customer,
     status,
     staff,
