@@ -187,8 +187,10 @@ export const efooCssVariablesResolver: CSSVariablesResolver = (theme) => ({
     // The input line keeps 3:1 against a Card and the input surface (zinc-9) and the page: zinc-5 at 57% over zinc-6.
     // Surface lines keep white 10%. The focus line (zinc-5) stays brighter than it.
     '--efoo-color-input-border': `color-mix(in srgb, var(--mantine-color-${z}-5) 57%, var(--mantine-color-${z}-6))`,
+    // The error line is the error red (red-4) at 70%, which keeps 3:1 against the page, a Card and the input surface;
+    // shadcn/ui's 50% falls to 2.4:1 on them.
     '--efoo-color-input-error-border':
-      'color-mix(in srgb, var(--mantine-color-error) 50%, transparent)',
+      'color-mix(in srgb, var(--mantine-color-error) 70%, transparent)',
     // shadcn/ui's dark outline surface: its input line (white 15%) at 30%, and at 50% on hover.
     '--efoo-color-outline-bg': 'color-mix(in srgb, white 4.5%, transparent)',
     '--efoo-color-outline-hover': 'color-mix(in srgb, white 7.5%, transparent)',

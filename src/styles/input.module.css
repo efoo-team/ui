@@ -36,7 +36,7 @@
     color: var(--mantine-color-text);
   }
 
-  /* shadcn/ui's dark error line is the destructive red at 50%; light keeps the full red. */
+  /* The error line: the full red in light, the red at 70% in dark (--efoo-input-error-border). */
   .wrapper[data-error]:not([data-variant='unstyled']) {
     --input-bd: var(--efoo-input-error-border);
   }
