@@ -20,7 +20,7 @@ import {
 import { useForm, type FormErrors } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconAlertCircle } from '@tabler/icons-react';
-import { useRef, useState, type MouseEvent } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { AppFrame } from './shared/AppFrame';
 import { BackLink } from './shared/BackLink';
 import {
@@ -236,9 +236,25 @@ function ProductFormPage({
   const reorderNow =
     product !== undefined && !isBlank(reorderPoint) && product.quantity < Number(reorderPoint);
 
+  /*
+   * Saving disables the fieldset and the save button, so the field or the button that had focus loses it to the page's
+   * body. Once the save ends, focus goes back to that element, so Tab goes on from where the user was. Focus the user
+   * moved during the save, such as to a link, stays where it is.
+   */
+  const focusBeforeSave = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const target = focusBeforeSave.current;
+    if (saving || !target) return;
+    focusBeforeSave.current = null;
+    if (document.activeElement !== document.body) return;
+    target.focus({ preventScroll: true });
+  }, [saving]);
+
   const submit = form.onSubmit(
     // The service would send the values here; the story waits as long as a save takes and reports it.
     async (values) => {
+      focusBeforeSave.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
       await new Promise((resolve) => setTimeout(resolve, 1200));
       if (editing) {
         setSavedName(values.name);

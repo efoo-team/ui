@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useRef, useState, type MouseEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import {
   Affix,
   Anchor,
@@ -377,23 +377,27 @@ function SettingsPage({
   };
 
   /*
-   * The save button is disabled while it saves, and the bar goes away once nothing is unsaved, so focus on either would
-   * fall to the page's body. It moves to the page's heading without scrolling, so Tab starts again from the top of the
-   * page. Focus elsewhere, such as the field where Enter submitted the form, stays where it is.
+   * Saving disables the save button, so focus on it falls to the page's body. Once the save ends, focus goes back to
+   * the element that had it, or to the page's heading when that element has gone with the save bar, which shows only
+   * while something is unsaved, so Tab goes on from where the user was. Focus elsewhere, such as the field where Enter
+   * submitted the form or where the user moved during the save, stays where it is.
    */
-  const keepFocusOnPage = () => {
-    const active = document.activeElement;
-    if (active === document.body || saveBarRef.current?.contains(active)) {
-      titleRef.current?.focus({ preventScroll: true });
-    }
-  };
+  const focusBeforeSave = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const target = focusBeforeSave.current;
+    if (saving || !target) return;
+    focusBeforeSave.current = null;
+    if (document.activeElement !== document.body) return;
+    (target.isConnected ? target : titleRef.current)?.focus({ preventScroll: true });
+  }, [saving]);
 
   // Saving is pretended: after a short wait the edited values become the saved ones.
   const save = form.onSubmit(
     (submitted) => {
+      focusBeforeSave.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
       setSaving(true);
       window.setTimeout(() => {
-        keepFocusOnPage();
         setSaved(submitted);
         setSaving(false);
         notifications.show({
@@ -413,8 +417,11 @@ function SettingsPage({
 
   const errorFields = CHECKED_FIELDS.filter(([field]) => form.errors[field]);
 
+  // The save bar goes away with the changes, so focus in it moves to the page's heading, as after a save.
   const discard = () => {
-    keepFocusOnPage();
+    if (saveBarRef.current?.contains(document.activeElement)) {
+      titleRef.current?.focus({ preventScroll: true });
+    }
     form.setValues(saved);
     form.clearErrors();
   };
