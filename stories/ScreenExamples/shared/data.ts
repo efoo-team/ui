@@ -8,6 +8,25 @@ export const ATTENTION_COLOR = 'red';
 export const yen = (value: number) => `¥${value.toLocaleString('ja-JP')}`;
 export const sum = (values: number[]) => values.reduce((total, value) => total + value, 0);
 
+// The moment the screens show, in the forms the data uses: the ISO date that date inputs take and return, and the
+// month/day with time of OrderEvent.at, which an action taken on a screen is stamped with.
+export const NOW = { date: '2026-10-31', at: '10/31 14:20' };
+
+// Order.date is month/day ('10/31'); the year is the one of NOW.
+const monthAndDay = (date: string) => date.split('/');
+
+// '10/31' -> '10 月 31 日', the way the screens write a date in a sentence.
+export const monthDay = (date: string) => {
+  const [month, day] = monthAndDay(date);
+  return `${month} 月 ${day} 日`;
+};
+
+// '10/31' -> '2026-10-31', the form date inputs return, so an order's date compares with them as a string.
+export const isoDate = (date: string) => {
+  const [month = '', day = ''] = monthAndDay(date);
+  return `${NOW.date.slice(0, 4)}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+};
+
 export interface Organization {
   name: string;
   initial: string;
@@ -163,6 +182,82 @@ export const PRODUCTS: Product[] = [
 
 export const needsReorder = (product: Product) => product.quantity < product.reorderPoint;
 
+// Every product the wholesaler sells: the five above, which the orders use, and a catalog-sized tail, so a product
+// list reads like a real one and a new product code follows the last one in use.
+export const ALL_PRODUCTS: Product[] = [
+  ...PRODUCTS,
+  {
+    code: 'P-1006',
+    name: '油性マーカー 黒（10 本）',
+    category: '筆記具',
+    unit: '箱',
+    price: 980,
+    quantity: 44,
+    reorderPoint: 30,
+    target: 150,
+  },
+  {
+    code: 'P-1007',
+    name: 'シャープペンシル 0.5mm',
+    category: '筆記具',
+    unit: '本',
+    price: 220,
+    quantity: 26,
+    reorderPoint: 40,
+    target: 160,
+  },
+  {
+    code: 'P-1008',
+    name: 'リングファイル A4 2 穴',
+    category: 'ファイル',
+    unit: '冊',
+    price: 380,
+    quantity: 75,
+    reorderPoint: 40,
+    target: 180,
+  },
+  {
+    code: 'P-1009',
+    name: 'A3 コピー用紙（250 枚）',
+    category: '用紙',
+    unit: '箱',
+    price: 3_200,
+    quantity: 12,
+    reorderPoint: 10,
+    target: 60,
+  },
+  {
+    code: 'P-1010',
+    name: '感熱ロール紙 58mm（20 巻）',
+    category: '用紙',
+    unit: '箱',
+    price: 1_850,
+    quantity: 9,
+    reorderPoint: 15,
+    target: 80,
+  },
+  {
+    code: 'P-1011',
+    name: 'ダブルクリップ 中（10 個）',
+    category: '事務用品',
+    unit: '箱',
+    price: 160,
+    quantity: 95,
+    reorderPoint: 40,
+    target: 200,
+  },
+  {
+    code: 'P-1012',
+    name: '修正テープ 5mm',
+    category: '筆記具',
+    unit: '個',
+    price: 240,
+    quantity: 130,
+    reorderPoint: 60,
+    target: 220,
+  },
+];
+
 export type OrderStatus = 'paymentPending' | 'notShipped' | 'shipped' | 'cancelled';
 
 // Only "not shipped" asks the user to act; the other states are shown without color.
@@ -172,6 +267,10 @@ export const ORDER_STATUS: Record<OrderStatus, { label: string; attention: boole
   shipped: { label: '発送済み', attention: false },
   cancelled: { label: 'キャンセル', attention: false },
 };
+
+// A shipped or cancelled order can no longer be cancelled.
+export const isCancellable = (order: { status: OrderStatus }) =>
+  order.status === 'notShipped' || order.status === 'paymentPending';
 
 const STATUS_ORDER: OrderStatus[] = [
   'notShipped',

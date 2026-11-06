@@ -1,4 +1,12 @@
-import { useEffect, useId, useRef, useState, type ReactElement, type ReactNode } from 'react';
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type MouseEvent,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 import {
   ActionIcon,
   Anchor,
@@ -81,10 +89,12 @@ interface NavbarProps {
   page: string | undefined;
   organization: Organization;
   onOrganizationChange: (organization: Organization) => void;
+  counts: Partial<Record<string, number>> | undefined;
   openedParents: string[];
   onToggleParent: (label: string) => void;
   onExpandParent: (label: string) => void;
-  onNavigate: () => void;
+  onNavigate: (label: string, event: MouseEvent<HTMLElement>) => void;
+  onClose: () => void;
 }
 
 /*
@@ -181,10 +191,12 @@ function Navbar({
   page,
   organization,
   onOrganizationChange,
+  counts,
   openedParents,
   onToggleParent,
   onExpandParent,
   onNavigate,
+  onClose,
 }: NavbarProps) {
   return (
     <>
@@ -198,12 +210,13 @@ function Navbar({
             />
           </Stack>
           {/* With layout="alt" the open navbar covers the header on narrow screens, so it carries its own close button. */}
-          <CloseButton hiddenFrom="sm" onClick={onNavigate} aria-label="サイドバーを閉じる" />
+          <CloseButton hiddenFrom="sm" onClick={onClose} aria-label="サイドバーを閉じる" />
         </Group>
       </AppShell.Section>
       <AppShell.Section grow component={ScrollArea} scrollbars="y">
         <Stack gap={4}>
-          {NAV_ITEMS.map(({ label, icon: ItemIcon, count, children }) => {
+          {NAV_ITEMS.map(({ label, icon: ItemIcon, count: defaultCount, children }) => {
+            const count = counts ? counts[label] : defaultCount;
             const name = count ? `${label}（未対応 ${count} 件）` : label;
             const icon = <ItemIcon size={ICON_SIZE} />;
             if (children) {
@@ -236,7 +249,7 @@ function Navbar({
                           label={child}
                           active={current}
                           aria-current={current ? 'page' : undefined}
-                          onClick={onNavigate}
+                          onClick={(event) => onNavigate(child, event)}
                         />
                       );
                     })}
@@ -255,7 +268,7 @@ function Navbar({
                   aria-label={name}
                   active={current}
                   aria-current={current ? 'page' : undefined}
-                  onClick={onNavigate}
+                  onClick={(event) => onNavigate(label, event)}
                   leftSection={icon}
                   rightSection={
                     count ? (
@@ -279,7 +292,7 @@ function Navbar({
             aria-label={SETTINGS_LABEL}
             active={parent === SETTINGS_LABEL}
             aria-current={parent === SETTINGS_LABEL ? 'page' : undefined}
-            onClick={onNavigate}
+            onClick={(event) => onNavigate(SETTINGS_LABEL, event)}
             leftSection={<IconSettings size={ICON_SIZE} />}
           />
         </Tooltip>
@@ -315,6 +328,20 @@ export interface AppFrameProps {
   page?: string;
   /** The page path in the header. Defaults to [parent, page]; the last item is the current screen. */
   breadcrumbs?: string[];
+  /** The organization selected in the switcher when the screen opens. Defaults to the first of ORGANIZATIONS. */
+  defaultOrganization?: Organization;
+  /**
+   * The counts beside the sidebar links without child links, by label. Defaults to the counts in NAV_ITEMS (the open
+   * inquiries); pass {} for an organization that has nothing to count yet.
+   */
+  counts?: Partial<Record<string, number>>;
+  /**
+   * Called with the label of a sidebar link or a page path item before the screen moves to it; return false to stay.
+   * A service does this with its router's navigation blocker (React Router's useBlocker, for example); in Storybook the
+   * links lead nowhere, so a screen that guards unsaved changes uses this instead. Links to the current screen, and
+   * buttons that only open child links or a menu, do not move and do not call it.
+   */
+  onBeforeNavigate?: (label: string) => boolean;
   /** The content of the main area. */
   children: ReactNode;
 }
@@ -324,13 +351,23 @@ export interface AppFrameProps {
  * the header with the page path, the global search and the account menu. A screen passes its place in the sidebar and
  * writes only the content of the main area.
  */
-export function AppFrame({ parent, page, breadcrumbs, children }: AppFrameProps) {
+export function AppFrame({
+  parent,
+  page,
+  breadcrumbs,
+  defaultOrganization,
+  counts,
+  onBeforeNavigate,
+  children,
+}: AppFrameProps) {
   const path = breadcrumbs ?? (page ? [parent, page] : [parent]);
   const [opened, { toggle, close }] = useDisclosure(false);
   const burgerRef = useRef<HTMLButtonElement>(null);
   const [desktopOpened, { toggle: toggleDesktop, open: openDesktop }] = useDisclosure(true);
   const [searchOpened, { open: openSearch, close: closeSearch }] = useDisclosure(false);
-  const [organization, setOrganization] = useState<Organization>(ORGANIZATIONS[0]!);
+  const [organization, setOrganization] = useState<Organization>(
+    defaultOrganization ?? ORGANIZATIONS[0]!,
+  );
   const [openedParents, setOpenedParents] = useState<string[]>([parent]);
   const navbarId = useId();
   const theme = useMantineTheme();
@@ -364,6 +401,15 @@ export function AppFrame({ parent, page, breadcrumbs, children }: AppFrameProps)
     openDesktop();
     setOpenedParents((current) => (current.includes(label) ? current : [...current, label]));
   };
+  // A press that the screen holds back keeps the narrow-screen navbar open, so the user is where they pressed.
+  const navigate = (label: string, event: MouseEvent<HTMLElement>) => {
+    const moves = event.currentTarget.getAttribute('aria-current') !== 'page';
+    if (moves && onBeforeNavigate?.(label) === false) {
+      event.preventDefault();
+      return;
+    }
+    close();
+  };
   const toggleParent = (label: string) =>
     setOpenedParents((current) =>
       current.includes(label) ? current.filter((value) => value !== label) : [...current, label],
@@ -396,8 +442,10 @@ export function AppFrame({ parent, page, breadcrumbs, children }: AppFrameProps)
             onOrganizationChange={setOrganization}
             openedParents={openedParents}
             onToggleParent={toggleParent}
+            counts={counts}
             onExpandParent={expandParent}
-            onNavigate={close}
+            onNavigate={navigate}
+            onClose={close}
           />
         </AppShell.Navbar>
       </RemoveScroll>
@@ -443,7 +491,7 @@ export function AppFrame({ parent, page, breadcrumbs, children }: AppFrameProps)
                     {item}
                   </Text>
                 ) : (
-                  <Anchor key={index} href="#" size="sm">
+                  <Anchor key={index} href="#" size="sm" onClick={(event) => navigate(item, event)}>
                     {item}
                   </Anchor>
                 ),

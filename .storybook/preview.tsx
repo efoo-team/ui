@@ -38,20 +38,44 @@ function readColorScheme(context: ComponentProps<typeof DocsContainer>['context'
   }
 }
 
+// Stories drawn in an iframe on a docs page (docs.story.inline: false, used by the 画面例 whose AppShell is fixed to the
+// viewport) run a preview of their own. It starts from the globals in its URL and reports them to this page as well.
+declare global {
+  var PREVIEW_URL: string | undefined;
+}
+
 function ThemedDocsContainer(props: ComponentProps<typeof DocsContainer>) {
   const { context } = props;
   const [colorScheme, setColorScheme] = useState(() => readColorScheme(context));
 
   useEffect(() => {
     const onGlobalsUpdated = ({ userGlobals }: { userGlobals?: Record<string, unknown> }) => {
-      lastColorScheme = userGlobals?.colorScheme as string | undefined;
-      setColorScheme(lastColorScheme);
+      // The page's own store holds the toolbar's value; the payload may come from a story iframe on the page.
+      let next: string | undefined;
+      try {
+        next = context.getStoryContext(context.storyById()).globals.colorScheme as
+          string | undefined;
+      } catch {
+        next = userGlobals?.colorScheme as string | undefined;
+      }
+      lastColorScheme = next;
+      setColorScheme(next);
     };
     context.channel.on(GLOBALS_UPDATED, onGlobalsUpdated);
     return () => context.channel.off(GLOBALS_UPDATED, onGlobalsUpdated);
   }, [context]);
 
-  return <DocsContainer {...props} theme={colorScheme === 'dark' ? themes.dark : themes.light} />;
+  // The story iframes take their URL from PREVIEW_URL, so they open in the toolbar's scheme, and the page is drawn
+  // again when the scheme changes so that they reload in it.
+  globalThis.PREVIEW_URL = `iframe.html?globals=colorScheme:${colorScheme === 'dark' ? 'dark' : 'light'}`;
+
+  return (
+    <DocsContainer
+      key={colorScheme}
+      {...props}
+      theme={colorScheme === 'dark' ? themes.dark : themes.light}
+    />
+  );
 }
 
 const preview: Preview = {
@@ -101,7 +125,16 @@ const preview: Preview = {
         order: [
           'はじめに',
           '画面例',
-          ['ダッシュボード', 'サインイン'],
+          [
+            'ダッシュボード',
+            '一覧（表）',
+            '詳細',
+            '作成と編集のフォーム',
+            '設定',
+            '最初の空の状態',
+            '権限が無いとき',
+            'サインイン',
+          ],
           '構造',
           '操作',
           [
