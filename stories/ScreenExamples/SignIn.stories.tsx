@@ -5,7 +5,7 @@ import {
   Anchor,
   Button,
   Card,
-  Center,
+  Divider,
   PasswordInput,
   Stack,
   Text,
@@ -31,9 +31,9 @@ const meta = {
           '**目的と読み手**　このサービスを使う社員が、使い始めるときに開く画面です。毎日使う人も通りますが、初めて使う人も必ず通る画面なので、慣れた人の速さよりも、初めて見る人が迷わず 1 つの行動に進めることを優先しています。\n\n' +
           '**情報構造**　扱う対象は、これから入る利用者のアカウント 1 つだけです。主はメールアドレスとパスワードの組で、シングルサインオン・パスワードの再設定・新規登録は、その組で入れないときの別の道として従に置きます。\n\n' +
           '**データパターン**　項目はメールアドレスとパスワードの 2 つで、どちらも必須です。状態は、何も入力していないとき（story『サインイン』）、入力に誤りがあるとき（story『入力に誤りがあるとき』。形式の誤りと未入力）、送信して確かめているあいだ（story『送信中』）、送った組がアカウントと合わなかったとき（story『メールアドレスかパスワードが違うとき』）の 4 つです。最後の状態がサインインで最も多い失敗です。\n\n' +
-          '**情報の流れ**　利用者は見出しで、どのサービスのサインインの画面かを知り、メールアドレスとパスワードを入れてサインインします。入れなかったときは、フォームの上の知らせで理由を知り、入力し直します。その道で入れないと分かったとき（パスワードを忘れた、シングルサインオンを使う、アカウントが無い）にだけ、主な道のすぐ下にある別の道を探します。\n\n' +
-          '**主役**　流れの中心である 2 つの欄と、塗りの「サインイン」のボタンです。画面の中央に幅を絞ったカードを 1 枚だけ置き、塗りのボタンをこの 1 つに限っています。見出しにはサービスの名前（架空の「販売管理」）を入れ、初めての人や、期限が切れて戻された人が、正しいサービスに来たかをその場で確かめられるようにしました。\n\n' +
-          '**抑えたもの・使わなかったもの**　サインインの前は組織も利用者も決まっておらず、サイドバー・全体検索・アカウントのメニューのどれも使えないため、外枠（AppFrame）は使っていません。見出しはカードの見出しと同じ大きさに抑え、シングルサインオンは枠線のボタン、パスワードの再設定と新規登録は小さなリンクにして、主な道より目立たないようにしています。欄のラベルと同じことを言うだけの補足の文は置いていません。認証の失敗は、メールアドレスとパスワードのどちらが違うかを書かない 1 件の Alert にしました。どちらかを書くと、登録されたメールアドレスかどうかを他人が確かめられてしまうためです（アカウントの列挙）。\n\n' +
+          '**情報の流れ**　利用者は見出しで、どのサービスのサインインの画面かを知り、メールアドレスとパスワードを入れてサインインします。入れなかったときは、フォームの上の知らせで理由を知り、入力し直します。カードは画面の上寄りに固定しているので、知らせが出ても見出しは動かず、欄が下へずれるだけです。その道で入れないと分かったとき（パスワードを忘れた、シングルサインオンを使う、アカウントが無い）にだけ、主な道のすぐ下にある別の道を探します。\n\n' +
+          '**主役**　流れの中心である 2 つの欄と、塗りの「サインイン」のボタンです。幅を絞ったカードを 1 枚だけ置き、塗りのボタンをこの 1 つに限っています。見出しにはサービスの名前（架空の「販売管理」）を入れ、ほかの画面のページ見出しと同じ大きさにして、初めての人や、期限が切れて戻された人が、正しいサービスに来たかをその場で確かめられるようにしました。\n\n' +
+          '**抑えたもの・使わなかったもの**　サインインの前は組織も利用者も決まっておらず、サイドバー・全体検索・アカウントのメニューのどれも使えないため、外枠（AppFrame）は使っていません。シングルサインオンは「または」の区切りの下に枠線のボタンで置いて、2 つを順に押すのではなくどちらか一方を選ぶものだと分かるようにし、パスワードの再設定と新規登録は小さなリンクにして、主な道より目立たないようにしています。欄のラベルと同じことを言うだけの補足の文は置いていません。認証の失敗は、メールアドレスとパスワードのどちらが違うかを書かない 1 件の Alert にしました。どちらかを書くと、登録されたメールアドレスかどうかを他人が確かめられてしまうためです（アカウントの列挙）。\n\n' +
           '**目的が違えば変わるところ**　組織の全員がシングルサインオンで入るサービスなら、パスワードの欄を置かず、シングルサインオンのボタンを塗りにして主役にします。アカウントを管理者だけが発行する社内のサービスなら、新規登録のリンクは置きません。',
       },
     },
@@ -98,12 +98,17 @@ function SignInPage({
   }, [failures, form.submitting]);
 
   return (
-    <Center mih="100dvh" p="md">
+    /*
+     * The card hangs from a fixed top instead of the middle of the screen: a message that appears above the form then
+     * pushes the form down, not the heading up, and on a phone the fields stay near the top, clear of the keyboard.
+     */
+    <Stack align="center" mih="100dvh" px="md" pb="md" pt={{ base: 'xl', sm: '18dvh' }}>
       <Card w="100%" maw={384}>
         <Stack gap="lg">
-          {/* The service's name, so someone signing in for the first time, or sent back here when a session ended,
-              can tell they are at the right service. A service puts its own name here, not a logo. */}
-          <Title order={1} size="h5">
+          {/* The service's name is the only line that says where the user is, so it takes the page-heading size the
+              other screens use. Someone signing in for the first time, or sent back here when a session ended, can
+              tell they are at the right service. A service puts its own name here, not a logo. */}
+          <Title order={1} size="h3">
             {SERVICE_NAME}にサインイン
           </Title>
           {/*
@@ -141,12 +146,15 @@ function SignInPage({
             )}
           >
             <Stack gap="md">
+              {/* While the pair is checked the fields are read-only, not disabled: the pair cannot change under the
+                  check, and what the user typed stays as readable as before. */}
               <TextInput
                 type="email"
                 label="メールアドレス"
                 placeholder="user@example.com"
                 autoComplete="email"
                 required
+                readOnly={submitting}
                 key={form.key('email')}
                 {...form.getInputProps('email')}
               />
@@ -155,6 +163,7 @@ function SignInPage({
                   label="パスワード"
                   autoComplete="current-password"
                   required
+                  readOnly={submitting}
                   key={form.key('password')}
                   {...form.getInputProps('password')}
                   // Mantine 9 sets aria-invalid on TextInput but not on the inner field of PasswordInput.
@@ -164,12 +173,14 @@ function SignInPage({
                   パスワードを忘れた場合
                 </Anchor>
               </Stack>
-              {/* While the pair is checked only the two ways to sign in wait: the fields stay readable as typed, and the
-                  check is short, so locking them would only gray out what the user just entered. */}
+              {/* The two buttons are alternatives, not steps, so a labelled rule sits between them. Both wait while the
+                  pair is checked, as either would start a second sign-in. The links stay: leaving for another page
+                  only drops the check and sends nothing twice. */}
               <Stack gap="sm">
                 <Button type="submit" fullWidth loading={submitting}>
                   サインイン
                 </Button>
+                <Divider label="または" labelPosition="center" />
                 <Button variant="outline" fullWidth disabled={submitting}>
                   シングルサインオンでサインイン
                 </Button>
@@ -184,7 +195,7 @@ function SignInPage({
           </form>
         </Stack>
       </Card>
-    </Center>
+    </Stack>
   );
 }
 
@@ -243,7 +254,7 @@ export const Submitting: Story = {
     docs: {
       description: {
         story:
-          'データパターンのうち、送信して確かめているあいだの状態です。「サインイン」を読み込み表示にし、シングルサインオンも押せなくして、二重の送信を防ぎます。欄は入力したとおりに読めるよう、そのまま残します。この画面例では、どの組を送ってもこの状態のあと『メールアドレスかパスワードが違うとき』になります。',
+          'データパターンのうち、送信して確かめているあいだの状態です。「サインイン」を読み込み表示にし、シングルサインオンも押せなくして、二重の送信を防ぎます。欄は読み取り専用にして、確かめている組が途中で変わらないようにしつつ、入力したとおりの色で読めるように残します。パスワードの再設定と新規登録のリンクは、移っても二重に送ることにはならないため、使えるまま残します。この画面例では、どの組を送ってもこの状態のあと『メールアドレスかパスワードが違うとき』になります。',
       },
     },
   },
