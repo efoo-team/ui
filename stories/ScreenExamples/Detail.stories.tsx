@@ -659,7 +659,7 @@ function HistoryCard({ order }: { order: Order }) {
     <SectionCard title="履歴">
       <Timeline active={order.history.length - 1}>
         {order.history.map((event) => (
-          <Timeline.Item key={`${event.at}-${event.label}`} title={event.label}>
+          <Timeline.Item key={event.id} title={event.label}>
             <Text size="sm" c="dimmed">
               {event.at}・{event.by}
             </Text>
@@ -693,11 +693,14 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
     (nextStepRef.current ?? headingRef.current)?.focus();
   }, [order]);
 
-  // The history records when the step was recorded (NOW); what the step was about, such as the day the order left,
-  // is kept apart from it.
+  /*
+   * The history records when the step was recorded (NOW); what the step was about, such as the day the order left,
+   * is kept apart from it. A service gets the new event's id back from the server; the story makes one up, so the
+   * same step taken twice (a second delay notice) still makes two events.
+   */
   const addEvent = (
     status: Order['status'],
-    event: Omit<OrderEvent, 'at' | 'by'>,
+    event: Omit<OrderEvent, 'id' | 'at' | 'by'>,
     changes: Partial<Order> = {},
   ) => {
     stepRecorded.current = true;
@@ -705,7 +708,10 @@ function OrderDetail({ initialOrder }: { initialOrder: Order }) {
       ...current,
       ...changes,
       status,
-      history: [...current.history, { at: NOW.at, by: CURRENT_USER.name, ...event }],
+      history: [
+        ...current.history,
+        { id: crypto.randomUUID(), at: NOW.at, by: CURRENT_USER.name, ...event },
+      ],
     }));
   };
 

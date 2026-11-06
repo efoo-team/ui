@@ -298,6 +298,8 @@ export type OrderEventKind =
   'registered' | 'paymentConfirmed' | 'delayNotified' | 'shipped' | 'cancelled';
 
 export interface OrderEvent {
+  /** Tells the event apart from the others in the history, as the row's id in a service's database does. */
+  id: string;
   /** Month/day and time, e.g. '10/31 09:12'. */
   at: string;
   kind: OrderEventKind;
@@ -347,7 +349,7 @@ function orderHistory(
   staff: string,
 ) {
   const minute = String((index * 7) % 50).padStart(2, '0');
-  const events: OrderEvent[] = [
+  const events: Omit<OrderEvent, 'id'>[] = [
     { at: `${date} 09:${minute}`, kind: 'registered', label: '受注を登録', by: staff },
   ];
   if (status === 'cancelled') {
@@ -431,7 +433,10 @@ export const ORDERS: Order[] = Array.from({ length: 36 }, (_, index) => {
       postalCode: customer.postalCode,
       address: customer.address,
     },
-    history: orderHistory(index, date, status, payment, staff),
+    history: orderHistory(index, date, status, payment, staff).map((event, number) => ({
+      ...event,
+      id: `${id}-${number + 1}`,
+    })),
   };
 });
 
