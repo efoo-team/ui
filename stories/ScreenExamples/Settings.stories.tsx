@@ -9,8 +9,10 @@ import {
   Card,
   Checkbox,
   Divider,
+  Flex,
   getDefaultZIndex,
   Group,
+  Input,
   Modal,
   MultiSelect,
   NumberInput,
@@ -21,6 +23,7 @@ import {
   Text,
   TextInput,
   Title,
+  VisuallyHidden,
 } from '@mantine/core';
 import { useForm, type FormErrors } from '@mantine/form';
 import { useWindowEvent } from '@mantine/hooks';
@@ -44,7 +47,7 @@ const meta = {
           '**情報構造**　扱うのは 1 つの組織（青葉商店）の設定で、「通知」「受注の既定値」「組織の情報」の 3 つのまとまりに分かれます。通知は、知らせる出来事 5 種のそれぞれが宛先（人、または受注の担当者）と手段（メール・お知らせ）を持ち、受注の既定値は受注の登録画面の初期値、組織の情報は請求書と納品書の差出人です。主は個々の設定項目で、まとまりは探すための区切りであり、保存は画面全体で 1 回です。\n\n' +
           '**データパターン**　項目は 21 個（通知 11（出来事ごとの宛先と手段、メールを送る時刻）、受注の既定値 4、組織の情報 6）です。宛先は 0〜4 件、手段は 0〜2 個（0 個ならその通知は送らない）で、住所は 30 字前後まで、支払い方法の選択肢は最長 16 字です。状態は、保存済みの値のまま（story『設定』）、保存していない変更が 1 件以上あり複数のまとまりにまたがる（story『変更を保存していないとき』）、保存を押したが入力に誤りがあり、誤りのある項目が画面の外にある（story『保存できなかったとき』）です。保存中と、保存せずに離れようとしたときは、『変更を保存していないとき』で操作して確かめられます。読み込み中、取得の失敗、通信の失敗で保存できなかったときは、この画面例では扱っていません。\n\n' +
           '**情報の流れ**　管理者は「発注点を下回ったら自分にも知らせてほしい」のような変えたいことを持って開き、見出しの下のまとまりの一覧で、それがどのまとまりにあるかを知って移り、今の値を読んで変えます。次に、何を変えたかを確かめて保存し、いつから反映されるかを知って終わります。保存できなかったときは、どの項目を直せばよいかを知ってそこへ移り、直してもう一度保存します。保存せずに離れようとしたときは、その場で引き止められます。\n\n' +
-          '**主役**　流れの最初の「探す」のために、見出しのすぐ下に 3 つのまとまりの名前と中身を 1 つずつ並べ、どの幅でも最初の 1 画面で、このページに何があるかが分かるようにしました。まとまりは変える頻度が高い順（担当者の交代で変わる通知、受注の既定値、移転や改称のときだけ変わる組織の情報）に上から並べています。最後の「確かめて保存する」のために、変更があるときだけ画面の下に保存の欄を固定し、どのまとまりで何件変えたかと、この画面で唯一の塗りのボタン「変更を保存」を置きました。保存できなかったときは、同じ欄が誤りの件数と直す項目へのリンクに変わり、フォーカスもこの欄に移ります。誤りのある項目がページの下にあって見えなくても、押した場所で分かるためです。変えた項目のラベルの横には「未保存」を付け、件数もこの項目の単位で数えています。\n\n' +
+          '**主役**　流れの最初の「探す」のために、見出しのすぐ下に 3 つのまとまりの名前（リンク）と中身を 1 つずつ並べ、どの幅でも最初の 1 画面で、このページに何があるかが分かるようにしました。スマホの幅ではリンクを 1 行目、中身を 2 行目に分け、折り返した段落の中の 1 語に見えないようにしています。まとまりは変える頻度が高い順（担当者の交代で変わる通知、受注の既定値、移転や改称のときだけ変わる組織の情報）に上から並べています。通知の中は、出来事ではない「メールを送る時刻」も含めて、左に太字の名前と説明、右に入力を置く同じ行の形にそろえ、左の名前を上から追う人が読み飛ばさないようにしました。最後の「確かめて保存する」のために、変更があるときだけ画面の下端に保存の欄を固定し、どのまとまりで何件変えたかと、この画面で唯一の塗りのボタン「変更を保存」を置きました。保存できなかったときは、同じ欄が誤りの件数と直す項目へのリンクに変わり、フォーカスもこの欄に移ります。誤りのある項目がページの下にあって見えなくても、押した場所で分かるためです。変えた項目のラベルの後ろ（必須の項目では「*」の後ろ）に「未保存」を付け、フォームの画面と同じ「項目名 *」の並びを崩さないようにしました。件数もこの項目の単位で数えています。\n\n' +
           '**抑えたもの・使わなかったもの**　Tabs は使っていません。隠れたタブに保存していない変更が残ると気づけず、ブラウザのページ内検索でも見つからないためです。まとまりの一覧は 1440 の幅で右の余白に固定する目次にもできますが、まとまりが 3 つで、探すのは開いた直後だけなので、どの幅でも同じ場所に置く一覧にとどめました。Switch も使っていません。押した時点で反映されるように見えるので、まとめて保存するこの画面では Checkbox と Radio にそろえました。何も変えていないときは、押しても何も起きない保存のボタンを出さず、「未保存」の印も誤りではないので色を付けていません。\n\n' +
           '**目的が違えば変わるところ**　まとまりが 6 つを超える、または 1 つのまとまりが何画面にも及ぶなら、まとまりの一覧を左か右に固定した目次にして今いる場所を示すか、まとまりごとにページを分けて、それぞれで保存します。自分の通知の受け取りのように、1 人分の 1 項目だけを変える画面なら、Switch で押したらすぐ反映する方が手数が少なくて済みます。',
       },
@@ -268,17 +271,37 @@ function jumpToField(event: MouseEvent<HTMLAnchorElement>, field: CheckedField) 
   node.scrollIntoView({ block: 'center' });
 }
 
-// A changed setting carries this next to its label, so the user can find each unsaved change on the page.
-function Label({ children, changed }: { children: ReactNode; changed: boolean }) {
-  return changed ? (
+/*
+ * A changed setting carries 未保存 next to its label, so the user can find each unsaved change on the page. Mantine
+ * draws a required field's asterisk last inside the label, which would put the mark between the name and the asterisk.
+ * A required field turns its own asterisk off (withAsterisk={false}) and the label draws it with Input.Label, the part
+ * Mantine draws it with, so the order is the form's 名前 * followed by the mark.
+ */
+function Label({
+  children,
+  changed,
+  required = false,
+}: {
+  children: ReactNode;
+  changed: boolean;
+  required?: boolean;
+}) {
+  if (!changed && !required) return children;
+  return (
     <Group component="span" gap="xs" wrap="nowrap" display="inline-flex">
-      <span>{children}</span>
-      <Badge component="span" variant="outline">
-        未保存
-      </Badge>
+      {required ? (
+        <Input.Label component="span" required>
+          {children}
+        </Input.Label>
+      ) : (
+        <span>{children}</span>
+      )}
+      {changed && (
+        <Badge component="span" variant="outline">
+          未保存
+        </Badge>
+      )}
     </Group>
-  ) : (
-    children
   );
 }
 
@@ -396,18 +419,26 @@ function SettingsPage({
            * Opened once in months, the page is new to its reader each time, so the parts and what each holds are
            * listed before the first part, on the first screen at every width.
            */}
-          <Stack component="nav" aria-label="設定のまとまり" gap={4}>
+          {/* Each link leads its own line on a phone, so it does not read as one word of a paragraph once the line wraps. */}
+          <Stack component="nav" aria-label="設定のまとまり" gap="xs">
             {SECTIONS.map((section) => (
-              <Text key={section.key} size="sm" c="dimmed">
+              <Flex
+                key={section.key}
+                direction={{ base: 'column', xs: 'row' }}
+                align={{ base: 'flex-start', xs: 'baseline' }}
+                gap={{ base: 0, xs: 'sm' }}
+              >
                 <Anchor
+                  size="sm"
                   href={`#${sectionId(section.key)}`}
                   onClick={(event) => jumpToSection(event, section.key)}
                 >
                   {section.title}
                 </Anchor>
-                {'　'}
-                {section.contents}
-              </Text>
+                <Text size="sm" c="dimmed">
+                  {section.contents}
+                </Text>
+              </Flex>
             ))}
           </Stack>
 
@@ -456,10 +487,16 @@ function SettingsPage({
                         <Checkbox.Group
                           label={
                             <Label changed={isChanged((v) => v.notifications[event.key].channels)}>
-                              知らせる手段
+                              {/*
+                               * Mantine names the group by this label and ignores aria-label, so the name that tells the
+                               * five groups apart is read from here; the visible words stay as they are.
+                               */}
+                              <span aria-hidden>知らせる手段</span>
+                              <VisuallyHidden component="span">
+                                {event.label}の知らせる手段
+                              </VisuallyHidden>
                             </Label>
                           }
-                          aria-label={`${event.label}を知らせる手段`}
                           {...form.getInputProps(`notifications.${event.key}.channels`)}
                         >
                           <Group gap="lg" mt="xs">
@@ -477,16 +514,32 @@ function SettingsPage({
                   </Stack>
                 ))}
                 <Divider />
-                <Radio.Group
-                  label={<Label changed={isChanged((v) => v.mailTiming)}>メールを送る時刻</Label>}
-                  description="お知らせには、いつもその場で表示します。"
-                  {...form.getInputProps('mailTiming')}
+                {/* The one setting that is not an event still takes the row of the events above, a bold name with a
+                    line on what it does and the control on the right, so a reader going down the left names meets it. */}
+                <SimpleGrid
+                  type="container"
+                  cols={{ base: 1, '36rem': 2 }}
+                  spacing="lg"
+                  verticalSpacing="sm"
                 >
-                  <Stack gap="xs" mt="xs">
-                    <Radio value="each" label="知らせることが起きるたびに送る" />
-                    <Radio value="morning" label="毎朝 9 時に 1 通にまとめて送る" />
+                  <Stack gap={4}>
+                    <Text size="sm" variant="emphasis">
+                      メールを送る時刻
+                    </Text>
+                    <Text size="sm" c="dimmed">
+                      上の通知のうち、手段にメールを選んだものを送る時刻です。お知らせには、いつもその場で表示します。
+                    </Text>
                   </Stack>
-                </Radio.Group>
+                  <Radio.Group
+                    label={<Label changed={isChanged((v) => v.mailTiming)}>送る時刻</Label>}
+                    {...form.getInputProps('mailTiming')}
+                  >
+                    <Stack gap="xs" mt="xs">
+                      <Radio value="each" label="知らせることが起きるたびに送る" />
+                      <Radio value="morning" label="毎朝 9 時に 1 通にまとめて送る" />
+                    </Stack>
+                  </Radio.Group>
+                </SimpleGrid>
               </Stack>
             </SectionCard>
           </Box>
@@ -544,35 +597,53 @@ function SettingsPage({
             <SectionCard title="組織の情報" description="請求書と納品書の差出人に印字します。">
               <Stack gap="md">
                 <TextInput
-                  label={<Label changed={isChanged((v) => v.organization.name)}>組織名</Label>}
+                  label={
+                    <Label changed={isChanged((v) => v.organization.name)} required>
+                      組織名
+                    </Label>
+                  }
                   description="サイドバーの組織の切り替えにも表示します。"
                   required
+                  withAsterisk={false}
                   id={fieldId('organization.name')}
                   {...form.getInputProps('organization.name')}
                 />
                 <SimpleGrid type="container" cols={{ base: 1, '36rem': 2 }}>
                   <TextInput
                     label={
-                      <Label changed={isChanged((v) => v.organization.postalCode)}>郵便番号</Label>
+                      <Label changed={isChanged((v) => v.organization.postalCode)} required>
+                        郵便番号
+                      </Label>
                     }
                     placeholder="000-0000"
                     required
+                    withAsterisk={false}
                     id={fieldId('organization.postalCode')}
                     {...form.getInputProps('organization.postalCode')}
                   />
                   <TextInput
                     type="tel"
-                    label={<Label changed={isChanged((v) => v.organization.phone)}>電話番号</Label>}
+                    label={
+                      <Label changed={isChanged((v) => v.organization.phone)} required>
+                        電話番号
+                      </Label>
+                    }
                     placeholder="03-0000-0000"
                     autoComplete="off"
                     required
+                    withAsterisk={false}
                     id={fieldId('organization.phone')}
                     {...form.getInputProps('organization.phone')}
                   />
                 </SimpleGrid>
                 <TextInput
-                  label={<Label changed={isChanged((v) => v.organization.address)}>住所</Label>}
+                  label={
+                    <Label changed={isChanged((v) => v.organization.address)} required>
+                      住所
+                    </Label>
+                  }
                   required
+                  withAsterisk={false}
                   id={fieldId('organization.address')}
                   {...form.getInputProps('organization.address')}
                 />
@@ -580,24 +651,26 @@ function SettingsPage({
                   <TextInput
                     type="email"
                     label={
-                      <Label changed={isChanged((v) => v.organization.billingEmail)}>
+                      <Label changed={isChanged((v) => v.organization.billingEmail)} required>
                         請求書の問い合わせ先
                       </Label>
                     }
                     description="請求書に載せるメールアドレスです。"
                     required
+                    withAsterisk={false}
                     id={fieldId('organization.billingEmail')}
                     {...form.getInputProps('organization.billingEmail')}
                   />
                   <TextInput
                     label={
-                      <Label changed={isChanged((v) => v.organization.registrationNumber)}>
+                      <Label changed={isChanged((v) => v.organization.registrationNumber)} required>
                         登録番号
                       </Label>
                     }
                     description="適格請求書発行事業者の登録番号です。"
                     placeholder="T0000000000000"
                     required
+                    withAsterisk={false}
                     id={fieldId('organization.registrationNumber')}
                     {...form.getInputProps('organization.registrationNumber')}
                   />
@@ -616,8 +689,12 @@ function SettingsPage({
             <Affix
               withinPortal={false}
               pos="sticky"
-              position={{ bottom: 'var(--mantine-spacing-md)' }}
+              position={{ bottom: 0 }}
               zIndex={getDefaultZIndex('app') - 1}
+              // The strip under the bar is the page's background down to the window's bottom edge, so the content
+              // scrolling under the bar does not show through below it. The bar's own top edge is where content is cut.
+              bg="var(--mantine-color-body)"
+              pb="md"
             >
               <Card
                 ref={saveBarRef}
@@ -641,9 +718,12 @@ function SettingsPage({
                         {errorFields.map(([field, label], index) => (
                           <span key={field}>
                             {index > 0 && '、'}
+                            {/* Taller than the line, so a finger hits the link at phone width. */}
                             <Anchor
                               href={`#${fieldId(field)}`}
                               onClick={(event) => jumpToField(event, field)}
+                              display="inline-block"
+                              py={4}
                             >
                               {label}
                             </Anchor>
@@ -712,7 +792,7 @@ export const Settings: Story = {
     docs: {
       description: {
         story:
-          'データパターンのうち、保存済みの値のまま開いたときです。保存の欄はまだ出さず、ページの補足で、項目を変えると画面の下に「変更を保存」が出ることを伝え、その下に 3 つのまとまりへのリンクを並べています。',
+          'データパターンのうち、保存済みの値のまま開いたときです。保存の欄はまだ出さず、ページの補足で、項目を変えると画面の下に「変更を保存」が出ることを伝え、その下に 3 つのまとまりへのリンクと中身を並べています（スマホの幅ではリンクと中身を 2 行に分けます）。',
       },
     },
   },
@@ -735,7 +815,7 @@ export const UnsavedChanges: Story = {
     docs: {
       description: {
         story:
-          'データパターンのうち、保存していない変更が 2 つのまとまり（通知・受注の既定値）に 3 件あるときです。変えた項目のラベル（通知では宛先か知らせる手段）の横に「未保存」を付け、画面の下に固定した欄で件数と保存・取り消しの操作を示し、サイドバーで別のページへ移ろうとすると確認のダイアログを出します。',
+          'データパターンのうち、保存していない変更が 2 つのまとまり（通知・受注の既定値）に 3 件あるときです。変えた項目のラベル（通知では宛先か知らせる手段）の後ろに「未保存」を付け、画面の下端に固定した欄で件数と保存・取り消しの操作を示し、サイドバーで別のページへ移ろうとすると確認のダイアログを出します。',
       },
     },
   },
@@ -748,7 +828,7 @@ export const SaveFailed: Story = {
     docs: {
       description: {
         story:
-          'データパターンのうち、保存を押したが入力に誤りがあって保存できなかったときです。誤りのある組織名と登録番号はページの下にあって見えないため、押した場所である保存の欄に、誤りの件数と直す項目へのリンクを出し、フォーカスもこの欄に移します。',
+          'データパターンのうち、保存を押したが入力に誤りがあって保存できなかったときです。誤りのある組織名と登録番号はページの下にあって見えないため、押した場所である保存の欄に、誤りの件数と直す項目へのリンクを出し、フォーカスもこの欄に移します。組織名と登録番号のラベルでは、必須の「*」の後ろに「未保存」が付きます。',
       },
     },
   },
